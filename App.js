@@ -4,16 +4,17 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import React, { useEffect, useState } from "react";
 import { StatusBar } from "expo-status-bar";
 import { StyleSheet, Text, View } from "react-native";
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import HomeScreen from './screens/HomeScreen';
-import Welcome1Screen from './screens/Welcome1Screen';
-import Welcome2Screen from './screens/Welcome2Screen';
-import Welcome3Screen from './screens/Welcome3Screen';
-import Welcome4Screen from './screens/Welcome4Screen';
-import Welcome5Screen from './screens/Welcome5Screen';
-import UserScreen from './screens/UserScreen';
-import test from './screens/test';
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import FontAwesome from "react-native-vector-icons/FontAwesome";
+import HomeScreen from "./screens/HomeScreen";
+import Welcome1Screen from "./screens/Welcome1Screen";
+import Welcome2Screen from "./screens/Welcome2Screen";
+import Welcome3Screen from "./screens/Welcome3Screen";
+import Welcome4Screen from "./screens/Welcome4Screen";
+import Welcome5Screen from "./screens/Welcome5Screen";
+import LoginScreen from "./screens/LoginScreen";
+import ProfileScreen from "./screens/ProfileScreen";
+import SearchScreen from "./screens/SearchScreen";
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -43,25 +44,49 @@ export default function App() {
   }
 
   const TabNavigator = () => {
-    return (
-      <Tab.Navigator screenOptions={({ route }) => ({
-        tabBarIcon: ({ color, size }) => {
-          let iconName = '';
-  
-          if (route.name === 'User') {
-            iconName = 'location-arrow';
-          } else if (route.name === 'test') {
-            iconName = 'map-pin';
+    const [token, setToken] = useState(null);
+
+    useEffect(() => {
+      async function checkToken() {
+        try {
+          const userToken = await AsyncStorage.getItem("userToken");
+          if (userToken) {
+            setToken(userToken);
           }
-  
-          return <FontAwesome name={iconName} size={size} color={color} />;
-        },
-        tabBarActiveTintColor: '#ec6e5b',
-        tabBarInactiveTintColor: '#335561',
-        headerShown: false,
-      })}>
-        <Tab.Screen name="User" component={UserScreen} />
-        <Tab.Screen name="test" component={test} />
+        } catch (error) {
+          console.error("Erreur lors de la vérification du token:", error);
+        }
+      }
+      checkToken();
+    }, []);
+
+    return (
+      <Tab.Navigator
+        screenOptions={({ route }) => ({
+          tabBarIcon: ({ color, size }) => {
+            let iconName = "";
+
+            if (route.name === "Home") {
+              iconName = "house";
+            } else if (route.name === "Search") {
+              iconName = "magnifying-glass";
+            } else if (route.name === "Profile") {
+              iconName = "user";
+            }
+
+            return <FontAwesome name={iconName} size={size} color={color} />;
+          },
+          tabBarActiveTintColor: "#ec6e5b",
+          tabBarInactiveTintColor: "#335561",
+          headerShown: false,
+        })}
+      >
+        <Tab.Screen name="Home" component={HomeScreen} />
+        <Tab.Screen name="Search" component={SearchScreen} />
+        <Tab.Screen
+          name="Profile"
+          component={token ? ProfileScreen : LoginScreen}
+        />
       </Tab.Navigator>
     );
   };
@@ -78,9 +103,11 @@ export default function App() {
             <Stack.Screen name="Welcome5" component={Welcome5Screen} />
           </>
         ) : (
-          <Stack.Screen name="Home" component={HomeScreen} />
+          <>
+            <Stack.Screen name="TabNavigator" component={TabNavigator} />
+            <Stack.Screen name="Login" component={LoginScreen} />
+          </>
         )}
-        <Stack.Screen name="TabNavigator" component={TabNavigator} />
       </Stack.Navigator>
     </NavigationContainer>
   );

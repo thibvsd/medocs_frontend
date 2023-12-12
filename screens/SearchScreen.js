@@ -6,11 +6,11 @@ import {
     TouchableOpacity,
   } from 'react-native';
   
-  export default function UserScreen({ navigation }) {
+  export default function SearchScreen({ navigation }) {
   
     return (
       <View>
-        <Text style={styles.title}>Welcome to Medocs</Text>
+        <Text style={styles.title}>Search</Text>
       </View>
     )
   }
