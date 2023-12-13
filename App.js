@@ -16,6 +16,14 @@ import LoginScreen from "./screens/LoginScreen";
 import ProfileScreen from "./screens/ProfileScreen";
 import SearchScreen from "./screens/SearchScreen";
 
+import { Provider } from "react-redux";
+import { configureStore } from "@reduxjs/toolkit";
+import user from "./reducers/user";
+
+const store = configureStore({
+  reducer: { user },
+});
+
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
@@ -92,23 +100,25 @@ export default function App() {
   };
 
   return (
-    <NavigationContainer>
-      <Stack.Navigator screenOptions={{ headerShown: false }}>
-        {isFirstLaunch ? (
-          <>
-            <Stack.Screen name="Welcome1" component={Welcome1Screen} />
-            <Stack.Screen name="Welcome2" component={Welcome2Screen} />
-            <Stack.Screen name="Welcome3" component={Welcome3Screen} />
-            <Stack.Screen name="Welcome4" component={Welcome4Screen} />
-            <Stack.Screen name="Welcome5" component={Welcome5Screen} />
-          </>
-        ) : (
-          <>
-            <Stack.Screen name="TabNavigator" component={TabNavigator} />
-            <Stack.Screen name="Login" component={LoginScreen} />
-          </>
-        )}
-      </Stack.Navigator>
-    </NavigationContainer>
+    <Provider store={store}>
+      <NavigationContainer>
+        <Stack.Navigator screenOptions={{ headerShown: false }}>
+          {isFirstLaunch ? (
+            <>
+              <Stack.Screen name="Welcome1" component={Welcome1Screen} />
+              <Stack.Screen name="Welcome2" component={Welcome2Screen} />
+              <Stack.Screen name="Welcome3" component={Welcome3Screen} />
+              <Stack.Screen name="Welcome4" component={Welcome4Screen} />
+              <Stack.Screen name="Welcome5" component={Welcome5Screen} />
+            </>
+          ) : (
+            <>
+              <Stack.Screen name="TabNavigator" component={TabNavigator} />
+              <Stack.Screen name="Login" component={LoginScreen} />
+            </>
+          )}
+        </Stack.Navigator>
+      </NavigationContainer>
+    </Provider>
   );
 }

@@ -9,7 +9,7 @@ import {
   export default function Welcome2Screen({ navigation }) {
   
     return (
-      <View>
+      <View style={styles.container}>
         <Text style={styles.title}>Welcome 2</Text>
         <TouchableOpacity onPress={() => navigation.navigate('Welcome3')} style={styles.button} activeOpacity={0.8}>
           <Text style={styles.textButton}>next</Text>
@@ -19,6 +19,10 @@ import {
   }
   
   const styles = StyleSheet.create({
-      
+    container: {
+      flex: 1,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
   });
   
