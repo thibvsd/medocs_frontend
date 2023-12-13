@@ -1,20 +1,26 @@
+import React, { useState } from "react";
 import {
-  Image,
-  StyleSheet,
-  Text,
   View,
+  Text,
   TouchableOpacity,
   TextInput,
   Alert,
+  StyleSheet,
 } from "react-native";
+import { useDispatch } from 'react-redux';
+import {login} from '../reducers/user';
+
+const IP_ADDRESS = '172.20.10.2'
 
 export default function LoginScreen({ navigation }) {
+  const dispatch = useDispatch();
   const [isSignIn, setIsSignIn] = useState(true);
   const [signUpUsername, setSignUpUsername] = useState("");
   const [signUpUserEmail, setSignUpUserEmail] = useState("");
   const [signUpUserAge, setSignUpUserAge] = useState("");
   const [signUpUserWeight, setSignUpUserWeight] = useState("");
   const [signUpPassword, setSignUpPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState(""); // Ajout du nouvel état
   const [signInUsername, setSignInUsername] = useState("");
   const [signInPassword, setSignInPassword] = useState("");
 
@@ -23,39 +29,51 @@ export default function LoginScreen({ navigation }) {
   };
 
   const handleRegister = () => {
-    const password = document.querySelector("#pwd").value;
-    const confirmPassword = document.querySelector("#confpwd").value;
-
-    if (password === confirmPassword) {
-      fetch("http://localhost:3000/users/signup", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          username: signUpUsername,
-          email: signUpUserEmail,
-          age: signUpUserAge,
-          weight: signUpUserWeight,
-          password: signUpPassword,
-        }),
-      })
-        .then((response) => response.json())
-        .then((data) => {
-          if (data.result) {
-            dispatch(login({ username: signUpUsername, token: data.token }));
-            setSignUpUsername("");
-            setSignUpPassword("");
-            setSignUpUserEmail("");
-            setSignUpUserAge("");
-            setSignUpUserWeight("");
-          }
-        });
-    } else {
+    if (signUpPassword !== confirmPassword) {
       Alert.alert("Attention", "Les mots de passe ne correspondent pas.");
+      return;
     }
-  };
+console.log(signUpUsername);
+fetch(`http://${IP_ADDRESS}:3000/users/signup`, {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({
+    username: signUpUsername,
+    email: signUpUserEmail,
+    age: signUpUserAge,
+    weight: signUpUserWeight,
+    password: signUpPassword,
+  }),
+})
+  .then((response) => {
+    console.log(response);
+    if (!response.ok) {
+      console.log('ici')
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+    return response.json();
+  })
+  .then((data) => {
+    // Traitement normal des données
+    if (data.result) {
+      dispatch(login({ username: signUpUsername, token: data.token }));
+      console.log(data);
+      setSignUpUsername("");
+      setSignUpPassword("");
+      setSignUpUserEmail("");
+      setSignUpUserAge("");
+      setSignUpUserWeight("");
+      setConfirmPassword("");
+    }
+  })
+  .catch((error) => {
+    // Gestion des erreurs
+    console.error("Fetch error:", error);
+    Alert.alert("Erreur", "Une erreur s'est produite lors de la communication avec le serveur.");
+  });}
 
   const handleConnection = () => {
-    fetch("http://localhost:3000/users/signin", {
+    fetch(`http://${IP_ADDRESS}:3000/users/signin`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -69,98 +87,123 @@ export default function LoginScreen({ navigation }) {
           dispatch(login({ username: signInUsername, token: data.token }));
           setSignInUsername("");
           setSignInPassword("");
+          navigation.navigate('ProfileScreen');
         }
       });
   };
 
   const SignUp = (
     <View style={styles.container}>
-      <Text>Sign In Form</Text>
+      <Text style={styles.title}>Inscription</Text>
       <TextInput
         style={styles.input}
-        type="text"
-        placeholder="User name"
-        onChange={(e) => setSignUpUsername(e.target.value)}
-      ></TextInput>
+        placeholder="Nom d'utilisateur"
+        value={signUpUsername}
+        onChangeText={(text) => setSignUpUsername(text)}
+      />
       <TextInput
         style={styles.input}
-        type="email"
-        placeholder="User email"
-        onChange={(e) => setSignUpUserEmail(e.target.value)}
-      ></TextInput>
+        placeholder="Email"
+        keyboardType="email-address"
+        value={signUpUserEmail}
+        onChangeText={(text) => setSignUpUserEmail(text)}
+      />
       <TextInput
         style={styles.input}
-        type="text"
-        placeholder="age"
-        onChange={(e) => setSignUpUserAge(e.target.value)}
-      ></TextInput>
+        placeholder="Âge"
+        keyboardType="numeric"
+        value={signUpUserAge}
+        onChangeText={(text) => setSignUpUserAge(text)}
+      />
       <TextInput
         style={styles.input}
-        type="text"
-        placeholder="weight"
-        onChange={(e) => setSignUpUserWeight(e.target.value)}
-      ></TextInput>
+        placeholder="Poids"
+        keyboardType="numeric"
+        value={signUpUserWeight}
+        onChangeText={(text) => setSignUpUserWeight(text)}
+      />
       <TextInput
         style={styles.input}
-        id="pwd"
-        type="password"
-        placeholder="Password"
-        onChange={(e) => setSignUpPassword(e.target.value)}
-      ></TextInput>
+        placeholder="Mot de passe"
+        secureTextEntry
+        value={signUpPassword}
+        onChangeText={(text) => setSignUpPassword(text)}
+      />
       <TextInput
         style={styles.input}
-        id="confpwd"
-        type="password"
-        placeholder="Confirm password"
-      ></TextInput>
-      <TouchableOpacity onPress={toggleForm}>
-        <Text>Déja un compte ? Et ba connecte toi !</Text>
+        placeholder="Confirmez le mot de passe"
+        secureTextEntry
+        value={confirmPassword} // Utilisation de confirmPassword au lieu de signUpPassword
+        onChangeText={(text) => setConfirmPassword(text)}
+      />
+      <TouchableOpacity style={styles.link} onPress={toggleForm}>
+        <Text>Vous avez déjà un compte ? Connectez-vous ici !</Text>
       </TouchableOpacity>
-      <TouchableOpacity onPress={handleRegister}>
-        <Text>Inscription</Text>
+      <TouchableOpacity style={styles.button} onPress={handleRegister}>
+        <Text style={styles.buttonText}>S'inscrire</Text>
       </TouchableOpacity>
     </View>
   );
 
   const SignIn = (
     <View style={styles.container}>
-      <Text>Sign Up Form</Text>
+      <Text style={styles.title}>Connexion</Text>
       <TextInput
         style={styles.input}
-        type="text"
-        placeholder="User name or email"
-        onChange={(e) => setSignUpUsername(e.target.value)}
-      ></TextInput>
+        placeholder="Nom d'utilisateur ou email"
+        value={signInUsername}
+        onChangeText={(text) => setSignInUsername(text)}
+      />
       <TextInput
         style={styles.input}
-        type="password"
-        placeholder="Password"
-        onChange={(e) => setSignUpPassword(e.target.value)}
-      ></TextInput>
-      <TouchableOpacity onPress={toggleForm}>
-        <Text>Pas de compte ? Inscrit toi !</Text>
+        placeholder="Mot de passe"
+        secureTextEntry
+        value={signInPassword}
+        onChangeText={(text) => setSignInPassword(text)}
+      />
+      <TouchableOpacity style={styles.link} onPress={toggleForm}>
+        <Text>Vous n'avez pas de compte ? Inscrivez-vous ici !</Text>
       </TouchableOpacity>
-      <TouchableOpacity onPress={handleConnection}>
-        <Text>Connection</Text>
+      <TouchableOpacity style={styles.button} onPress={handleConnection}>
+        <Text style={styles.buttonText}>Se connecter</Text>
       </TouchableOpacity>
     </View>
   );
 
-  return <View>{isSignIn ? SignIn : SignUp}</View>;
+  return <View style={styles.container}>{isSignIn ? SignIn : SignUp}</View>;
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: "center",
     justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 20,
+  },
+  title: {
+    fontSize: 24,
+    marginBottom: 20,
   },
   input: {
-    width: "80%",
+    width: "100%",
     height: 40,
     borderColor: "gray",
     borderWidth: 1,
     marginBottom: 20,
     paddingHorizontal: 10,
+  },
+  button: {
+    backgroundColor: "#ec6e5b",
+    padding: 10,
+    borderRadius: 5,
+    width: "100%",
+    alignItems: "center",
+  },
+  buttonText: {
+    color: "white",
+    fontSize: 16,
+  },
+  link: {
+    marginBottom: 20,
   },
 });

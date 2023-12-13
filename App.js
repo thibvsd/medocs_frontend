@@ -15,14 +15,18 @@ import Welcome5Screen from "./screens/Welcome5Screen";
 import LoginScreen from "./screens/LoginScreen";
 import ProfileScreen from "./screens/ProfileScreen";
 import SearchScreen from "./screens/SearchScreen";
+import FavoritesScreen from "./screens/FavoritesScreen";
+import TreatmentsScreen from "./screens/TreatmentsScreen";
+import SettingsScreen from "./screens/SettingsScreen";
+import FAQScreen from "./screens/FAQScreen.js";
 
-import { Provider } from "react-redux";
-import { configureStore } from "@reduxjs/toolkit";
-import user from "./reducers/user";
-
+import { Provider } from 'react-redux';
+import { configureStore } from '@reduxjs/toolkit';
+import user from './reducers/user';
 const store = configureStore({
   reducer: { user },
 });
+
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -75,9 +79,9 @@ export default function App() {
             let iconName = "";
 
             if (route.name === "Home") {
-              iconName = "house";
+              iconName = "home";
             } else if (route.name === "Search") {
-              iconName = "magnifying-glass";
+              iconName = "search";
             } else if (route.name === "Profile") {
               iconName = "user";
             }
@@ -99,26 +103,39 @@ export default function App() {
     );
   };
 
+  const ProfileScreenStack = () => {
+    return (
+      <Stack.Navigator>
+        <Stack.Screen name="Profile" component={ProfileScreen} />
+        <Stack.Screen name="Favoris" component={FavoritesScreen} />
+        <Stack.Screen name="Traitements" component={TreatmentsScreen} />
+        <Stack.Screen name="Parametres" component={SettingsScreen} />
+        <Stack.Screen name="FAQ" component={FAQScreen} />
+        <Stack.Screen name="Se déconnecter" component={HomeScreen} />
+      </Stack.Navigator>
+    );
+  };
+
   return (
     <Provider store={store}>
-      <NavigationContainer>
-        <Stack.Navigator screenOptions={{ headerShown: false }}>
-          {isFirstLaunch ? (
-            <>
-              <Stack.Screen name="Welcome1" component={Welcome1Screen} />
-              <Stack.Screen name="Welcome2" component={Welcome2Screen} />
-              <Stack.Screen name="Welcome3" component={Welcome3Screen} />
-              <Stack.Screen name="Welcome4" component={Welcome4Screen} />
-              <Stack.Screen name="Welcome5" component={Welcome5Screen} />
-            </>
-          ) : (
-            <>
-              <Stack.Screen name="TabNavigator" component={TabNavigator} />
-              <Stack.Screen name="Login" component={LoginScreen} />
-            </>
-          )}
-        </Stack.Navigator>
-      </NavigationContainer>
+    <NavigationContainer>
+      <Stack.Navigator screenOptions={{ headerShown: false }}>
+        {isFirstLaunch ? (
+          <>
+            <Stack.Screen name="Welcome1" component={Welcome1Screen} />
+            <Stack.Screen name="Welcome2" component={Welcome2Screen} />
+            <Stack.Screen name="Welcome3" component={Welcome3Screen} />
+            <Stack.Screen name="Welcome4" component={Welcome4Screen} />
+            <Stack.Screen name="Welcome5" component={Welcome5Screen} />
+          </>
+        ) : (
+          <>
+            <Stack.Screen name="TabNavigator" component={TabNavigator} />
+            <Stack.Screen name="Login" component={LoginScreen} />
+          </>
+        )}
+      </Stack.Navigator>
+    </NavigationContainer>
     </Provider>
   );
 }
