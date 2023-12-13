@@ -106,12 +106,13 @@ export default function App() {
   const ProfileScreenStack = () => {
     return (
       <Stack.Navigator>
-        <Stack.Screen name="Profile" component={ProfileScreen} />
         <Stack.Screen name="Favoris" component={FavoritesScreen} />
         <Stack.Screen name="Traitements" component={TreatmentsScreen} />
         <Stack.Screen name="Parametres" component={SettingsScreen} />
         <Stack.Screen name="FAQ" component={FAQScreen} />
         <Stack.Screen name="Se déconnecter" component={HomeScreen} />
+        <Stack.Screen name="ProfileScreen" component={ProfileScreen} />
+
       </Stack.Navigator>
     );
   };

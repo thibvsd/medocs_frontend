@@ -10,7 +10,7 @@ import {
 import { useDispatch } from 'react-redux';
 import {login} from '../reducers/user';
 
-const IP_ADDRESS = '172.20.10.2'
+const IP_ADDRESS = '192.168.0.11'
 
 export default function LoginScreen({ navigation }) {
   const dispatch = useDispatch();
@@ -64,6 +64,7 @@ fetch(`http://${IP_ADDRESS}:3000/users/signup`, {
       setSignUpUserAge("");
       setSignUpUserWeight("");
       setConfirmPassword("");
+      navigation.navigate('ProfileScreenStack');
     }
   })
   .catch((error) => {
@@ -87,7 +88,7 @@ fetch(`http://${IP_ADDRESS}:3000/users/signup`, {
           dispatch(login({ username: signInUsername, token: data.token }));
           setSignInUsername("");
           setSignInPassword("");
-          navigation.navigate('ProfileScreen');
+          navigation.navigate('ProfileScreenStack');
         }
       });
   };
@@ -150,7 +151,7 @@ fetch(`http://${IP_ADDRESS}:3000/users/signup`, {
       <Text style={styles.title}>Connexion</Text>
       <TextInput
         style={styles.input}
-        placeholder="Nom d'utilisateur ou email"
+        placeholder="Email"
         value={signInUsername}
         onChangeText={(text) => setSignInUsername(text)}
       />
