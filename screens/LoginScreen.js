@@ -10,7 +10,7 @@ import {
 import { useDispatch } from 'react-redux';
 import {login} from '../reducers/user';
 
-const IP_ADDRESS = '172.20.10.2'
+import { IP_ADDRESS } from '../config.js';
 
 // ECRAN DE SIGNUP / SIGNIN
 
