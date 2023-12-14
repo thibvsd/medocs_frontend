@@ -23,6 +23,7 @@ export default function LoginScreen({ navigation }) {
   const [signUpUserWeight, setSignUpUserWeight] = useState("");
   const [signUpPassword, setSignUpPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState(""); // Ajout du nouvel état
+  const [signInEmail, setSignInEmail] = useState("");
   const [signInUsername, setSignInUsername] = useState("");
   const [signInPassword, setSignInPassword] = useState("");
 
@@ -35,62 +36,62 @@ export default function LoginScreen({ navigation }) {
       Alert.alert("Attention", "Les mots de passe ne correspondent pas.");
       return;
     }
-console.log(signUpUsername);
-fetch(`http://${IP_ADDRESS}:3000/users/signup`, {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({
-    username: signUpUsername,
-    email: signUpUserEmail,
-    age: signUpUserAge,
-    weight: signUpUserWeight,
-    password: signUpPassword,
-  }),
-})
-  .then((response) => {
-    console.log(response);
-    if (!response.ok) {
-      console.log('ici')
-      throw new Error(`HTTP error! Status: ${response.status}`);
-    }
-    return response.json();
-  })
-  .then((data) => {
-    // Traitement normal des données
-    if (data.result) {
-      dispatch(login({ username: signUpUsername, token: data.token }));
-      console.log(data);
-      setSignUpUsername("");
-      setSignUpPassword("");
-      setSignUpUserEmail("");
-      setSignUpUserAge("");
-      setSignUpUserWeight("");
-      setConfirmPassword("");
-      navigation.navigate('Profile');
-    }
-  })
-  .catch((error) => {
-    // Gestion des erreurs
-    console.error("Fetch error:", error);
-    Alert.alert("Erreur", "Une erreur s'est produite lors de la communication avec le serveur.");
-  });}
+    fetch(`http://${IP_ADDRESS}:3000/users/signup`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        username: signUpUsername,
+        email: signUpUserEmail,
+        age: signUpUserAge,
+        weight: signUpUserWeight,
+        password: signUpPassword,
+      }),
+    })
+      .then((response) => {
+        console.log('signup', response);
+        if (!response.ok) {
+          console.log('ici')
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then((data) => {
+        // Traitement normal des données
+        if (data.result) {
+          dispatch(login({ username: signUpUsername, token: data.token, email: signUpUserEmail }));
+          console.log('signup', data);
+          setSignUpUsername("");
+          setSignUpPassword("");
+          setSignUpUserEmail("");
+          setSignUpUserAge("");
+          setSignUpUserWeight("");
+          setConfirmPassword("");
+          navigation.navigate('Profile');
+        }
+      })
+      .catch((error) => {
+        // Gestion des erreurs
+        console.error("Fetch error:", error);
+        Alert.alert("Erreur", "Une erreur s'est produite lors de la communication avec le serveur.");
+      });
+}
 
   const handleConnection = () => {
     fetch(`http://${IP_ADDRESS}:3000/users/signin`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        username: signInUsername,
+        email: signInEmail,
         password: signInPassword,
       }),
     })
       .then((response) => response.json())
       .then((data) => {
         if (data.result) {
-          dispatch(login({ username: signInUsername, token: data.token }));
-          setSignInUsername("");
+          dispatch(login({ email: signInEmail, token: data.token, username: data.username }));
+          setSignInEmail("");
           setSignInPassword("");
-          navigation.navigate('ProfileScreenStack');
+          navigation.navigate('Profile');
         }
       });
   };
@@ -154,8 +155,8 @@ fetch(`http://${IP_ADDRESS}:3000/users/signup`, {
       <TextInput
         style={styles.input}
         placeholder="Email"
-        value={signInUsername}
-        onChangeText={(text) => setSignInUsername(text)}
+        value={signInEmail}
+        onChangeText={(text) => setSignInEmail(text)}
       />
       <TextInput
         style={styles.input}
