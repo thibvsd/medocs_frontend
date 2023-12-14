@@ -3,7 +3,9 @@ import { View, Text, TextInput, TouchableOpacity, FlatList, StyleSheet } from 'r
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Autocomplete from 'react-native-autocomplete-input';
 
-const IP_ADDRESS = '192.168.0.11'
+const IP_ADDRESS = '172.20.10.2'
+
+// ECRAN DE RECHERCHE
 
 export default function SearchScreen({ navigation }) {
   const { navigate } = navigation;

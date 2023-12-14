@@ -97,7 +97,7 @@ export default function App() {
         <Tab.Screen name="Search" component={SearchScreen} />
         <Tab.Screen
           name="Profile"
-          component={token ? ProfileScreen : LoginScreen}
+          component={token ? ProfileScreenStack : LoginScreen}
         />
       </Tab.Navigator>
     );
@@ -106,12 +106,12 @@ export default function App() {
   const ProfileScreenStack = () => {
     return (
       <Stack.Navigator>
+        <Stack.Screen name="ProfileScreen" component={ProfileScreen} />
         <Stack.Screen name="Favoris" component={FavoritesScreen} />
         <Stack.Screen name="Traitements" component={TreatmentsScreen} />
         <Stack.Screen name="Parametres" component={SettingsScreen} />
         <Stack.Screen name="FAQ" component={FAQScreen} />
         <Stack.Screen name="Se déconnecter" component={HomeScreen} />
-        <Stack.Screen name="ProfileScreen" component={ProfileScreen} />
 
       </Stack.Navigator>
     );
