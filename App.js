@@ -15,20 +15,18 @@ import TreatmentsScreen from "./screens/TreatmentsScreen";
 import SettingsScreen from "./screens/SettingsScreen";
 import FAQScreen from "./screens/FAQScreen.js";
 
-
 import { persistStore, persistReducer } from 'redux-persist';
 import { PersistGate } from 'redux-persist/integration/react';
 import storage from 'redux-persist/lib/storage';
-
+import user from './reducers/user';
 import { combineReducers, configureStore } from '@reduxjs/toolkit';
-const reducers = combineReducers({ reducername });
+
+const reducers = combineReducers({ user });
 const persistConfig = { key: 'appMedidoc', storage };
 
 import { Provider } from 'react-redux';
 
 import { Step1Screen, Step2Screen, Step3Screen, Step4Screen, Step5Screen } from './screens/WelcomeScreen';
-
-import user from './reducers/user';
 
 const store = configureStore({
   reducer: persistReducer(persistConfig, reducers),
@@ -129,11 +127,13 @@ export default function App() {
   const StepNavigator = () => {
     return (
         <Stack.Navigator initialRouteName="Step1" screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="TabNavigator" component={TabNavigator} />
           <Stack.Screen name="Step1" component={Step1Screen} />
           <Stack.Screen name="Step2" component={Step2Screen} />
           <Stack.Screen name="Step3" component={Step3Screen} />
           <Stack.Screen name="Step4" component={Step4Screen} />
           <Stack.Screen name="Step5" component={Step5Screen} />
+          <Stack.Screen name="Login" component={LoginScreen} />
         </Stack.Navigator>
     );
   };
