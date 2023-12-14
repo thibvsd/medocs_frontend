@@ -25,7 +25,7 @@ import { PersistGate } from 'redux-persist/integration/react';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 // redux imports
-import { Provider } from 'react-redux';
+import { Provider, useSelector } from 'react-redux';
 import { combineReducers, configureStore } from '@reduxjs/toolkit';
 import user from './reducers/user';
 
@@ -46,10 +46,11 @@ const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
 export default function App() {
-  const [isFirstLaunch, setIsFirstLaunch] = useState(null);
 
+  const [isFirstLaunch, setIsFirstLaunch] = useState(null);
   useEffect(() => {
     async function checkIfFirstLaunch() {
+
       try {
         const hasLaunched = await AsyncStorage.getItem("appLaunched");
         if (hasLaunched === null) {
@@ -70,6 +71,9 @@ export default function App() {
   }
 
   const TabNavigator = () => {
+    
+    const isToken = useSelector((state) => state.user.value.token);
+    console.log('isToken ==> ', isToken);
 
     const [token, setToken] = useState(null);
     useEffect(() => {
@@ -85,8 +89,6 @@ export default function App() {
       }
       checkToken();
     }, []);
-    console.log('token ==> ', token);
-
 
     return (
       <Tab.Navigator
@@ -113,7 +115,7 @@ export default function App() {
         <Tab.Screen name="Search" component={SearchScreen} />
         <Tab.Screen
           name="Profile"
-          component={token ? ProfileScreen : LoginScreen}
+          component={isToken ? ProfileScreen : LoginScreen}
         />
       </Tab.Navigator>
     );
