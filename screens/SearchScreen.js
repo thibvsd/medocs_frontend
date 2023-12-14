@@ -44,15 +44,16 @@ export default function SearchScreen({ navigation }) {
   }, []);
 
   const handleSearch = () => {
+
     dispatch(addLastSearch(query));
     // Ajouter la logique de recherche ici
     console.log("Recherche lancée pour :", query);
   };
 
-  const handleOpenFilters = () => {
-    // Ajouter la logique pour ouvrir la page de filtres ici
-    console.log("Ouvrir la page de filtres");
-  };
+  // const handleOpenFilters = () => {
+  //   // Ajouter la logique pour ouvrir la page de filtres ici
+  //   console.log("Ouvrir la page de filtres");
+  // };
 
   // Filtrer les suggestions en fonction de la valeur de l'input
   const filterData = (text) => {
@@ -77,8 +78,12 @@ export default function SearchScreen({ navigation }) {
 
   // Si je clique sur une suggestion, fonction handleSearch lancée
   const onSuggestionPress = (suggestion) => {
-    setQuery(suggestion);
-    handleSearch();
+    const drugId = data.namesAndId.find((item) => item.name === suggestion)._id;
+    if (drugId) {
+      setQuery(drugId);
+      handleSearch(drugId); // Passer l'id à la fonction handleSearch
+    }
+    console.log(drugId)
   };
 
   return (
@@ -101,7 +106,6 @@ export default function SearchScreen({ navigation }) {
             <FontAwesome name="search" size={30} color="white" />
           </TouchableOpacity>
           <TouchableOpacity
-            onPress={handleOpenFilters}
             style={styles.filtersButton}
           >
             <FontAwesome name="filter" size={30} color="white" />
