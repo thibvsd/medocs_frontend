@@ -1,17 +1,15 @@
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+
 import React, { useEffect, useState } from "react";
+
 import { StatusBar } from "expo-status-bar";
-import { StyleSheet, Text, View } from "react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { StyleSheet, Text, View, Button, Image, TouchableOpacity } from "react-native";
+
 import FontAwesome from "react-native-vector-icons/FontAwesome";
+
 import HomeScreen from "./screens/HomeScreen";
-import Welcome1Screen from "./screens/Welcome1Screen";
-import Welcome2Screen from "./screens/Welcome2Screen";
-import Welcome3Screen from "./screens/Welcome3Screen";
-import Welcome4Screen from "./screens/Welcome4Screen";
-import Welcome5Screen from "./screens/Welcome5Screen";
 import LoginScreen from "./screens/LoginScreen";
 import ProfileScreen from "./screens/ProfileScreen";
 import SearchScreen from "./screens/SearchScreen";
@@ -19,23 +17,40 @@ import FavoritesScreen from "./screens/FavoritesScreen";
 import TreatmentsScreen from "./screens/TreatmentsScreen";
 import SettingsScreen from "./screens/SettingsScreen";
 import FAQScreen from "./screens/FAQScreen.js";
+import { Step1Screen, Step2Screen, Step3Screen, Step4Screen, Step5Screen } from './screens/WelcomeScreen';
 
-import { Provider } from 'react-redux';
-import { configureStore } from '@reduxjs/toolkit';
+import { persistStore, persistReducer } from 'redux-persist';
+import { PersistGate } from 'redux-persist/integration/react';
+
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
+// redux imports
+import { Provider, useSelector } from 'react-redux';
+import { combineReducers, configureStore } from '@reduxjs/toolkit';
 import user from './reducers/user';
+
+const reducers = combineReducers({ user });
+const persistConfig = {
+  key: 'medidoc',
+  storage: AsyncStorage,
+};
+
 const store = configureStore({
-  reducer: { user },
+  reducer: persistReducer(persistConfig, reducers),
+  middleware: (getDefaultMiddleware) => getDefaultMiddleware({ serializableCheck: false }),
 });
 
+const persistor = persistStore(store);
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
 export default function App() {
-  const [isFirstLaunch, setIsFirstLaunch] = useState(null);
 
+  const [isFirstLaunch, setIsFirstLaunch] = useState(null);
   useEffect(() => {
     async function checkIfFirstLaunch() {
+
       try {
         const hasLaunched = await AsyncStorage.getItem("appLaunched");
         if (hasLaunched === null) {
@@ -56,12 +71,15 @@ export default function App() {
   }
 
   const TabNavigator = () => {
-    const [token, setToken] = useState(null);
+    
+    const isToken = useSelector((state) => state.user.value.token);
+    console.log('isToken ==> ', isToken);
 
+    const [token, setToken] = useState(null);
     useEffect(() => {
       async function checkToken() {
         try {
-          const userToken = await AsyncStorage.getItem("userToken");
+          const userToken = await AsyncStorage.getItem("token");
           if (userToken) {
             setToken(userToken);
           }
@@ -97,7 +115,7 @@ export default function App() {
         <Tab.Screen name="Search" component={SearchScreen} />
         <Tab.Screen
           name="Profile"
-          component={token ? ProfileScreenStack : LoginScreen}
+          component={isToken ? ProfileScreenStack : LoginScreen}
         />
       </Tab.Navigator>
     );
@@ -112,31 +130,46 @@ export default function App() {
         <Stack.Screen name="Parametres" component={SettingsScreen} />
         <Stack.Screen name="FAQ" component={FAQScreen} />
         <Stack.Screen name="Se déconnecter" component={HomeScreen} />
-
       </Stack.Navigator>
+    );
+  };
+
+  const StepNavigator = () => {
+    return (
+        <Stack.Navigator initialRouteName="Step1" screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="Step1" component={Step1Screen} />
+          <Stack.Screen name="Step2" component={Step2Screen} />
+          <Stack.Screen name="Step3" component={Step3Screen} />
+          <Stack.Screen name="Step4" component={Step4Screen} />
+          <Stack.Screen name="Step5" component={Step5Screen} />
+        </Stack.Navigator>
     );
   };
 
   return (
     <Provider store={store}>
-    <NavigationContainer>
-      <Stack.Navigator screenOptions={{ headerShown: false }}>
-        {isFirstLaunch ? (
-          <>
-            <Stack.Screen name="Welcome1" component={Welcome1Screen} />
-            <Stack.Screen name="Welcome2" component={Welcome2Screen} />
-            <Stack.Screen name="Welcome3" component={Welcome3Screen} />
-            <Stack.Screen name="Welcome4" component={Welcome4Screen} />
-            <Stack.Screen name="Welcome5" component={Welcome5Screen} />
-          </>
-        ) : (
-          <>
+      <PersistGate persistor={persistor}>  
+        <NavigationContainer>
+            {isFirstLaunch ? (
+            <Stack.Navigator initialRouteName="StepNavigator" screenOptions={{ headerShown: false }}>
+               <Stack.Screen name="StepNavigator" component={StepNavigator} />
+               <Stack.Screen name="TabNavigator" component={TabNavigator} />
+             </Stack.Navigator>
+            ) : (
+          <Stack.Navigator screenOptions={{ headerShown: false }}>
             <Stack.Screen name="TabNavigator" component={TabNavigator} />
-            <Stack.Screen name="Login" component={LoginScreen} />
-          </>
-        )}
-      </Stack.Navigator>
-    </NavigationContainer>
+          </Stack.Navigator>
+            )}
+        </NavigationContainer>
+      </PersistGate>
     </Provider>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+});
