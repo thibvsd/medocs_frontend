@@ -1,11 +1,14 @@
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+
 import React, { useEffect, useState } from "react";
+
 import { StatusBar } from "expo-status-bar";
 import { StyleSheet, Text, View, Button, Image, TouchableOpacity } from "react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+
 import FontAwesome from "react-native-vector-icons/FontAwesome";
+
 import HomeScreen from "./screens/HomeScreen";
 import LoginScreen from "./screens/LoginScreen";
 import ProfileScreen from "./screens/ProfileScreen";
@@ -14,26 +17,28 @@ import FavoritesScreen from "./screens/FavoritesScreen";
 import TreatmentsScreen from "./screens/TreatmentsScreen";
 import SettingsScreen from "./screens/SettingsScreen";
 import FAQScreen from "./screens/FAQScreen.js";
+import { Step1Screen, Step2Screen, Step3Screen, Step4Screen, Step5Screen } from './screens/WelcomeScreen';
 
 import { persistStore, persistReducer } from 'redux-persist';
 import { PersistGate } from 'redux-persist/integration/react';
-import storage from 'redux-persist/lib/storage';
-import user from './reducers/user';
+
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
+// redux imports
+import { Provider } from 'react-redux';
 import { combineReducers, configureStore } from '@reduxjs/toolkit';
+import user from './reducers/user';
 
 const reducers = combineReducers({ user });
-const persistConfig = { key: 'appMedidoc', storage };
-
-import { Provider } from 'react-redux';
-
-import { Step1Screen, Step2Screen, Step3Screen, Step4Screen, Step5Screen } from './screens/WelcomeScreen';
+const persistConfig = {
+  key: 'medidoc',
+  storage: AsyncStorage,
+};
 
 const store = configureStore({
   reducer: persistReducer(persistConfig, reducers),
   middleware: (getDefaultMiddleware) => getDefaultMiddleware({ serializableCheck: false }),
- });
-
-// reducer: { user }
+});
 
 const persistor = persistStore(store);
 
@@ -65,11 +70,12 @@ export default function App() {
   }
 
   const TabNavigator = () => {
+
     const [token, setToken] = useState(null);
     useEffect(() => {
       async function checkToken() {
         try {
-          const userToken = await AsyncStorage.getItem("userToken");
+          const userToken = await AsyncStorage.getItem("token");
           if (userToken) {
             setToken(userToken);
           }
@@ -80,6 +86,8 @@ export default function App() {
       checkToken();
     }, []);
     console.log('token ==> ', token);
+
+
     return (
       <Tab.Navigator
         screenOptions={({ route }) => ({
