@@ -1,6 +1,8 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 
+console.log("profile screen");
+
 const ProfileScreen = ({ navigation }) => {
   return (
     <View style={styles.container}>
