@@ -1,9 +1,17 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-
-console.log("profile screen");
+import { useDispatch } from 'react-redux';
+import {logout} from '../reducers/user';
 
 const ProfileScreen = ({ navigation }) => {
+
+  const dispatch = useDispatch();
+
+  const handleLogout = () => {
+    // Dispatch the logout action to reset the state
+    dispatch(logout());
+  };
+
   return (
     <View style={styles.container}>
       <Text style={styles.username}>username</Text>
@@ -38,7 +46,7 @@ const ProfileScreen = ({ navigation }) => {
 
       <TouchableOpacity
         style={styles.button}
-        onPress={() => navigation.navigate('HomeScreen')}
+        onPress={handleLogout}
       >
         <Text style={styles.buttonText}>Log out</Text>
       </TouchableOpacity>

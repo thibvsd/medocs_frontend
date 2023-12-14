@@ -8,6 +8,7 @@ import {
   } from 'react-native';
 
 import React from 'react';
+
 export const Step1Screen = ({ navigation }) => (
     <View style={styles.container}>
       <Text style={styles.title}>Welcome 1</Text>
