@@ -115,7 +115,7 @@ export default function App() {
         <Tab.Screen name="Search" component={SearchScreen} />
         <Tab.Screen
           name="Profile"
-          component={isToken ? ProfileScreen : LoginScreen}
+          component={isToken ? ProfileScreenStack : LoginScreen}
         />
       </Tab.Navigator>
     );
@@ -137,13 +137,11 @@ export default function App() {
   const StepNavigator = () => {
     return (
         <Stack.Navigator initialRouteName="Step1" screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="TabNavigator" component={TabNavigator} />
           <Stack.Screen name="Step1" component={Step1Screen} />
           <Stack.Screen name="Step2" component={Step2Screen} />
           <Stack.Screen name="Step3" component={Step3Screen} />
           <Stack.Screen name="Step4" component={Step4Screen} />
           <Stack.Screen name="Step5" component={Step5Screen} />
-          <Stack.Screen name="Login" component={LoginScreen} />
         </Stack.Navigator>
     );
   };
@@ -153,12 +151,13 @@ export default function App() {
       <PersistGate persistor={persistor}>  
         <NavigationContainer>
             {isFirstLaunch ? (
-              <StepNavigator/>
+            <Stack.Navigator initialRouteName="StepNavigator" screenOptions={{ headerShown: false }}>
+               <Stack.Screen name="StepNavigator" component={StepNavigator} />
+               <Stack.Screen name="TabNavigator" component={TabNavigator} />
+             </Stack.Navigator>
             ) : (
-              
           <Stack.Navigator screenOptions={{ headerShown: false }}>
             <Stack.Screen name="TabNavigator" component={TabNavigator} />
-            <Stack.Screen name="Login" component={LoginScreen} />
           </Stack.Navigator>
             )}
         </NavigationContainer>
