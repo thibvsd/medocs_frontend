@@ -3,7 +3,7 @@ import { View, Text, TextInput, TouchableOpacity, FlatList, StyleSheet } from 'r
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Autocomplete from 'react-native-autocomplete-input';
 
-const IP_ADDRESS = '172.20.10.2'
+import { IP_ADDRESS } from '../config.js';
 
 // ECRAN DE RECHERCHE
 
