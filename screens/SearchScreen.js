@@ -44,6 +44,7 @@ export default function SearchScreen({ navigation }) {
     fetchData();
   }, []);
 
+  // Lancer la recherche en cliquant sur le bouton
   const handleSearch = () => {
     dispatch(addLastSearch(query));
     // Ajouter la logique de recherche ici
