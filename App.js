@@ -4,8 +4,7 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 
 import React, { useEffect, useState } from "react";
 
-import { StatusBar } from "expo-status-bar";
-import { StyleSheet, Text, View, Button, Image, TouchableOpacity } from "react-native";
+import { StyleSheet } from "react-native";
 
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 
@@ -17,7 +16,8 @@ import FavoritesScreen from "./screens/FavoritesScreen";
 import TreatmentsScreen from "./screens/TreatmentsScreen";
 import SettingsScreen from "./screens/SettingsScreen";
 import FAQScreen from "./screens/FAQScreen.js";
-import { Step1Screen, Step2Screen, Step3Screen, Step4Screen, Step5Screen } from './screens/WelcomeScreen';
+import OnboardingScreen from "./screens/OnboardingScreen";
+import InfoDrugScreen from "./screens/InfoDrugScreen";
 
 import { persistStore, persistReducer } from 'redux-persist';
 import { PersistGate } from 'redux-persist/integration/react';
@@ -47,10 +47,24 @@ const Tab = createBottomTabNavigator();
 
 export default function App() {
 
+  const [token, setToken] = useState(null);
+  useEffect(() => {
+    async function checkToken() {
+      try {
+        const userToken = await AsyncStorage.getItem("token");
+        if (userToken) {
+          setToken(userToken);
+        }
+      } catch (error) {
+        console.error("Erreur lors de la vérification du token:", error);
+      }
+    }
+    checkToken();
+  }, []);
+
   const [isFirstLaunch, setIsFirstLaunch] = useState(null);
   useEffect(() => {
     async function checkIfFirstLaunch() {
-
       try {
         const hasLaunched = await AsyncStorage.getItem("appLaunched");
         if (hasLaunched === null) {
@@ -71,27 +85,9 @@ export default function App() {
   }
 
   const TabNavigator = () => {
-    
-    const isToken = useSelector((state) => state.user.value.token);
-    console.log('isToken ==> ', isToken);
-
-    const [token, setToken] = useState(null);
-    useEffect(() => {
-      async function checkToken() {
-        try {
-          const userToken = await AsyncStorage.getItem("token");
-          if (userToken) {
-            setToken(userToken);
-          }
-        } catch (error) {
-          console.error("Erreur lors de la vérification du token:", error);
-        }
-      }
-      checkToken();
-    }, []);
-
+    const initialRoute = isFirstLaunch ? "Profile" : "Home";
     return (
-      <Tab.Navigator
+      <Tab.Navigator initialRouteName={initialRoute}
         screenOptions={({ route }) => ({
           tabBarIcon: ({ color, size }) => {
             let iconName = "";
@@ -113,36 +109,50 @@ export default function App() {
       >
         <Tab.Screen name="Home" component={HomeScreen} />
         <Tab.Screen name="Search" component={SearchScreen} />
-        <Tab.Screen
-          name="Profile"
-          component={isToken ? ProfileScreenStack : LoginScreen}
-        />
+        <Tab.Screen name="Profile" component={ProfileScreenStack} />
       </Tab.Navigator>
     );
   };
 
+  //GERE L'AFFICHAGE DU PROFIL AU CLICK SUR USER ICON
   const ProfileScreenStack = () => {
+    const isToken = useSelector((state) => state.user.value.token);
     return (
       <Stack.Navigator>
-        <Stack.Screen name="ProfileScreen" component={ProfileScreen} />
-        <Stack.Screen name="Favoris" component={FavoritesScreen} />
-        <Stack.Screen name="Traitements" component={TreatmentsScreen} />
-        <Stack.Screen name="Parametres" component={SettingsScreen} />
-        <Stack.Screen name="FAQ" component={FAQScreen} />
-        <Stack.Screen name="Se déconnecter" component={HomeScreen} />
+        {(isFirstLaunch || !isToken) ? (
+          <>
+            <Stack.Screen name="Login" component={LoginScreen} options={{ headerShown: false }} /> 
+            <Stack.Screen name="Onboarding" component={LoginScreenStack} options={{ headerShown: false }} />
+            </>
+          ) : (
+          <>
+            <Stack.Screen name="ProfileScreen" component={ProfileScreen} />
+            <Stack.Screen name="Favoris" component={FavoritesScreen} />
+            <Stack.Screen name="Traitements" component={TreatmentsScreen} />
+            <Stack.Screen name="Parametres" component={SettingsScreen} />
+            <Stack.Screen name="FAQ" component={FAQScreen} />
+            <Stack.Screen name="Se déconnecter" component={HomeScreen} />
+          </>
+        )}
       </Stack.Navigator>
     );
   };
 
-  const StepNavigator = () => {
+  const LoginScreenStack = () => {
     return (
-        <Stack.Navigator initialRouteName="Step1" screenOptions={{ headerShown: false }}>
-          <Stack.Screen name="Step1" component={Step1Screen} />
-          <Stack.Screen name="Step2" component={Step2Screen} />
-          <Stack.Screen name="Step3" component={Step3Screen} />
-          <Stack.Screen name="Step4" component={Step4Screen} />
-          <Stack.Screen name="Step5" component={Step5Screen} />
-        </Stack.Navigator>
+      <Stack.Navigator>
+        <Stack.Screen name="TabNavigator" component={TabNavigator} options={{ headerShown: false }} />
+        <Stack.Screen name="Login" component={LoginScreen} options={{ headerShown: false }} />
+      </Stack.Navigator>
+    );
+  };
+
+  const SearchScreenStack = () => {
+    return (
+      <Stack.Navigator>
+        <Stack.Screen name="SearchSreen" component={SearchScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="InfoDrugScreen" component={InfoDrugScreen} options={{ headerShown: false }} />
+      </Stack.Navigator>
     );
   };
 
@@ -150,16 +160,20 @@ export default function App() {
     <Provider store={store}>
       <PersistGate persistor={persistor}>  
         <NavigationContainer>
-            {isFirstLaunch ? (
-            <Stack.Navigator initialRouteName="StepNavigator" screenOptions={{ headerShown: false }}>
-               <Stack.Screen name="StepNavigator" component={StepNavigator} />
-               <Stack.Screen name="TabNavigator" component={TabNavigator} />
-             </Stack.Navigator>
-            ) : (
+        {isFirstLaunch ? (
           <Stack.Navigator screenOptions={{ headerShown: false }}>
+            <Stack.Screen options={{ headerShown: false }}
+              name="Onboarding"
+              component={OnboardingScreen}
+            />
             <Stack.Screen name="TabNavigator" component={TabNavigator} />
           </Stack.Navigator>
-            )}
+          ) : (
+          <Stack.Navigator screenOptions={{ headerShown: false }}>
+            <Stack.Screen name="TabNavigator" component={TabNavigator} />
+            <Stack.Screen name="Profile" component={ProfileScreen} />
+          </Stack.Navigator>
+          )}
         </NavigationContainer>
       </PersistGate>
     </Provider>
