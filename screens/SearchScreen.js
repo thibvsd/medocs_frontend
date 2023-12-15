@@ -11,8 +11,8 @@ import {
 } from "react-native";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import Autocomplete from "react-native-autocomplete-input";
-import { useDispatch, useSelector } from "react-redux";
-import { addLastSearch, add5LastSearches } from "../reducers/drugs";
+import { useDispatch } from "react-redux";
+import { addLastSearch } from "../reducers/drugs";
 import { IP_ADDRESS } from "../config.js";
 
 // ECRAN DE RECHERCHE
@@ -24,7 +24,6 @@ export default function SearchScreen({ navigation }) {
   const [query, setQuery] = useState("");
   const [data, setData] = useState([]);
   const [suggestions, setSuggestions] = useState([]);
-  const lastSearches = useSelector((state) => state.drugs.value.last5Searches);
 
 
   useEffect(() => {
@@ -35,7 +34,7 @@ export default function SearchScreen({ navigation }) {
           `http://${IP_ADDRESS}:3000/drugs/allNames`
         );
         const result = await response.json();
-        setData(result);
+        setData(result.namesAndId);
         // console.log(data);
       } catch (error) {
         console.error(error);
@@ -45,6 +44,7 @@ export default function SearchScreen({ navigation }) {
     fetchData();
   }, []);
 
+  // Lancer la recherche en cliquant sur le bouton
   const handleSearch = () => {
     dispatch(addLastSearch(query));
     // Ajouter la logique de recherche ici
@@ -54,9 +54,9 @@ export default function SearchScreen({ navigation }) {
   // Filtrer les suggestions en fonction de la valeur de l'input
   const filterData = (text) => {
     if (text.length >= 3) {
-      const filteredData = data.namesAndId
+      const filteredData = data
         .filter((item) => item.name.toLowerCase().includes(text.toLowerCase()))
-        .slice(0, 10); // Limite à 20 suggestions
+        .slice(0, 10); // Limite à 10 suggestions
       setSuggestions(filteredData.map((item) => item.name)); // map pour n'avoir que les names sans clé
     } else {
       setSuggestions([]);
@@ -65,19 +65,14 @@ export default function SearchScreen({ navigation }) {
 
   const onSuggestionPress = (suggestion) => {
     // Cherche le name et extrait son _id :
-    const selectedDrug = data.namesAndId.find(
+    const selectedDrug = data.find(
       (item) => item.name === suggestion
     )._id;
     console.log("selectedDrug :", selectedDrug);
     dispatch(addLastSearch(selectedDrug)); // Dispatch the selected drug id
-    dispatch(add5LastSearches({name:suggestion,_id:selectedDrug}));
     // navigation.navigate('infoDrugScreen');
   };
 
-  // CORRIGER LE MAP !! (faire un fetch des dernières recherches)
-  const lastSearchesItems = lastSearches.map((search, index) => (
-    <Text style={styles.lastSearchesItem} key={index}>{search.name}</Text>
-  ));
 
   return (
     // masque le clavier quand on clique en dehors de la zone input :
@@ -107,11 +102,7 @@ export default function SearchScreen({ navigation }) {
           <TouchableOpacity onPress={handleSearch} style={styles.searchButton}>
             <FontAwesome name="search" size={30} color="white" />
           </TouchableOpacity>
-        </View>
-        <View style={styles.lastSearchesContainer}>
-          <Text style={styles.lastSearchesTitle}>Mes dernières recherches</Text>
-          {/* Affichez les 5 dernières recherches */}
-          {lastSearchesItems}
+
         </View>
       </View>
     </TouchableWithoutFeedback>
@@ -163,20 +154,7 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 5,
   },
-  lastSearchesContainer: {
-    marginTop: 30,
-    paddingHorizontal: 16,
-    fontSize: 24,
-  },
-  lastSearchesTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    paddingBottom: 10,
-  },
-  lastSearchesItem: {
-  marginTop: 10,
-  marginTop: 10,  
-  },
+  
   suggestionItem: {
     backgroundColor:"white",
     padding: 10,
