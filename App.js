@@ -28,8 +28,10 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Provider, useSelector } from 'react-redux';
 import { combineReducers, configureStore } from '@reduxjs/toolkit';
 import user from './reducers/user';
+import drugs from './reducers/drugs';
 
-const reducers = combineReducers({ user });
+
+const reducers = combineReducers({ user, drugs });
 const persistConfig = {
   key: 'medidoc',
   storage: AsyncStorage,
