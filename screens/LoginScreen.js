@@ -7,10 +7,10 @@ import {
   Alert,
   StyleSheet,
 } from "react-native";
-import { useDispatch } from 'react-redux';
-import {login} from '../reducers/user';
+import { useDispatch } from "react-redux";
+import { login } from "../reducers/user";
 
-import { IP_ADDRESS } from '../config.js';
+import { IP_ADDRESS } from "../config.js";
 
 // ECRAN DE SIGNUP / SIGNIN
 
@@ -26,6 +26,7 @@ export default function LoginScreen({ navigation }) {
   const [signInEmail, setSignInEmail] = useState("");
   const [signInUsername, setSignInUsername] = useState("");
   const [signInPassword, setSignInPassword] = useState("");
+  const [isChecked, setChecked] = useState(false);
 
   const toggleForm = () => {
     setIsSignIn(!isSignIn);
@@ -48,9 +49,9 @@ export default function LoginScreen({ navigation }) {
       }),
     })
       .then((response) => {
-        console.log('signup', response);
+        console.log("signup", response);
         if (!response.ok) {
-          console.log('ici')
+          console.log("ici");
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
         return response.json();
@@ -58,23 +59,32 @@ export default function LoginScreen({ navigation }) {
       .then((data) => {
         // Traitement normal des données
         if (data.result) {
-          dispatch(login({ username: signUpUsername, token: data.token, email: signUpUserEmail }));
-          console.log('signup', data);
+          dispatch(
+            login({
+              username: signUpUsername,
+              token: data.token,
+              email: signUpUserEmail,
+            })
+          );
+          console.log("signup", data);
           setSignUpUsername("");
           setSignUpPassword("");
           setSignUpUserEmail("");
           setSignUpUserAge("");
           setSignUpUserWeight("");
           setConfirmPassword("");
-          navigation.navigate('Profile');
+          navigation.navigate("Profile");
         }
       })
       .catch((error) => {
         // Gestion des erreurs
         console.error("Fetch error:", error);
-        Alert.alert("Erreur", "Une erreur s'est produite lors de la communication avec le serveur.");
+        Alert.alert(
+          "Erreur",
+          "Une erreur s'est produite lors de la communication avec le serveur."
+        );
       });
-}
+  };
 
   const handleConnection = () => {
     fetch(`http://${IP_ADDRESS}:3000/users/signin`, {
@@ -88,12 +98,22 @@ export default function LoginScreen({ navigation }) {
       .then((response) => response.json())
       .then((data) => {
         if (data.result) {
-          dispatch(login({ email: signInEmail, token: data.token, username: data.username }));
+          dispatch(
+            login({
+              email: signInEmail,
+              token: data.token,
+              username: data.username,
+            })
+          );
           setSignInEmail("");
           setSignInPassword("");
-          navigation.navigate('Profile');
+          navigation.navigate("Profile");
         }
       });
+  };
+
+  const toggleCheckBox = () => {
+    setChecked(!isChecked);
   };
 
   const SignUp = (
@@ -140,10 +160,23 @@ export default function LoginScreen({ navigation }) {
         value={confirmPassword} // Utilisation de confirmPassword au lieu de signUpPassword
         onChangeText={(text) => setConfirmPassword(text)}
       />
+      <View style={styles.checkboxContainer}>
+        <CheckBox value={isChecked} onValueChange={toggleCheckBox} />
+        <Text style={styles.checkboxText}>
+          J’accepte les conditions d’utilisation de l’application :
+        </Text>
+        <TouchableOpacity onPress={() => navigation.navigate("FAQ")}>
+          <Text style={styles.linkText}>FAQ</Text>
+        </TouchableOpacity>
+      </View>
       <TouchableOpacity style={styles.link} onPress={toggleForm}>
         <Text>Vous avez déjà un compte ? Connectez-vous ici !</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.button} onPress={handleRegister}>
+      <TouchableOpacity
+        style={[styles.button, !isChecked && styles.disabledButton]}
+        onPress={handleRegister}
+        disabled={!isChecked}
+      >
         <Text style={styles.buttonText}>S'inscrire</Text>
       </TouchableOpacity>
     </View>
@@ -209,5 +242,21 @@ const styles = StyleSheet.create({
   },
   link: {
     marginBottom: 20,
+  },
+  checkboxContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 20,
+  },
+  checkboxText: {
+    marginLeft: 10,
+  },
+  linkText: {
+    color: "blue",
+    textDecorationLine: "underline",
+    marginLeft: 5,
+  },
+  disabledButton: {
+    backgroundColor: 'gray',
   },
 });
