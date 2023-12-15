@@ -76,7 +76,10 @@ export default function SearchScreen({ navigation }) {
 
   return (
     // masque le clavier quand on clique en dehors de la zone input :
-    <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+    <TouchableWithoutFeedback onPress={() => {
+      Keyboard.dismiss();
+      setSuggestions([]); // Masquer les suggestions lorsqu'on clique en dehors
+    }  }>
       <View style={styles.container}>
         <Text style={styles.title}>Recherche</Text>
         <View style={styles.searchContainer}>
