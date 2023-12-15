@@ -12,12 +12,9 @@ export const drugSlice = createSlice({
   addLastSearch: (state, action) => {
     state.value.search = action.payload;
   },
-    add3LastSearch: (state, action) => {
-      state.value.token = action.payload.token;
-      state.value.username = action.payload.username;
-    },
+
   },
 });
 
-export const { addLastSearch, add3LastSearch } = drugSlice.actions;
+export const { addLastSearch } = drugSlice.actions;
 export default drugSlice.reducer;
