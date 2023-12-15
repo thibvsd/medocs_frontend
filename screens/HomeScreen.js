@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   TouchableWithoutFeedback,
   Keyboard,
+  Modal,
   FlatList,
   ScrollView,
   StyleSheet,
@@ -26,6 +27,8 @@ export default function HomeScreen({ navigation }) {
   const [data, setData] = useState([]);
   const [suggestions, setSuggestions] = useState([]);
   const [articles, setArticles] = useState([]);
+  const [isFilterModalVisible, setFilterModalVisible] = useState(false);
+
 
   useEffect(() => {
     const fetchData = async () => {
@@ -87,6 +90,14 @@ export default function HomeScreen({ navigation }) {
   };
 
 
+  const openFilterModal = () => {
+    setFilterModalVisible(true);
+  };
+
+  const closeFilterModal = () => {
+    setFilterModalVisible(false);
+  };
+
   // Affichage des articles récupérés via le fetch
   const feed = articles.map((data, i) => {
     return (
@@ -138,9 +149,32 @@ export default function HomeScreen({ navigation }) {
           />
         </View>
         <Text style={styles.title}>Feed</Text>
+        <View style={styles.filterButtonContainer}>
+          <TouchableOpacity
+            style={styles.filterButton}
+            onPress={openFilterModal}
+          >
+          <FontAwesome name='filter' size={25} color='#ec6e5b' />
+          </TouchableOpacity>
+        </View>
         <ScrollView contentContainerStyle={styles.scrollView}>
           {feed}
         </ScrollView>
+     {/* Filter Modal */}
+     <Modal
+          animationType="slide"
+          transparent={true}
+          visible={isFilterModalVisible}
+          onRequestClose={closeFilterModal}
+        >
+          <View style={styles.modalContainer}>
+            {/* Your modal content goes here */}
+            <Text style={styles.modalText}>Filter Options</Text>
+            <TouchableOpacity onPress={closeFilterModal}>
+              <Text style={styles.closeModalText}>Close Modal</Text>
+            </TouchableOpacity>
+          </View>
+        </Modal>
       </View>
     </TouchableWithoutFeedback>
   );
@@ -226,5 +260,21 @@ const styles = StyleSheet.create({
   },
   openUrlButtonText: {
     color: "white",
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)', // semi-transparent black background
+  },
+  modalText: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: 'white',
+    marginBottom: 20,
+  },
+  closeModalText: {
+    fontSize: 16,
+    color: 'white',
   },
 });
