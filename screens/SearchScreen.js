@@ -11,7 +11,7 @@ import {
 } from "react-native";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import Autocomplete from "react-native-autocomplete-input";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { addLastSearch } from "../reducers/drugs";
 import { IP_ADDRESS } from "../config.js";
 
@@ -19,11 +19,16 @@ import { IP_ADDRESS } from "../config.js";
 
 export default function SearchScreen({ navigation }) {
   const dispatch = useDispatch();
+  // const token = useSelector((state) => state.user.value.token) ;
+  const token = 'kTe-BIKeY40kJaYz6JMm9sEcJFtpxVpD' // Token avec des lastSearches
+
+  
   const { navigate } = navigation;
 
   const [query, setQuery] = useState("");
   const [data, setData] = useState([]);
   const [suggestions, setSuggestions] = useState([]);
+  const [searches, setSearches] = useState([]);
 
 
   useEffect(() => {
@@ -42,6 +47,23 @@ export default function SearchScreen({ navigation }) {
     };
 
     fetchData();
+
+    const fetchLastSearch = async () => {
+      try {
+        const response = await fetch(
+          `http://${IP_ADDRESS}:3000/searches/last5Searches/${token}`
+        );
+        const result = await response.json();
+        console.log("dans fetch",result.search);
+        setSearches(result.search);
+  
+        // console.log(data);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    fetchLastSearch();
+
   }, []);
 
   // Lancer la recherche en cliquant sur le bouton
@@ -69,16 +91,35 @@ export default function SearchScreen({ navigation }) {
       (item) => item.name === suggestion
     )._id;
     console.log("selectedDrug :", selectedDrug);
-    dispatch(addLastSearch(selectedDrug)); // Dispatch the selected drug id
+    dispatch(addLastSearch(selectedDrug)); // Dispatch l'id pour pouvoir le récupérer sur la page infoDrugScreen
     // navigation.navigate('infoDrugScreen');
+    setQuery("");
+
   };
+
+  const onLastSearchClick = (data) => {
+    dispatch(addLastSearch(data._id));
+    // navigation.navigate('infoDrugScreen');
+  }
+
+  // Map pour afficher les dernières recherches
+  const lastSearches = searches.map((data, i) => {
+      return (
+      <View key={i} style={styles.lastSearchesContainer}>
+        <TouchableOpacity onPress={() => onLastSearchClick(data)}>
+        <Text style={styles.searchName}>{data.drug_id.name}</Text>
+                </TouchableOpacity>
+      </View>
+    );
+  });
 
 
   return (
     // masque le clavier quand on clique en dehors de la zone input :
     <TouchableWithoutFeedback onPress={() => {
       Keyboard.dismiss();
-      setSuggestions([]); // Masquer les suggestions lorsqu'on clique en dehors
+      setSuggestions([]);
+      setQuery(""); // Masquer les suggestions lorsqu'on clique en dehors
     }  }>
       <View style={styles.container}>
         <Text style={styles.title}>Recherche</Text>
@@ -99,14 +140,15 @@ export default function SearchScreen({ navigation }) {
                 </TouchableOpacity>
               ),
             }}
-            placeholder="Rechercher..."
+            placeholder="Nom du médicament..."
             containerStyle={styles.autocompleteContainer}
           />
           <TouchableOpacity onPress={handleSearch} style={styles.searchButton}>
             <FontAwesome name="search" size={30} color="white" />
           </TouchableOpacity>
-
         </View>
+        <Text style={styles.titleLastSearches}>Mes dernières recherches</Text>
+        {lastSearches}
       </View>
     </TouchableWithoutFeedback>
   );
@@ -116,6 +158,10 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: "bold",
   },
+  titleLastSearches:{
+    marginTop:40,
+    fontSize:20,
+  },
   container: {
     flex: 1,
     marginTop: 120,
@@ -124,20 +170,18 @@ const styles = StyleSheet.create({
   },
   searchContainer: {
     flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
+    alignItems: "top",
     marginTop: 20,
     paddingHorizontal: 16,
-    alignItems: "flex-end", // Ajout de cette ligne
   },
   autocompleteContainer: {
     flex: 1,
     left: 0,
     right: 0,
     top: 0,
-    zIndex: 1,
     marginBottom: 10,
-    backgroundColor:"white",
+    backgroundColor: "#fff",
+    opacity:1,
   },
   searchInput: {
     flex: 1,
@@ -148,23 +192,26 @@ const styles = StyleSheet.create({
     color: "#333",
   },
   searchButton: {
-    height: 50,
-    width: 50,
+    height: 44,
+    width: 44,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: "#3498db",
-    padding: 10,
     borderRadius: 5,
   },
   
   suggestionItem: {
-    backgroundColor:"white",
+    backgroundColor: "#fff", // Utilisez une couleur solide
     padding: 10,
     borderBottomWidth: 1,
     borderBottomColor: "#ccc",
+    opacity: 1,
   },
   buttonText: {
     color: "#fff",
+  },
+  lastSearchesContainer:{
+marginTop: 20,
   },
 });
