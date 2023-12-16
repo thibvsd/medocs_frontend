@@ -31,7 +31,6 @@ export default function LoginScreen({ route, navigation }) {
     setIsSignIn(!isSignIn);
   };
     
-  const { IsSignup } = route.params.IsSignup;
   useEffect(() => {
     if (route.params && route.params.IsSignup) {
     setIsSignIn(!isSignIn);
