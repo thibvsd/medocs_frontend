@@ -108,8 +108,8 @@ export default function App() {
           headerShown: false,
         })}
       >
-        <Tab.Screen name="Home" component={HomeScreen} />
-        <Tab.Screen name="Search" component={SearchScreen} />
+        <Tab.Screen name="Home" component={HomeScreenStack} />
+        <Tab.Screen name="Search" component={SearchScreenStack} />
         <Tab.Screen name="Profile" component={ProfileScreenStack} />
       </Tab.Navigator>
     );
@@ -141,6 +141,15 @@ export default function App() {
     return (
       <Stack.Navigator>
         <Stack.Screen name="SearchSreen" component={SearchScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="InfoDrugScreen" component={InfoDrugScreen} options={{ headerShown: false }} />
+      </Stack.Navigator>
+    );
+  };
+
+  const HomeScreenStack = () => {
+    return (
+      <Stack.Navigator>
+        <Stack.Screen name="SearchSreen" component={HomeScreen} options={{ headerShown: false }} />
         <Stack.Screen name="InfoDrugScreen" component={InfoDrugScreen} options={{ headerShown: false }} />
       </Stack.Navigator>
     );

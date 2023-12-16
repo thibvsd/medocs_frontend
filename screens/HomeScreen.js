@@ -10,7 +10,7 @@ import {
   FlatList,
   ScrollView,
   StyleSheet,
-  Image, // N'oubliez pas d'importer Image
+  Image, 
 } from "react-native";
 import Autocomplete from "react-native-autocomplete-input";
 import { useDispatch } from "react-redux";
@@ -77,7 +77,7 @@ export default function HomeScreen({ navigation }) {
     const selectedDrug = data.find((item) => item.name === suggestion)._id;
     console.log("selectedDrug :", selectedDrug);
     dispatch(addLastSearch(selectedDrug));
-    // navigation.navigate('infoDrugScreen');
+    navigation.navigate('InfoDrugScreen');
   };
 
   // Ouvre l'url
@@ -205,10 +205,11 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     position: "relative",
     zIndex: 0,
+    marginTop:20,
   },
   container: {
     flex: 1,
-    marginTop: 120,
+    marginTop: 100,
     justifyContent: "top",
     alignItems: "center",
   },
