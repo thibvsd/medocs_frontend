@@ -15,7 +15,7 @@ import {
 import Autocomplete from "react-native-autocomplete-input";
 import { useDispatch } from "react-redux";
 import { addLastSearch } from "../reducers/drugs";
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import FontAwesome from "react-native-vector-icons/FontAwesome";
 import { Linking } from "react-native";
 import { IP_ADDRESS } from "../config.js";
 
@@ -29,8 +29,8 @@ export default function HomeScreen({ navigation }) {
   const [articles, setArticles] = useState([]);
   const [isFilterModalVisible, setFilterModalVisible] = useState(false);
 
-
   useEffect(() => {
+    // Fetch pour alimenter les noms des médicaments dans les suggestions
     const fetchData = async () => {
       try {
         const response = await fetch(
@@ -43,6 +43,7 @@ export default function HomeScreen({ navigation }) {
       }
     };
 
+    // Fetch pour récupérer les 3 derniers articles
     const fetchArticles = async () => {
       try {
         const response = await fetch(
@@ -59,6 +60,7 @@ export default function HomeScreen({ navigation }) {
     fetchArticles();
   }, []);
 
+  // Filtre les suggestions en fonction de la valeur de l'input
   const filterData = (text) => {
     if (text.length >= 3) {
       const filteredData = data
@@ -70,6 +72,7 @@ export default function HomeScreen({ navigation }) {
     }
   };
 
+  // Click déclenche le dispatch de l'élement et redirige vers l'info du médicament
   const onSuggestionPress = (suggestion) => {
     const selectedDrug = data.find((item) => item.name === suggestion)._id;
     console.log("selectedDrug :", selectedDrug);
@@ -77,6 +80,7 @@ export default function HomeScreen({ navigation }) {
     // navigation.navigate('infoDrugScreen');
   };
 
+  // Ouvre l'url
   const openUrl = (url) => {
     Linking.openURL(url)
       .then((supported) => {
@@ -89,7 +93,6 @@ export default function HomeScreen({ navigation }) {
       .catch((err) => console.error("Error opening URL:", err));
   };
 
-
   const openFilterModal = () => {
     setFilterModalVisible(true);
   };
@@ -100,21 +103,23 @@ export default function HomeScreen({ navigation }) {
 
   // Affichage des articles récupérés via le fetch
   const feed = articles.map((data, i) => {
-    return (
+    const options = { day: '2-digit', month: '2-digit', year: 'numeric' };
+    const formattedDate = new Date(data.date).toLocaleDateString('fr-FR', options);
+      return (
       <View key={i} style={styles.articleContainer}>
-            <Image
-              source={{ uri: data.illustration }}
-              style={styles.articleImage}
-            />
-            <View style={styles.articleTextContainer}>
-              <Text style={styles.articleTitle}>{data.title}</Text>
-              <Text style={styles.articleContent}>{data.content}</Text>
-            </View>
-            <TouchableOpacity
-          onPress={() => openUrl(data.url)}
-        >
-          <FontAwesome name='external-link' size={25} color='#ec6e5b' />
+        <View style={styles.articleTextContainer}>
+          <Text style={styles.articleTitle}>{data.title}</Text>
+          <Text style={styles.articleDate}>{formattedDate}</Text>
+
+          <Text style={styles.articleContent}>{data.content}</Text>
+        </View>
+        <TouchableOpacity onPress={() => openUrl(data.url)}>
+          <FontAwesome name="external-link" size={25} color="#ec6e5b" />
         </TouchableOpacity>
+        <Image
+          source={{ uri: data.illustration }}
+          style={styles.articleImage}
+        />
       </View>
     );
   });
@@ -150,18 +155,31 @@ export default function HomeScreen({ navigation }) {
         </View>
         <Text style={styles.title}>Feed</Text>
         <View style={styles.filterButtonContainer}>
-          <TouchableOpacity
-            style={styles.filterButton}
-            onPress={openFilterModal}
-          >
-          <FontAwesome name='filter' size={25} color='#ec6e5b' />
-          </TouchableOpacity>
+          <View style={styles.filterButtons}>
+            <TouchableOpacity
+              style={styles.filterButton}
+              onPress={openFilterModal}
+            >
+              <FontAwesome name="filter" size={25} color="#ec6e5b" />
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.filterButton}>
+              <Text style={styles.filterButtonText}>Source</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.filterButton}>
+              <Text style={styles.filterButtonText}>Famille</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.filterButton}>
+              <Text style={styles.filterButtonText}>Mot-clé</Text>
+            </TouchableOpacity>
+          </View>
         </View>
-        <ScrollView contentContainerStyle={styles.scrollView}>
+        <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+          <TouchableOpacity>
           {feed}
+          </TouchableOpacity>
         </ScrollView>
-     {/* Filter Modal */}
-     <Modal
+        {/* Filter Modal */}
+        <Modal
           animationType="slide"
           transparent={true}
           visible={isFilterModalVisible}
@@ -227,35 +245,66 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: "#ccc",
   },
-  articlesContainer: {
-
-    borderColor: "black",
+  filterButtonContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+    paddingHorizontal: 16,
+    marginTop: 10,
   },
+  filterButtons: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  filterButton: {
+    marginRight: 10,
+  },
+  filterButtonText: {
+    fontSize: 16,
+    color: '#ec6e5b',
+  },
+
   articleContainer: {
+    marginTop:20,
+    flexDirection: 'row',
+    justifyContent: 'space-around', 
+    alignItems: 'center', 
     marginVertical: 10,
+    marginLeft:20,
+    width:"90%",
+  },
+  scrollView: {
+    flexGrow: 1,
+    width:"100%",
   },
   articleImage: {
-    width: 50,
-    height: 50,
-    marginRight: 10,
+    width: 80,
+    height: 80,
+    marginRight: 20, 
+    marginLeft : 10, 
+
   },
   articleTextContainer: {
     flex: 1,
-    
+    marginRight: 10, 
   },
   articleTitle: {
     fontSize: 16,
-    fontWeight: "bold",
+    fontWeight: 'bold',
+  },
+  articleDate:{
+fontStyle:"italic",
+color:"grey",
   },
   articleContent: {
     fontSize: 14,
   },
+
   openUrlButton: {
-    position: "absolute",
     bottom: 0,
     right: 0,
     backgroundColor: "blue",
-    padding: 10,
     borderRadius: 5,
   },
   openUrlButtonText: {
@@ -263,18 +312,18 @@ const styles = StyleSheet.create({
   },
   modalContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)', // semi-transparent black background
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.8)",
   },
   modalText: {
     fontSize: 20,
-    fontWeight: 'bold',
-    color: 'white',
+    fontWeight: "bold",
+    color: "white",
     marginBottom: 20,
   },
   closeModalText: {
     fontSize: 16,
-    color: 'white',
+    color: "white",
   },
 });
