@@ -115,37 +115,7 @@ export default function App() {
     );
   };
 
-  const TabNavigatorGuest = () => {
-    return (
-      <Tab.Navigator initialRouteName="Profile"
-        screenOptions={({ route }) => ({
-          tabBarIcon: ({ color, size }) => {
-            let iconName = "";
-
-            if (route.name === "Home") {
-              iconName = "home";
-            } else if (route.name === "Search") {
-              iconName = "search";
-            } else if (route.name === "Profile") {
-              iconName = "user";
-            }
-            return <FontAwesome name={iconName} size={size} color={color} />;
-          },
-          tabBarActiveTintColor: "#ec6e5b",
-          tabBarInactiveTintColor: "#335561",
-          headerShown: false,
-        })}
-      >
-        <Tab.Screen name="Home" component={HomeScreen} />
-        <Tab.Screen name="Search" component={SearchScreen} />
-        <Tab.Screen name="Profile" component={ProfileScreenStack} />
-      </Tab.Navigator>
-    );
-  };
-
-
   //GERE L'AFFICHAGE DU PROFIL AU CLICK SUR USER ICON
-
   const ProfileScreenStack = () => {
     const isToken = useSelector((state) => state.user.value.token);
     return (
@@ -183,12 +153,12 @@ export default function App() {
         {isFirstLaunch ? (
           <Stack.Navigator screenOptions={{ headerShown: false }}>            
             <Stack.Screen name="Onbording" component={OnboardingScreen} />
-            <Stack.Screen name="Guest" component={TabNavigatorGuest} />
             <Stack.Screen name="TabNavigator" component={TabNavigator} />
           </Stack.Navigator>
           ) : (
           <Stack.Navigator screenOptions={{ headerShown: false }}>
             <Stack.Screen name="TabNavigator" component={TabNavigator} />
+            <Stack.Screen name="LoginScreen" component={LoginScreen} options={{ headerShown: false }} />
           </Stack.Navigator>
           )}
         </NavigationContainer>
