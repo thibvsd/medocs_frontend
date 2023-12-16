@@ -129,6 +129,7 @@ export default function HomeScreen({ navigation }) {
       onPress={() => {
         Keyboard.dismiss();
         setSuggestions([]);
+        setQuery(""); 
       }}
     >
       <View style={styles.container}>
@@ -149,7 +150,7 @@ export default function HomeScreen({ navigation }) {
                 </TouchableOpacity>
               ),
             }}
-            placeholder="Rechercher..."
+            placeholder="Rechercher un médicament..."
             containerStyle={styles.autocompleteContainer}
           />
         </View>
