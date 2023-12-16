@@ -20,16 +20,13 @@ import { IP_ADDRESS } from "../config.js";
 export default function SearchScreen({ navigation }) {
   const dispatch = useDispatch();
   // const token = useSelector((state) => state.user.value.token) ;
-  const token = 'kTe-BIKeY40kJaYz6JMm9sEcJFtpxVpD' // Token avec des lastSearches
-
-  
-  const { navigate } = navigation;
+  const token = "kTe-BIKeY40kJaYz6JMm9sEcJFtpxVpD"; // Token avec des lastSearches
 
   const [query, setQuery] = useState("");
   const [data, setData] = useState([]);
   const [suggestions, setSuggestions] = useState([]);
   const [searches, setSearches] = useState([]);
-
+  const [searchQuery, setSearchQuery] = useState([]);
 
   useEffect(() => {
     // Fetch les noms des médicaments (pour l'autocomplétion)
@@ -54,23 +51,32 @@ export default function SearchScreen({ navigation }) {
           `http://${IP_ADDRESS}:3000/searches/last5Searches/${token}`
         );
         const result = await response.json();
-        console.log("dans fetch",result.search);
+        console.log("dans fetch", result.search);
         setSearches(result.search);
-  
-        // console.log(data);
       } catch (error) {
         console.error(error);
       }
     };
     fetchLastSearch();
-
   }, []);
 
   // Lancer la recherche en cliquant sur le bouton
   const handleSearch = () => {
-    dispatch(addLastSearch(query));
-    // Ajouter la logique de recherche ici
-    console.log("Recherche lancée pour :", query);
+    const fetchQuery = async () => {
+      try {
+        const response = await fetch(
+          `http://${IP_ADDRESS}:3000/drugs/byName/${query}`
+        );
+        const result = await response.json();
+        setSearchQuery(result.name);
+        // console.log(data);
+      } catch (error) {
+        console.error(error);
+      }
+      console.log("Recherche lancée pour :", query);
+    };
+    fetchQuery();
+    setQuery("");
   };
 
   // Filtrer les suggestions en fonction de la valeur de l'input
@@ -87,40 +93,39 @@ export default function SearchScreen({ navigation }) {
 
   const onSuggestionPress = (suggestion) => {
     // Cherche le name et extrait son _id :
-    const selectedDrug = data.find(
-      (item) => item.name === suggestion
-    )._id;
+    const selectedDrug = data.find((item) => item.name === suggestion)._id;
     console.log("selectedDrug :", selectedDrug);
     dispatch(addLastSearch(selectedDrug)); // Dispatch l'id pour pouvoir le récupérer sur la page infoDrugScreen
-    // navigation.navigate('infoDrugScreen');
+    navigation.navigate("InfoDrugScreen");
     setQuery("");
-
   };
 
   const onLastSearchClick = (data) => {
     dispatch(addLastSearch(data._id));
-    // navigation.navigate('infoDrugScreen');
-  }
+    navigation.navigate("InfoDrugScreen");
+    setQuery("");
+  };
 
   // Map pour afficher les dernières recherches
   const lastSearches = searches.map((data, i) => {
-      return (
+    return (
       <View key={i} style={styles.lastSearchesContainer}>
         <TouchableOpacity onPress={() => onLastSearchClick(data)}>
-        <Text style={styles.searchName}>{data.drug_id.name}</Text>
-                </TouchableOpacity>
+          <Text style={styles.searchName}>{data.drug_id.name}</Text>
+        </TouchableOpacity>
       </View>
     );
   });
 
-
   return (
     // masque le clavier quand on clique en dehors de la zone input :
-    <TouchableWithoutFeedback onPress={() => {
-      Keyboard.dismiss();
-      setSuggestions([]);
-      setQuery(""); // Masquer les suggestions lorsqu'on clique en dehors
-    }  }>
+    <TouchableWithoutFeedback
+      onPress={() => {
+        Keyboard.dismiss();
+        setSuggestions([]);
+        setQuery(""); // Masquer les suggestions lorsqu'on clique en dehors
+      }}
+    >
       <View style={styles.container}>
         <Text style={styles.title}>Recherche</Text>
         <View style={styles.searchContainer}>
@@ -158,9 +163,9 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: "bold",
   },
-  titleLastSearches:{
-    marginTop:40,
-    fontSize:20,
+  titleLastSearches: {
+    marginTop: 40,
+    fontSize: 20,
   },
   container: {
     flex: 1,
@@ -181,7 +186,7 @@ const styles = StyleSheet.create({
     top: 0,
     marginBottom: 10,
     backgroundColor: "#fff",
-    opacity:1,
+    opacity: 1,
   },
   searchInput: {
     flex: 1,
@@ -200,7 +205,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#3498db",
     borderRadius: 5,
   },
-  
+
   suggestionItem: {
     backgroundColor: "#fff", // Utilisez une couleur solide
     padding: 10,
@@ -211,7 +216,11 @@ const styles = StyleSheet.create({
   buttonText: {
     color: "#fff",
   },
-  lastSearchesContainer:{
-marginTop: 20,
+  lastSearchesContainer: {
+    marginTop: 20,
+  },
+  searchName: {
+    color: "blue",
+    textDecorationLine: "underline",
   },
 });
