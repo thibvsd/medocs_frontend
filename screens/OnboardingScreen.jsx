@@ -1,241 +1,129 @@
 import React from 'react';
-import { View, Text,  Image, StyleSheet, TouchableOpacity } from 'react-native';
 import Onboarding from 'react-native-onboarding-swiper';
 import { useNavigation } from '@react-navigation/native';
-import { Button, Icon } from 'react-native-elements';
+import {
+  View,
+  Text,
+  Button,
+  Image,
+  StyleSheet,
+  TouchableOpacity,
+} from "react-native";
 
 import { Border, FontFamily, FontSize, Color } from "../assets/GlobalStyles";
 
-const OnboardingScreen = () => {
-  const navigation = useNavigation();
-  const onSkip = () => {
-    // Navigate to the "Profile" screen when the "Skip" button is clicked
-    navigation.navigate('TabNavigator','Home'); //go to login with no tabnavigator
-  };
-  const Done = ({...props}) => (
-    <TouchableOpacity
-    {...props}
-    >
-    <Text style={{fontSize:16, marginHorizontal:20}}>Done</Text>
-    <Button
-            title={'Done eff to home'}
-            containerViewStyle={{ marginTop: 20 }}
-            backgroundColor={'white'}
-            borderRadius={5}
-            textStyle={{ color: '#003c8f' }}
-            onPress={onHome}
-          />
-    </TouchableOpacity>
-  )
+const Dots = ({ selected }) => {
+  let backgroundColor;
 
-  const Dots = ({selected}) => {
-    let backgroundColor;
-    backgroundColor = selected ? 'green' : 'black'
-    return (
-    <View
-    style={{
-        width:24,
-        height:6,
-        marginHorizontal:3,
-        backgroundColor
-    }}
-    />
-    )
-  }
-  const onDone = () => {
-    navigation.replace('TabNavigator','Home'); 
-  };
-  const onLogin = () => {
-    navigation.navigate('Guest');
-    //navigation.navigate('TabNavigator','Profile');
-  }
-  const onHome = () => {
-    navigation.replace('TabNavigator','Home'); 
-  };
+  backgroundColor = selected ? "rgba(0, 0, 0, 0.8)" : "rgba(0, 0, 0, 0.3)";
+
   return (
-    <View>
-      {/* Your Onboarding content here */}
-      <Onboarding
+    <View
+      style={{
+        width: 6,
+        height: 6,
+        marginHorizontal: 3,
+        backgroundColor,
+      }}
+    />
+  );
+};
+
+const Next = ({ ...props }) => (
+  <Button title="Next" color="#000000" {...props} />
+);
+
+const Done = ({ ...props }) => (
+  <TouchableOpacity style={{ marginHorizontal: 8 }} {...props}>
+    <Text style={{ fontSize: 16 }}>Done</Text>
+  </TouchableOpacity>
+);
+
+
+const OnboardingScreen = () => {
+
+
+const navigation = useNavigation();
+
+const onDone = () => {
+  navigation.replace('TabNavigator','Home'); 
+};
+const onLogin = () => {
+  navigation.navigate('Guest');
+  //navigation.navigate('TabNavigator','Profile');
+}
+const onHome = () => {
+  navigation.replace('TabNavigator','Home'); 
+};
+
+
+
+  return (
+    <Onboarding     
+      DoneButtonComponent={Done}
       DotComponent={Dots}
+      onSkip={() => navigation.navigate("NuevaOrden")}       
+      onDone={() => navigation.navigate("NuevaOrden")}
       pages={[
         {
-          backgroundColor: '#ffffff',
-          title: (
-            <View style={styles.logo}>
-              <Image
-                style={styles.vectorIcon}
-                contentFit="cover"
-                source={require("../assets/logo.png")}
-              />
-              <Text style={styles.medidoc}>Medidoc</Text>
-            </View>
-          ),
-          subtitle: (
-          <>
-            <View style={styles.contentFlexBox}>
-              <Text style={styles.headline}>{`Prêt ? `}</Text>
-              <TouchableOpacity onPress={onHome}>
-                <Text style={styles.connectezVousPour}>
-                  Connectez vous pour profiter dès à présent des fonctionnalités de l’application
+          backgroundColor: "#a6e4d0",
+          image: <Image source={require("../assets/logo.png")} />,
+          title: <>
+          <View style={styles.contentFlexBox}>
+          <Text style={styles.headline}>{`Prêt ? `}</Text>
+            <TouchableOpacity onPress={onHome}>
+              <Text style={styles.connectezVousPour}>
+                Connectez vous pour profiter dès à présent des fonctionnalités de l’application
+              </Text>
+            </TouchableOpacity>
+          </View></>,
+          subtitle: <>
+          <View style={styles.frameFlexBox}>
+            <View style={styles.buttonLayout}>
+              <View style={[styles.loginButtonChild, styles.buttonChildPosition]} />
+              <TouchableOpacity onPress={onLogin}>
+                <Text style={styles.connexion}>
+                Connexion
                 </Text>
               </TouchableOpacity>
             </View>
-            <View style={styles.frameFlexBox}>
-              <View style={styles.buttonLayout}>
-                <View style={[styles.loginButtonChild, styles.buttonChildPosition]} />
-                <Text style={styles.connexion}>
-                  <Button
-                    backgroundColor={'none'}
-                    textStyle={{ color: '#ffffff' }}
-                    title={'Connexion'}
-                    containerViewStyle={{ marginTop: 20 }}
-                    borderRadius={5}
-                    onPress={onLogin}
-                  />
-                  </Text>
-              </View>
-              <View style={[styles.signupButton, styles.buttonLayout]}>
-                <View
-                  style={[styles.signupButtonChild, styles.buttonChildPosition]}
-                />
-                <Text style={[styles.inscription, styles.inscriptionTypo]}>
-                  <Button
-                  title={'Inscription'}
-                  containerViewStyle={{ marginTop: 20 }}
-                  borderRadius={5}
-                  onPress={onLogin}
-                  backgroundColor={'none'}
-                  textStyle={{ color: '#ffffff' }}
-                  />
-                </Text>
-              </View>
-            </View>
-            <View style={[styles.frame, styles.frameFlexBox]}>
-              <Text style={styles.ou}>ou</Text>
-              <View style={styles.buttonLayout}>                
-                <Text style={[styles.continuerEnTant, styles.inscriptionTypo]}>
-                  Continuer en tant qu’invité
-                </Text>
-              </View>
-            </View>
-          </>
-          ),
-          },
-        {
-          title: 'Send Messages',
-          subtitle: (
-            <>
-            <Button
-              title={'Login'}
-              containerViewStyle={{ marginTop: 20 }}
-              backgroundColor={'white'}
-              borderRadius={5}
-              textStyle={{ color: '#003c8f' }}
-              onPress={onLogin}
-            /><Button
-            title={'Guest'}
-            containerViewStyle={{ marginTop: 20 }}
-            backgroundColor={'white'}
-            borderRadius={5}
-            textStyle={{ color: '#003c8f' }}
-            onPress={onHome}
-          /></>
-          ),
-          backgroundColor: '#ffffff',
-          image: (
-            <Icon
-              name="paper-plane-o"
-              type="font-awesome"
-              size={100}
-              color="white"
-            />
-          ),
-        },
-        {
-          title: 'Get Notified',
-          backgroundColor: '#ffffff',
-          subtitle: 'We will send you notification as soon as something happened',
-          image: (
-            <Icon name="bell-o" type="font-awesome" size={100} color="white" />
-          ),
-        },
-        {
-          title: "That's Enough",
-          backgroundColor: '#ffffff',
-          subtitle: (
-            <>
-            <Button
-              title={'Login'}
-              containerViewStyle={{ marginTop: 20 }}
-              backgroundColor={'white'}
-              borderRadius={5}
-              textStyle={{ color: '#003c8f' }}
-              onPress={onLogin}
-            /><Button
-            title={'Guest'}
-            containerViewStyle={{ marginTop: 20 }}
-            backgroundColor={'white'}
-            borderRadius={5}
-            textStyle={{ color: '#003c8f' }}
-            onPress={onHome}
-          /></>
-          ),
-          image: (
-            <Icon name="rocket" type="font-awesome" size={100} color="white" />
-          ),
-        },
-        {
-          backgroundColor: '#ffffff',
-          title: (
-            <View style={styles.logo}>
-              <Image
-                style={styles.vectorIcon}
-                contentFit="cover"
-                source={require("../assets/logo.png")}
+            <View style={[styles.signupButton, styles.buttonLayout]}>
+              <View
+                style={[styles.signupButtonChild, styles.buttonChildPosition]}
               />
-              <Text style={styles.medidoc}>Medidoc</Text>
-            </View>
-          ),
-          subtitle: (
-          <>
-            <View style={styles.contentFlexBox}>
-              <Text style={styles.headline}>{`Prêt ? `}</Text>
-              <Text style={styles.connectezVousPour}>
-                Connectez vous pour profiter dès à présent des fonctionnalités de
-                l’application
+              <TouchableOpacity onPress={onLogin}>
+              <Text style={[styles.inscription, styles.inscriptionTypo]}>
+                Inscription
               </Text>
+              </TouchableOpacity>
             </View>
-            <View style={styles.frameFlexBox}>
-              <View style={styles.buttonLayout}>
-                <View style={[styles.loginButtonChild, styles.buttonChildPosition]} />
-                <Text style={styles.connexion}>Connexion</Text>
-              </View>
-              <View style={[styles.signupButton, styles.buttonLayout]}>
-                <View
-                  style={[styles.signupButtonChild, styles.buttonChildPosition]}
-                />
-                <Text style={[styles.inscription, styles.inscriptionTypo]}>
-                  Inscription
-                </Text>
-              </View>
-            </View>
-            <View style={[styles.frame, styles.frameFlexBox]}>
-              <Text style={styles.ou}>ou</Text>
-              <View style={styles.buttonLayout}>
+          </View>
+          <View style={[styles.frame, styles.frameFlexBox]}>
+            <Text style={styles.ou}>ou</Text>
+            <View style={styles.buttonLayout}> 
+              <TouchableOpacity onPress={onHome}>             
                 <Text style={[styles.continuerEnTant, styles.inscriptionTypo]}>
                   Continuer en tant qu’invité
                 </Text>
-              </View>
+              </TouchableOpacity>  
             </View>
-          </>
-          ),
-        }        
+          </View>
+        </>
+        },
+        {
+          backgroundColor: "#fdeb93",
+          image: <Image source={require("../assets/logo.png")} />,
+          title: "Ecran 2",
+          subtitle: "...",
+        },
+        {
+          backgroundColor: "#e9bcbe",
+          image: <Image source={require("../assets/logo.png")} />,
+          title: "Ecran 3",
+          subtitle: "...",
+        },
       ]}
-        onSkip={onSkip}
-        onDone={onDone}
-        // Add other Onboarding props as needed
-      />
-    </View>
+    />
   );
 };
 
