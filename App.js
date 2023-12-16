@@ -87,9 +87,8 @@ export default function App() {
   }
 
   const TabNavigator = () => {
-    const initialRoute = isFirstLaunch ? "Profile" : "Home";
     return (
-      <Tab.Navigator initialRouteName={initialRoute}
+      <Tab.Navigator
         screenOptions={({ route }) => ({
           tabBarIcon: ({ color, size }) => {
             let iconName = "";
@@ -116,17 +115,45 @@ export default function App() {
     );
   };
 
+  const TabNavigatorGuest = () => {
+    return (
+      <Tab.Navigator initialRouteName="Profile"
+        screenOptions={({ route }) => ({
+          tabBarIcon: ({ color, size }) => {
+            let iconName = "";
+
+            if (route.name === "Home") {
+              iconName = "home";
+            } else if (route.name === "Search") {
+              iconName = "search";
+            } else if (route.name === "Profile") {
+              iconName = "user";
+            }
+            return <FontAwesome name={iconName} size={size} color={color} />;
+          },
+          tabBarActiveTintColor: "#ec6e5b",
+          tabBarInactiveTintColor: "#335561",
+          headerShown: false,
+        })}
+      >
+        <Tab.Screen name="Home" component={HomeScreen} />
+        <Tab.Screen name="Search" component={SearchScreen} />
+        <Tab.Screen name="Profile" component={ProfileScreenStack} />
+      </Tab.Navigator>
+    );
+  };
+
+
   //GERE L'AFFICHAGE DU PROFIL AU CLICK SUR USER ICON
+
   const ProfileScreenStack = () => {
     const isToken = useSelector((state) => state.user.value.token);
     return (
       <Stack.Navigator>
-        {(isFirstLaunch || !isToken) ? (
-          <>
-            <Stack.Screen name="Login" component={LoginScreen} options={{ headerShown: false }} /> 
-            <Stack.Screen name="Onboarding" component={LoginScreenStack} options={{ headerShown: false }} />
-            </>
-          ) : (
+        {!isToken ? (
+          // Si l'utilisateur est connecté
+          <Stack.Screen name="Login" component={LoginScreen} options={{ headerShown: false }} />
+        ) : (
           <>
             <Stack.Screen name="ProfileScreen" component={ProfileScreen} />
             <Stack.Screen name="Favoris" component={FavoritesScreen} />
@@ -136,15 +163,6 @@ export default function App() {
             <Stack.Screen name="Se déconnecter" component={HomeScreen} />
           </>
         )}
-      </Stack.Navigator>
-    );
-  };
-
-  const LoginScreenStack = () => {
-    return (
-      <Stack.Navigator>
-        <Stack.Screen name="TabNavigator" component={TabNavigator} options={{ headerShown: false }} />
-        <Stack.Screen name="Login" component={LoginScreen} options={{ headerShown: false }} />
       </Stack.Navigator>
     );
   };
@@ -163,17 +181,14 @@ export default function App() {
       <PersistGate persistor={persistor}>  
         <NavigationContainer>
         {isFirstLaunch ? (
-          <Stack.Navigator screenOptions={{ headerShown: false }}>
-            <Stack.Screen options={{ headerShown: false }}
-              name="Onboarding"
-              component={OnboardingScreen}
-            />
+          <Stack.Navigator screenOptions={{ headerShown: false }}>            
+            <Stack.Screen name="Onbording" component={OnboardingScreen} />
+            <Stack.Screen name="Guest" component={TabNavigatorGuest} />
             <Stack.Screen name="TabNavigator" component={TabNavigator} />
           </Stack.Navigator>
           ) : (
           <Stack.Navigator screenOptions={{ headerShown: false }}>
             <Stack.Screen name="TabNavigator" component={TabNavigator} />
-            <Stack.Screen name="Profile" component={ProfileScreen} />
           </Stack.Navigator>
           )}
         </NavigationContainer>
