@@ -49,6 +49,8 @@ const Tab = createBottomTabNavigator();
 
 export default function App() {
 
+  // AsyncStorage.clear();
+
   const [token, setToken] = useState(null);
   useEffect(() => {
     async function checkToken() {

@@ -14,55 +14,82 @@ import Autocomplete from "react-native-autocomplete-input";
 import { useDispatch, useSelector } from "react-redux";
 import { addLastSearch } from "../reducers/drugs";
 import { IP_ADDRESS } from "../config.js";
+import AsyncStorage from '@react-native-async-storage/async-storage';  // Importer AsyncStorage
 
 // ECRAN DE RECHERCHE
 
 export default function SearchScreen({ navigation }) {
   const dispatch = useDispatch();
   // const token = useSelector((state) => state.user.value.token) ;
-  const token = "kTe-BIKeY40kJaYz6JMm9sEcJFtpxVpD"; // Token avec des lastSearches pour tester
-  // !!! Récupérer le vrai token => async storage ? redux ?
+  // const token = "kTe-BIKeY40kJaYz6JMm9sEcJFtpxVpD"; // Token avec des lastSearches pour tester
+ const token = "XkXnvWcBQXW4ortC2mvsTyeX7_XU5xLb"; // Token sans  lastSearches pour tester
+// !!! MODIFIER RECUPERATION TOKEN (aussi dans fetch LastSearch)
 
+  // const [token, setToken] = useState('');
   const [query, setQuery] = useState("");
   const [data, setData] = useState([]);
   const [suggestions, setSuggestions] = useState([]);
   const [searches, setSearches] = useState([]);
   const [searchQuery, setSearchQuery] = useState([]);
+  const [showSearchResults, setShowSearchResults] = useState(false);
+
 
   useEffect(() => {
-    // Fetch les noms des médicaments (pour l'autocomplétion)
+
+    // AbortController pour arrêter la requête si query est modifié
+    const fetchDataController = new AbortController();
+    const fetchLastSearchController = new AbortController();
+
+    // Fonction pour fetch les noms des médicaments (pour l'autocomplétion)
     const fetchData = async () => {
       try {
+        if (query.length >= 3) {
+          const response = await fetch(
+            `http://${IP_ADDRESS}:3000/drugs/query3characters/${query}`,
+            { signal: fetchDataController.signal }
+          );
+          const result = await response.json();
+          setData(result.namesAndId);
+        }
+      } catch (error) {
+        if (error.name === 'AbortError') {
+          console.log('La requête fetchData a été annulée.');
+        } else {
+          console.error(error);
+        }
+      }
+    };
+
+    // Fonction pour fetch les dernières recherches
+    const fetchLastSearch = async () => {
+      try {
+    //         // Attendre la résolution de la Promise AsyncStorage qui récupère le token
+    // const storedToken = await AsyncStorage.getItem('token');
+    // // Utiliser la valeur du token
+    // setToken(storedToken);
+
         const response = await fetch(
-          `http://${IP_ADDRESS}:3000/drugs/allNames`
+          `http://${IP_ADDRESS}:3000/searches/last5Searches/${token}`,
+          { signal: fetchLastSearchController.signal }
         );
         const result = await response.json();
-        setData(result.namesAndId);
-        // console.log(data);
+        setSearches(result.search);
+        console.log('Token:', token);
       } catch (error) {
-        console.error(error);
+        if (error.name === 'AbortError') {
+          console.log('La requête fetchLastSearch a été annulée.');
+        } else {
+          console.error(error);
+        }
       }
     };
 
     fetchData();
-
-    const fetchLastSearch = async () => {
-      try {
-        const response = await fetch(
-          `http://${IP_ADDRESS}:3000/searches/last5Searches/${token}`
-        );
-        const result = await response.json();
-        console.log("dans fetch lastsearch",result.search);
-        setSearches(result.search);
-  
-        // console.log(data);
-      } catch (error) {
-        console.error(error);
-      }
-    };
     fetchLastSearch();
 
-  }, []);
+    // Annuler la requête fetchData à chaque modification de query
+    return () => fetchDataController.abort();
+  }, [query]); // le useEffect se relance si query change
 
 
   // Lancer la recherche en cliquant sur le bouton
@@ -73,15 +100,17 @@ export default function SearchScreen({ navigation }) {
           `http://${IP_ADDRESS}:3000/drugs/byName/${query}`
         );
         const result = await response.json();
-        setSearchQuery(result.name);
-        // console.log(data);
+        console.log(result);
+        setSearchQuery(result); // enregistre les résultats de la recherche
+        setShowSearchResults(true); // Afficher les résultats de la recherche
+        console.log("searchQuery",searchQuery)
       } catch (error) {
         console.error(error);
       }
-      console.log("Recherche lancée pour :", query);
     };
     fetchQuery();
     setQuery("");
+    setSuggestions([]);
   };
 
   // Filtrer les suggestions en fonction de la valeur de l'input
@@ -105,7 +134,9 @@ export default function SearchScreen({ navigation }) {
     setQuery("");
   };
 
-  const onLastSearchClick = (data) => {
+
+// Quand click sur un résultat de recherche ou une lastSearch, rediriger vers l'info du médicament
+  const onSearchClick = (data) => {
     dispatch(addLastSearch(data._id));
     navigation.navigate("InfoDrugScreen");
     setQuery("");
@@ -116,13 +147,22 @@ export default function SearchScreen({ navigation }) {
     <View></View>
   ) : (
     searches.map((data, i) => (
-      <View key={i} style={styles.lastSearchesContainer}>
-        <TouchableOpacity onPress={() => onLastSearchClick(data)}>
+      <View key={i} style={styles.searchesContainer}>
+        <TouchableOpacity onPress={() => onSearchClick(data)}>
           <Text style={styles.searchName}>{data.drug_id.name}</Text>
         </TouchableOpacity>
       </View>
     ))
   );
+
+  // Map pour afficher les résultats de la recherche
+  const newSearch = searchQuery.map((data, i) => (
+      <View key={i} style={styles.searchesContainer}>
+        <TouchableOpacity onPress={() => onSearchClick(data)}>
+          <Text style={styles.searchName}>{data.name}</Text>
+        </TouchableOpacity>
+      </View>
+  ));
 
   return (
     // masque le clavier quand on clique en dehors de la zone input :
@@ -159,8 +199,19 @@ export default function SearchScreen({ navigation }) {
             <FontAwesome name="search" size={30} color="white" />
           </TouchableOpacity>
         </View>
-        <Text style={styles.titleLastSearches}>Mes dernières recherches</Text>
-        {lastSearches}
+        {showSearchResults ? (
+          // Afficher les résultats de la recherche si on en a lancé une
+         <View>
+          <Text style={styles.titleSearches}>Résultats de la recherche :</Text>
+          {newSearch}
+          </View>
+        ) : (
+          // Afficher Mes dernières recherches (par défaut)
+          <View>
+            <Text style={styles.titleSearches}>Mes dernières recherches</Text>
+            {lastSearches}
+          </View>
+        )}
       </View>
     </TouchableWithoutFeedback>
   );
@@ -170,7 +221,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: "bold",
   },
-  titleLastSearches: {
+  titleSearches: {
     marginTop: 40,
     fontSize: 20,
   },
@@ -223,7 +274,7 @@ const styles = StyleSheet.create({
   buttonText: {
     color: "#fff",
   },
-  lastSearchesContainer: {
+  searchesContainer: {
     marginTop: 20,
   },
   searchName: {
