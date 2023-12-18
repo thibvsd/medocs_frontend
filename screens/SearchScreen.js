@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   TouchableWithoutFeedback,
   Keyboard,
+  ScrollView,
   FlatList,
   StyleSheet,
 } from "react-native";
@@ -21,8 +22,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';  // Import
 export default function SearchScreen({ navigation }) {
   const dispatch = useDispatch();
   // const token = useSelector((state) => state.user.value.token) ;
-  // const token = "kTe-BIKeY40kJaYz6JMm9sEcJFtpxVpD"; // Token avec des lastSearches pour tester
- const token = "XkXnvWcBQXW4ortC2mvsTyeX7_XU5xLb"; // Token sans  lastSearches pour tester
+  const token = "kTe-BIKeY40kJaYz6JMm9sEcJFtpxVpD"; // Token avec des lastSearches pour tester
+//  const token = "XkXnvWcBQXW4ortC2mvsTyeX7_XU5xLb"; // Token sans  lastSearches pour tester
 // !!! MODIFIER RECUPERATION TOKEN (aussi dans fetch LastSearch)
 
   // const [token, setToken] = useState('');
@@ -30,7 +31,7 @@ export default function SearchScreen({ navigation }) {
   const [data, setData] = useState([]);
   const [suggestions, setSuggestions] = useState([]);
   const [searches, setSearches] = useState([]);
-  const [searchQuery, setSearchQuery] = useState([]);
+  const [queryResults, setQueryResults] = useState([]);
   const [showSearchResults, setShowSearchResults] = useState(false);
 
 
@@ -101,9 +102,8 @@ export default function SearchScreen({ navigation }) {
         );
         const result = await response.json();
         console.log(result);
-        setSearchQuery(result); // enregistre les résultats de la recherche
+        setQueryResults(result); // enregistre les résultats de la recherche
         setShowSearchResults(true); // Afficher les résultats de la recherche
-        console.log("searchQuery",searchQuery)
       } catch (error) {
         console.error(error);
       }
@@ -140,6 +140,8 @@ export default function SearchScreen({ navigation }) {
     dispatch(addLastSearch(data._id));
     navigation.navigate("InfoDrugScreen");
     setQuery("");
+    setQueryResults([]);
+    setShowSearchResults(false); 
   };
 
   // Map pour afficher les dernières recherches si elles existent
@@ -156,7 +158,8 @@ export default function SearchScreen({ navigation }) {
   );
 
   // Map pour afficher les résultats de la recherche
-  const newSearch = searchQuery.map((data, i) => (
+  const newSearch = queryResults.map((data, i) => (
+
       <View key={i} style={styles.searchesContainer}>
         <TouchableOpacity onPress={() => onSearchClick(data)}>
           <Text style={styles.searchName}>{data.name}</Text>
@@ -203,7 +206,12 @@ export default function SearchScreen({ navigation }) {
           // Afficher les résultats de la recherche si on en a lancé une
          <View>
           <Text style={styles.titleSearches}>Résultats de la recherche :</Text>
+          <ScrollView
+    style={styles.scrollView}
+    showsVerticalScrollIndicator={false}
+  >
           {newSearch}
+          </ScrollView>
           </View>
         ) : (
           // Afficher Mes dernières recherches (par défaut)
@@ -224,6 +232,7 @@ const styles = StyleSheet.create({
   titleSearches: {
     marginTop: 40,
     fontSize: 20,
+    textAlign:'center',
   },
   container: {
     flex: 1,
@@ -233,9 +242,13 @@ const styles = StyleSheet.create({
   },
   searchContainer: {
     flexDirection: "row",
-    alignItems: "top",
+    alignItems: "center",
+    justifyContent: "space-between",
     marginTop: 20,
     paddingHorizontal: 16,
+    alignItems: "flex-end",
+    position: "relative",
+    zIndex: 1,
   },
   autocompleteContainer: {
     flex: 1,
@@ -280,5 +293,9 @@ const styles = StyleSheet.create({
   searchName: {
     color: "blue",
     textDecorationLine: "underline",
+  },
+  scrollView: {
+    flexGrow: 1,
+    width: "100%",
   },
 });

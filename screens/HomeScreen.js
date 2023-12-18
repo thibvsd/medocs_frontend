@@ -87,6 +87,28 @@ export default function HomeScreen({ navigation }) {
     navigation.navigate("InfoDrugScreen");
   };
 
+// Click sur la loupe, lance la recherche
+  const handleSearch = () => {
+    const fetchQuery = async () => {
+      try {
+        const response = await fetch(
+          `http://${IP_ADDRESS}:3000/drugs/byName/${query}`
+        );
+        const result = await response.json();
+        console.log(result);
+        setQueryResults(result); // enregistre les résultats de la recherche
+        setShowSearchResults(true); // Afficher les résultats de la recherche
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    fetchQuery();
+    setQuery("");
+    setSuggestions([]);
+    navigation.navigate("InfoDrugScreen");
+
+  };
+
   // Ouvre l'url
   const openUrl = (url) => {
     Linking.openURL(url)
@@ -186,6 +208,9 @@ export default function HomeScreen({ navigation }) {
             placeholder="Rechercher un médicament..."
             containerStyle={styles.autocompleteContainer}
           />
+                    <TouchableOpacity onPress={handleSearch} style={styles.searchButton}>
+            <FontAwesome name="search" size={30} color="white" />
+          </TouchableOpacity>
         </View>
         <Text style={styles.title}>Feed</Text>
         <View style={styles.filterButtonContainer}>
