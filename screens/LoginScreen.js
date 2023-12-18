@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect  } from "react";
 import {
   View,
   Text,
@@ -14,7 +14,7 @@ import { IP_ADDRESS } from "../config.js";
 
 // ECRAN DE SIGNUP / SIGNIN
 
-export default function LoginScreen({ navigation }) {
+export default function LoginScreen({ route, navigation }) {
   const dispatch = useDispatch();
   const [isSignIn, setIsSignIn] = useState(true);
   const [signUpUsername, setSignUpUsername] = useState("");
@@ -31,7 +31,13 @@ export default function LoginScreen({ navigation }) {
   const toggleForm = () => {
     setIsSignIn(!isSignIn);
   };
-
+    
+  useEffect(() => {
+    if (route.params && route.params.IsSignup) {
+    setIsSignIn(!isSignIn);
+    }
+  }, [route.params]); 
+  
   const handleRegister = () => {
     if (signUpPassword !== confirmPassword) {
       Alert.alert("Attention", "Les mots de passe ne correspondent pas.");
