@@ -9,7 +9,6 @@ import {
   StyleSheet,
   TouchableOpacity,
 } from "react-native";
-
 import { Border, FontFamily, FontSize, Color } from "../assets/GlobalStyles";
 
 const Dots = ({ selected }) => {
@@ -49,21 +48,38 @@ const onDone = () => {
   navigation.replace('TabNavigator','Home'); 
 };
 const onLogin = () => {
-  navigation.navigate('Guest');
-  //navigation.navigate('TabNavigator','Profile');
+  navigation.navigate('TabNavigator', {
+    screen: 'Profile',
+    params: {
+      screen: 'Login',
+      params: {
+        IsSignup: false,
+      },
+    },
+  });
+}
+
+const onInscription = () => {
+  navigation.navigate('TabNavigator', {
+    screen: 'Profile',
+    params: {
+      screen: 'Login',
+      params: {
+        IsSignup: true,
+      },
+    },
+  });
 }
 const onHome = () => {
   navigation.replace('TabNavigator','Home'); 
 };
 
-
-
   return (
     <Onboarding     
       DoneButtonComponent={Done}
       DotComponent={Dots}
-      onSkip={() => navigation.navigate("NuevaOrden")}       
-      onDone={() => navigation.navigate("NuevaOrden")}
+      onSkip={() => navigation.navigate("TabNavigator")}       
+      onDone={() => navigation.navigate("TabNavigator")}
       pages={[
         {
           backgroundColor: "#a6e4d0",
@@ -91,7 +107,7 @@ const onHome = () => {
               <View
                 style={[styles.signupButtonChild, styles.buttonChildPosition]}
               />
-              <TouchableOpacity onPress={onLogin}>
+              <TouchableOpacity onPress={onInscription}>
               <Text style={[styles.inscription, styles.inscriptionTypo]}>
                 Inscription
               </Text>
