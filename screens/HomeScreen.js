@@ -10,7 +10,7 @@ import {
   FlatList,
   ScrollView,
   StyleSheet,
-  Image, 
+  Image,
 } from "react-native";
 import Autocomplete from "react-native-autocomplete-input";
 import { useDispatch } from "react-redux";
@@ -27,7 +27,14 @@ export default function HomeScreen({ navigation }) {
   const [data, setData] = useState([]);
   const [suggestions, setSuggestions] = useState([]);
   const [articles, setArticles] = useState([]);
-  const [isFilterModalVisible, setFilterModalVisible] = useState(false);
+  const [selectedFilter, setSelectedFilter] = useState(null);
+  const [filterModals, setFilterModals] = useState({
+    boutonFiltre: false,
+    source: false,
+    famille: false,
+    motCle: false,
+    // Add more modals as needed
+  });
 
   useEffect(() => {
     // Fetch pour alimenter les noms des médicaments dans les suggestions
@@ -77,7 +84,7 @@ export default function HomeScreen({ navigation }) {
     const selectedDrug = data.find((item) => item.name === suggestion)._id;
     console.log("selectedDrug :", selectedDrug);
     dispatch(addLastSearch(selectedDrug));
-    navigation.navigate('InfoDrugScreen');
+    navigation.navigate("InfoDrugScreen");
   };
 
   // Ouvre l'url
@@ -93,19 +100,45 @@ export default function HomeScreen({ navigation }) {
       .catch((err) => console.error("Error opening URL:", err));
   };
 
-  const openFilterModal = () => {
-    setFilterModalVisible(true);
+  const openFilterModal = (filter) => {
+    setSelectedFilter(filter);
+    setFilterModals((prev) => ({ ...prev, [filter]: true }));
   };
 
   const closeFilterModal = () => {
-    setFilterModalVisible(false);
+    setSelectedFilter(null);
+    setFilterModals((prev) => ({ ...prev, [selectedFilter]: false }));
+  };
+
+  const renderFilterMenu = (filter) => {
+    // Implement your filter menu content here
+    // It should contain an input area and check buttons
+    return (
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={filterModals[filter]}
+        onRequestClose={closeFilterModal}
+      >
+        <View style={styles.modalContainer}>
+          <Text style={styles.modalText}>Filter Options - {filter}</Text>
+          {/* Your filter menu content */}
+          <TouchableOpacity onPress={closeFilterModal}>
+            <Text style={styles.closeModalText}>Close Modal</Text>
+          </TouchableOpacity>
+        </View>
+      </Modal>
+    );
   };
 
   // Affichage des articles récupérés via le fetch
   const feed = articles.map((data, i) => {
-    const options = { day: '2-digit', month: '2-digit', year: 'numeric' };
-    const formattedDate = new Date(data.date).toLocaleDateString('fr-FR', options);
-      return (
+    const options = { day: "2-digit", month: "2-digit", year: "numeric" };
+    const formattedDate = new Date(data.date).toLocaleDateString(
+      "fr-FR",
+      options
+    );
+    return (
       <View key={i} style={styles.articleContainer}>
         <View style={styles.articleTextContainer}>
           <Text style={styles.articleTitle}>{data.title}</Text>
@@ -114,7 +147,7 @@ export default function HomeScreen({ navigation }) {
           <Text style={styles.articleContent}>{data.content}</Text>
         </View>
         <TouchableOpacity onPress={() => openUrl(data.url)}>
-          <FontAwesome name="external-link" size={25} color="#ec6e5b" />
+          <FontAwesome name="external-link" size={25} color="#3FB4B1" />
         </TouchableOpacity>
         <Image
           source={{ uri: data.illustration }}
@@ -129,7 +162,7 @@ export default function HomeScreen({ navigation }) {
       onPress={() => {
         Keyboard.dismiss();
         setSuggestions([]);
-        setQuery(""); 
+        setQuery("");
       }}
     >
       <View style={styles.container}>
@@ -158,42 +191,58 @@ export default function HomeScreen({ navigation }) {
         <View style={styles.filterButtonContainer}>
           <View style={styles.filterButtons}>
             <TouchableOpacity
-              style={styles.filterButton}
-              onPress={openFilterModal}
+              style={styles.filterButtonLeft}
+              onPress={() => openFilterModal("boutonFiltre")}
             >
-              <FontAwesome name="filter" size={25} color="#ec6e5b" />
+              <FontAwesome name="filter" size={25} color="#3FB4B1" />
             </TouchableOpacity>
-            <TouchableOpacity style={styles.filterButton}>
-              <Text style={styles.filterButtonText}>Source</Text>
+            <TouchableOpacity style={styles.filterButton}
+            onPress={() =>openFilterModal('source')}>
+              <Text style={styles.filterButtonText}>
+                Source{" "}
+                <FontAwesome
+                  name="caret-down"
+                  size={20}
+                  color="white"
+                  style={styles.filterButtonCaret}
+                />
+              </Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.filterButton}>
-              <Text style={styles.filterButtonText}>Famille</Text>
+            <TouchableOpacity style={styles.filterButton}
+            onPress={() =>openFilterModal('famille')}>
+              <Text style={styles.filterButtonText}>
+                Famille{" "}
+                <FontAwesome
+                  name="caret-down"
+                  size={20}
+                  color="white"
+                  style={styles.filterButtonCaret}
+                />
+              </Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.filterButton}>
-              <Text style={styles.filterButtonText}>Mot-clé</Text>
+            <TouchableOpacity style={styles.filterButton}
+            onPress={() =>openFilterModal('motCle')}>
+              <Text style={styles.filterButtonText}>
+                Mot-clé{" "}
+                <FontAwesome
+                  name="caret-down"
+                  size={20}
+                  color="white"
+                  style={styles.filterButtonCaret}
+                />
+              </Text>
             </TouchableOpacity>
           </View>
+          {selectedFilter &&
+            filterModals[selectedFilter] &&
+            renderFilterMenu(selectedFilter)}
         </View>
-        <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
-          <TouchableOpacity>
-          {feed}
-          </TouchableOpacity>
-        </ScrollView>
-        {/* Filter Modal */}
-        <Modal
-          animationType="slide"
-          transparent={true}
-          visible={isFilterModalVisible}
-          onRequestClose={closeFilterModal}
+        <ScrollView
+          style={styles.scrollView}
+          showsVerticalScrollIndicator={false}
         >
-          <View style={styles.modalContainer}>
-            {/* Your modal content goes here */}
-            <Text style={styles.modalText}>Filter Options</Text>
-            <TouchableOpacity onPress={closeFilterModal}>
-              <Text style={styles.closeModalText}>Close Modal</Text>
-            </TouchableOpacity>
-          </View>
-        </Modal>
+          <TouchableOpacity>{feed}</TouchableOpacity>
+        </ScrollView>
       </View>
     </TouchableWithoutFeedback>
   );
@@ -205,7 +254,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     position: "relative",
     zIndex: 0,
-    marginTop:20,
+    marginTop: 20,
   },
   container: {
     flex: 1,
@@ -248,56 +297,63 @@ const styles = StyleSheet.create({
     borderBottomColor: "#ccc",
   },
   filterButtonContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'flex-start',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "flex-start",
     paddingHorizontal: 16,
     marginTop: 10,
   },
   filterButtons: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  filterButtonLeft: {
+    marginLeft: 10,
+    marginRight: 10,
   },
   filterButton: {
-    marginRight: 10,
+    marginRight: 5,
+    color: "white",
+    backgroundColor: "#3FB4B1",
+    borderRadius: 30,
+    paddingVertical: 10,
+    paddingHorizontal: 18,
   },
   filterButtonText: {
     fontSize: 16,
-    color: '#ec6e5b',
+    color: "white",
   },
-
   articleContainer: {
-    marginTop:20,
-    flexDirection: 'row',
-    justifyContent: 'space-around', 
-    alignItems: 'center', 
+    marginTop: 20,
+    flexDirection: "row",
+    justifyContent: "space-around",
+    alignItems: "center",
     marginVertical: 10,
-    marginLeft:20,
-    width:"90%",
+    marginLeft: 20,
+    width: "90%",
   },
   scrollView: {
     flexGrow: 1,
-    width:"100%",
+    width: "100%",
   },
   articleImage: {
     width: 80,
     height: 80,
-    marginRight: 20, 
-    marginLeft : 10, 
-
+    marginRight: 20,
+    marginLeft: 10,
   },
   articleTextContainer: {
     flex: 1,
-    marginRight: 10, 
+    marginRight: 10,
   },
   articleTitle: {
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
-  articleDate:{
-fontStyle:"italic",
-color:"grey",
+  articleDate: {
+    fontStyle: "italic",
+    color: "grey",
   },
   articleContent: {
     fontSize: 14,
