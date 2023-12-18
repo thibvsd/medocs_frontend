@@ -79,13 +79,28 @@ export default function HomeScreen({ navigation }) {
     }
   };
 
-  // Click déclenche le dispatch de l'élement et redirige vers l'info du médicament
   const onSuggestionPress = (suggestion) => {
+    // Cherche le name et extrait son _id :
     const selectedDrug = data.find((item) => item.name === suggestion)._id;
-    console.log("selectedDrug :", selectedDrug);
-    dispatch(addLastSearch(selectedDrug));
-    navigation.navigate("InfoDrugScreen");
-  };
+    // enregistre la recherche dans la DB
+ fetch(`http://${IP_ADDRESS}:3000/searches/addLastSearch/${token}`,{
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              _id: selectedDrug,
+            }),
+          })
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.result) {
+            dispatch(addLastSearch(selectedDrug)); // Dispatch l'id pour pouvoir le récupérer sur la page infoDrugScreen
+            navigation.navigate("InfoDrugScreen"); // redirige vers l'info du médicament
+            setQuery("");
+            setSuggestions([]);
+          }
+        })};
 
 // Click sur la loupe, lance la recherche
   const handleSearch = () => {
