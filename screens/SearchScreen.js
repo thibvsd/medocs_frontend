@@ -20,7 +20,8 @@ import { IP_ADDRESS } from "../config.js";
 export default function SearchScreen({ navigation }) {
   const dispatch = useDispatch();
   // const token = useSelector((state) => state.user.value.token) ;
-  const token = "kTe-BIKeY40kJaYz6JMm9sEcJFtpxVpD"; // Token avec des lastSearches
+  const token = "kTe-BIKeY40kJaYz6JMm9sEcJFtpxVpD"; // Token avec des lastSearches pour tester
+  // !!! Récupérer le vrai token => async storage ? redux ?
 
   const [query, setQuery] = useState("");
   const [data, setData] = useState([]);
@@ -51,14 +52,18 @@ export default function SearchScreen({ navigation }) {
           `http://${IP_ADDRESS}:3000/searches/last5Searches/${token}`
         );
         const result = await response.json();
-        console.log("dans fetch", result.search);
+        console.log("dans fetch lastsearch",result.search);
         setSearches(result.search);
+  
+        // console.log(data);
       } catch (error) {
         console.error(error);
       }
     };
     fetchLastSearch();
+
   }, []);
+
 
   // Lancer la recherche en cliquant sur le bouton
   const handleSearch = () => {
@@ -106,16 +111,18 @@ export default function SearchScreen({ navigation }) {
     setQuery("");
   };
 
-  // Map pour afficher les dernières recherches
-  const lastSearches = searches.map((data, i) => {
-    return (
+  // Map pour afficher les dernières recherches si elles existent
+  const lastSearches = data.drug_id === null ? (
+    <View></View>
+  ) : (
+    searches.map((data, i) => (
       <View key={i} style={styles.lastSearchesContainer}>
         <TouchableOpacity onPress={() => onLastSearchClick(data)}>
           <Text style={styles.searchName}>{data.drug_id.name}</Text>
         </TouchableOpacity>
       </View>
-    );
-  });
+    ))
+  );
 
   return (
     // masque le clavier quand on clique en dehors de la zone input :
@@ -184,9 +191,9 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     top: 0,
+    zIndex: 1,
     marginBottom: 10,
-    backgroundColor: "#fff",
-    opacity: 1,
+    backgroundColor: "white",
   },
   searchInput: {
     flex: 1,
