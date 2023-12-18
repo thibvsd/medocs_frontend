@@ -298,7 +298,7 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    marginTop: 100,
+    marginTop: 120,
     justifyContent: "top",
     alignItems: "center",
   },
@@ -424,4 +424,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "white",
   },
+  searchButton:{
+  height: 44,
+  width: 44,
+  flexDirection: "row",
+  alignItems: "center",
+  justifyContent: "center",
+  backgroundColor: "#3498db",
+  borderRadius: 5,}
 });

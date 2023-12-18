@@ -203,7 +203,6 @@ export default function SearchScreen({ navigation }) {
       }}
     >
       <View style={styles.container}>
-        <Text style={styles.title}>Recherche</Text>
         <View style={styles.searchContainer}>
           <Autocomplete
             data={suggestions}
@@ -221,7 +220,7 @@ export default function SearchScreen({ navigation }) {
                 </TouchableOpacity>
               ),
             }}
-            placeholder="Nom du médicament..."
+            placeholder="Rechercher un médicament..."
             containerStyle={styles.autocompleteContainer}
           />
           <TouchableOpacity onPress={handleSearch} style={styles.searchButton}>
