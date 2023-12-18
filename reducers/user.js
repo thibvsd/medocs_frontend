@@ -9,6 +9,7 @@ export const userSlice = createSlice({
   initialState,
   reducers: {
     login: (state, action) => {
+      console.log('reducer payload', action.payload);
       state.value.token = action.payload.token;
       state.value.username = action.payload.username;
       state.value.email = action.payload.email;
@@ -21,5 +22,5 @@ export const userSlice = createSlice({
   },
 });
 
-export const { login, logout } = userSlice.actions;
+export const { login, logout, addAsyncStoragetoken } = userSlice.actions;
 export default userSlice.reducer;
