@@ -13,7 +13,7 @@ import {
   Image,
 } from "react-native";
 import Autocomplete from "react-native-autocomplete-input";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { addLastSearch } from "../reducers/drugs";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import { Linking } from "react-native";
@@ -23,7 +23,8 @@ export default function HomeScreen({ navigation }) {
   const dispatch = useDispatch();
   const { navigate } = navigation;
 
-  const [query, setQuery] = useState("");
+  const token = useSelector((state) => state.user.value.token);
+  const [query, setQuery] = useState('');
   const [data, setData] = useState([]);
   const [suggestions, setSuggestions] = useState([]);
   const [articles, setArticles] = useState([]);
@@ -33,28 +34,38 @@ export default function HomeScreen({ navigation }) {
     source: false,
     famille: false,
     motCle: false,
-    // Add more modals as needed
   });
 
   useEffect(() => {
-    // Fetch pour alimenter les noms des médicaments dans les suggestions
-    const fetchData = async () => {
-      try {
-        const response = await fetch(
-          `http://${IP_ADDRESS}:3000/drugs/allNames`
-        );
-        const result = await response.json();
-        setData(result.namesAndId);
-      } catch (error) {
-        console.error(error);
-      }
-    };
+   // AbortController pour arrêter la requête si query est modifié
+   const fetchDataController = new AbortController();
+
+   // Fonction pour fetch les noms des médicaments (pour l'autocomplétion)
+   const fetchData = async () => {
+     try {
+       if (query.length >= 3) {
+         const response = await fetch(
+           `http://${IP_ADDRESS}:3000/drugs/query3characters/${query}`,
+           { signal: fetchDataController.signal }
+         );
+         const result = await response.json();
+         setData(result.namesAndId);
+       }
+     } catch (error) {
+       if (error.name === "AbortError") {
+         console.log("La requête fetchData a été annulée.");
+       } else {
+         console.error(error);
+       }
+     }
+   };
 
     // Fetch pour récupérer les 3 derniers articles
     const fetchArticles = async () => {
       try {
         const response = await fetch(
-          `http://${IP_ADDRESS}:3000/articles/latestNews`
+          `http://${IP_ADDRESS}:3000/articles/latestNews`, 
+
         );
         const result = await response.json();
         setArticles(result.latestNews);
@@ -63,9 +74,37 @@ export default function HomeScreen({ navigation }) {
       }
     };
 
+    const fetchSources = async () => {
+      try {
+        const response = await fetch(
+          `http://${IP_ADDRESS}:3000/articles/sources`, 
+    
+        );
+        const resultSources = await response.json();
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    
+    const fetchFamilles = async () => {
+      try {
+        const response = await fetch(
+          `http://${IP_ADDRESS}:3000/articles/labels`, 
+    
+        );
+        const resultLabels = await response.json();
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
     fetchData();
     fetchArticles();
+    fetchSources();
+    fetchFamilles();
+    return () => fetchDataController.abort();
   }, []);
+
 
   // Filtre les suggestions en fonction de la valeur de l'input
   const filterData = (text) => {
@@ -114,23 +153,18 @@ export default function HomeScreen({ navigation }) {
 
 // Click sur la loupe, lance la recherche
   const handleSearch = () => {
-    const fetchQuery = async () => {
-      try {
-        const response = await fetch(
-          `http://${IP_ADDRESS}:3000/drugs/byName/${query}`
-        );
-        const result = await response.json();
-        console.log(result);
-        setQueryResults(result); // enregistre les résultats de la recherche
-        setShowSearchResults(true); // Afficher les résultats de la recherche
-      } catch (error) {
-        console.error(error);
-      }
-    };
-    fetchQuery();
+    navigation.navigate('TabNavigator',{
+      screen: 'Search',
+      params: {
+        screen: 'SearchScreen',
+        params: {
+          query: query,
+        },
+      },
+    });
     setQuery("");
     setSuggestions([]);
-    navigation.navigate("InfoDrugScreen");
+    Keyboard.dismiss();
 
   };
 
@@ -158,6 +192,12 @@ export default function HomeScreen({ navigation }) {
   };
 
   const renderFilterMenu = (filter) => {
+    // <TextInput
+    // style={styles.input}
+    // placeholder="Enter your filter"
+    // value={inputValue}
+    // onChangeText={(text) => setInputValue(text)}
+  // />
     // Implement your filter menu content here
     // It should contain an input area and check buttons
     return (
@@ -246,6 +286,7 @@ export default function HomeScreen({ navigation }) {
             >
               <FontAwesome name="filter" size={25} color="#3FB4B1" />
             </TouchableOpacity>
+
             <TouchableOpacity style={styles.filterButton}
             onPress={() =>openFilterModal('source')}>
               <Text style={styles.filterButtonText}>
@@ -258,6 +299,7 @@ export default function HomeScreen({ navigation }) {
                 />
               </Text>
             </TouchableOpacity>
+
             <TouchableOpacity style={styles.filterButton}
             onPress={() =>openFilterModal('famille')}>
               <Text style={styles.filterButtonText}>
@@ -270,6 +312,7 @@ export default function HomeScreen({ navigation }) {
                 />
               </Text>
             </TouchableOpacity>
+
             <TouchableOpacity style={styles.filterButton}
             onPress={() =>openFilterModal('motCle')}>
               <Text style={styles.filterButtonText}>

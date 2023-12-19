@@ -155,7 +155,7 @@ const [fontsLoaded, error] = useFonts({
     return (
       <Stack.Navigator>
         <Stack.Screen
-          name="SearchSreen"
+          name="SearchScreen"
           component={SearchScreen}
           options={{ headerShown: false }}
         />
