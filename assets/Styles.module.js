@@ -8,6 +8,24 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     paddingHorizontal: 20,
+    fontFamily: FontFamily.interRegular,
+  },  
+  contentContainer: {
+    flex: 1,
+    fontFamily: FontFamily.interRegular,
+    paddingBottom:20
+  },
+  scrollView: {
+    flex: 1,
+    backgroundColor: '#ffffff',
+    marginBottom: 10,
+    padding: 10, 
+    margin: 10,
+    borderRadius: 5
+  },
+  containerInfosDrugs: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
   },
   button: {
     backgroundColor: "#199a8e",
