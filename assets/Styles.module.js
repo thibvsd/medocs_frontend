@@ -2,12 +2,29 @@ import { StyleSheet } from 'react-native';
 import { Border, FontFamily, FontSize, Color } from "./GlobalStyles";
 
 const styles = StyleSheet.create({
-
   container: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
     paddingHorizontal: 20,
+    fontFamily: FontFamily.interRegular,
+  },  
+  contentContainer: {
+    flex: 1,
+    fontFamily: FontFamily.interRegular,
+    paddingBottom:20
+  },
+  scrollView: {
+    flex: 1,
+    backgroundColor: '#ffffff',
+    marginBottom: 10,
+    padding: 10, 
+    margin: 10,
+    borderRadius: 5
+  },
+  containerInfosDrugs: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
   },
   button: {
     backgroundColor: "#199a8e",
