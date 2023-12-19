@@ -115,7 +115,7 @@ export default function InfoDrugScreen({ navigation }) {
         }
         
         <View style={styles.containerInfosDrugs}>
-        <TouchableOpacity style={[styles.button]}>
+          <TouchableOpacity style={[styles.button]}>
             <Text style= {[styles.buttonText, { marginLeft: 10 } ]}>
               Effets{'\n'}indésirables
             </Text>

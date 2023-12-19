@@ -2,7 +2,6 @@ import { StyleSheet } from 'react-native';
 import { Border, FontFamily, FontSize, Color } from "./GlobalStyles";
 
 const styles = StyleSheet.create({
-
   container: {
     flex: 1,
     justifyContent: "center",
