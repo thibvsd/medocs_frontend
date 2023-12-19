@@ -6,6 +6,7 @@ import {
   TextInput,
   Alert,
   StyleSheet,
+  CheckBox,
 } from "react-native";
 import { useDispatch } from "react-redux";
 import { login } from "../reducers/user";
@@ -166,7 +167,7 @@ export default function LoginScreen({ route, navigation }) {
         value={confirmPassword} // Utilisation de confirmPassword au lieu de signUpPassword
         onChangeText={(text) => setConfirmPassword(text)}
       />
-      <View style={styles.checkboxContainer}>
+      {/* <View style={styles.checkboxContainer}>
         <CheckBox value={isChecked} onValueChange={toggleCheckBox} />
         <Text style={styles.checkboxText}>
           J’accepte les conditions d’utilisation de l’application :
@@ -174,14 +175,14 @@ export default function LoginScreen({ route, navigation }) {
         <TouchableOpacity onPress={() => navigation.navigate("FAQ")}>
           <Text style={styles.linkText}>FAQ</Text>
         </TouchableOpacity>
-      </View>
+      </View> */}
       <TouchableOpacity style={styles.link} onPress={toggleForm}>
         <Text>Vous avez déjà un compte ? Connectez-vous ici !</Text>
       </TouchableOpacity>
       <TouchableOpacity
         style={[styles.button, !isChecked && styles.disabledButton]}
         onPress={handleRegister}
-        disabled={!isChecked}
+        // disabled={!isChecked}
       >
         <Text style={styles.buttonText}>S'inscrire</Text>
       </TouchableOpacity>
