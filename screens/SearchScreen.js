@@ -29,9 +29,10 @@ export default function SearchScreen({ route, navigation }) {
   const [queryResults, setQueryResults] = useState([]);
   const [showSearchResults, setShowSearchResults] = useState(false);
   const token = useSelector((state) => state.user.value.token);
+  
 
   useEffect(() => {
-    if (route.params.query) {
+    if (route.params && route.params.query) {
     setShowSearchResults(true);
     console.log("queryparam", route.params.query);
     const fetchQuery = async () => {

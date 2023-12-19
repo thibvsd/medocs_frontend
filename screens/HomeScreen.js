@@ -86,6 +86,7 @@ export default function HomeScreen({ navigation }) {
       }
     };
     
+// !! la route ne fonctionne pas
     const fetchFamilles = async () => {
       try {
         const response = await fetch(
