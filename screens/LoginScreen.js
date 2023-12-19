@@ -6,11 +6,15 @@ import {
   TextInput,
   Alert,
   StyleSheet,
+  Image
 } from "react-native";
 import { useDispatch } from 'react-redux';
 import {login} from '../reducers/user';
 
 import { IP_ADDRESS } from '../config.js';
+
+import styles from "../assets/Styles.module.js";
+import { Border, FontFamily, FontSize, Color } from "../assets/GlobalStyles";
 
 // ECRAN DE SIGNUP / SIGNIN
 
@@ -26,6 +30,7 @@ export default function LoginScreen({ route, navigation }) {
   const [signInEmail, setSignInEmail] = useState("");
   const [signInUsername, setSignInUsername] = useState("");
   const [signInPassword, setSignInPassword] = useState("");
+
 
   const toggleForm = () => {
     setIsSignIn(!isSignIn);
@@ -103,8 +108,8 @@ export default function LoginScreen({ route, navigation }) {
   };
 
   const SignUp = (
-    <View style={styles.container}>
-      <Text style={styles.title}>Inscription</Text>
+    <>
+      <Text style={styles.title}>Medidoc</Text>
       <TextInput
         style={styles.input}
         placeholder="Nom d'utilisateur"
@@ -147,17 +152,17 @@ export default function LoginScreen({ route, navigation }) {
         onChangeText={(text) => setConfirmPassword(text)}
       />
       <TouchableOpacity style={styles.link} onPress={toggleForm}>
-        <Text>Vous avez déjà un compte ? Connectez-vous ici !</Text>
+        <Text>Vous avez déjà un compte ?{'\n'}Connectez-vous ici !</Text>
       </TouchableOpacity>
       <TouchableOpacity style={styles.button} onPress={handleRegister}>
         <Text style={styles.buttonText}>S'inscrire</Text>
       </TouchableOpacity>
-    </View>
+    </>
   );
 
   const SignIn = (
-    <View style={styles.container}>
-      <Text style={styles.title}>Connexion</Text>
+    <>
+      <Text style={styles.title}>Medidoc</Text>
       <TextInput
         style={styles.input}
         placeholder="Email"
@@ -172,48 +177,18 @@ export default function LoginScreen({ route, navigation }) {
         onChangeText={(text) => setSignInPassword(text)}
       />
       <TouchableOpacity style={styles.link} onPress={toggleForm}>
-        <Text>Vous n'avez pas de compte ? Inscrivez-vous ici !</Text>
+        <Text style={{ textAlign: 'center'}}>Vous n'avez pas de compte ?{'\n'}Inscrivez-vous ici !</Text>
       </TouchableOpacity>
       <TouchableOpacity style={styles.button} onPress={handleConnection}>
         <Text style={styles.buttonText}>Se connecter</Text>
       </TouchableOpacity>
-    </View>
+    </>
   );
 
-  return <View style={styles.container}>{isSignIn ? SignIn : SignUp}</View>;
+  return (
+    <View style={styles.container}>
+      <Image style={styles.logo} source={require('../assets/logo.png')} resizeMode="contain" />
+      {isSignIn ? SignIn : SignUp}
+    </View>
+  )
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    paddingHorizontal: 20,
-  },
-  title: {
-    fontSize: 24,
-    marginBottom: 20,
-  },
-  input: {
-    width: "100%",
-    height: 40,
-    borderColor: "gray",
-    borderWidth: 1,
-    marginBottom: 20,
-    paddingHorizontal: 10,
-  },
-  button: {
-    backgroundColor: "#ec6e5b",
-    padding: 10,
-    borderRadius: 5,
-    width: "100%",
-    alignItems: "center",
-  },
-  buttonText: {
-    color: "white",
-    fontSize: 16,
-  },
-  link: {
-    marginBottom: 20,
-  },
-});
