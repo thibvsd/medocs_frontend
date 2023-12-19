@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   TouchableWithoutFeedback,
   Keyboard,
+  ScrollView,
   FlatList,
   StyleSheet,
 } from "react-native";
@@ -19,53 +20,70 @@ import { IP_ADDRESS } from "../config.js";
 
 export default function SearchScreen({ navigation }) {
   const dispatch = useDispatch();
-  // const token = useSelector((state) => state.user.value.token) ;
-  const token = "kTe-BIKeY40kJaYz6JMm9sEcJFtpxVpD"; // Token avec des lastSearches pour tester
-  // !!! Récupérer le vrai token => async storage ? redux ?
+  // const token = "kTe-BIKeY40kJaYz6JMm9sEcJFtpxVpD"; // Token avec des lastSearches pour tester
+  //  const token = "XkXnvWcBQXW4ortC2mvsTyeX7_XU5xLb"; // Token sans  lastSearches pour tester
 
   const [query, setQuery] = useState("");
   const [data, setData] = useState([]);
   const [suggestions, setSuggestions] = useState([]);
   const [searches, setSearches] = useState([]);
-  const [searchQuery, setSearchQuery] = useState([]);
+  const [queryResults, setQueryResults] = useState([]);
+  const [showSearchResults, setShowSearchResults] = useState(false);
+  const token = useSelector((state) => state.user.value.token);
 
   useEffect(() => {
-    // Fetch les noms des médicaments (pour l'autocomplétion)
+    // AbortController pour arrêter la requête si query est modifié
+    const fetchDataController = new AbortController();
+    const fetchLastSearchController = new AbortController();
+
+    // Fonction pour fetch les noms des médicaments (pour l'autocomplétion)
     const fetchData = async () => {
       try {
+        if (query.length >= 3) {
+          const response = await fetch(
+            `http://${IP_ADDRESS}:3000/drugs/query3characters/${query}`,
+            { signal: fetchDataController.signal }
+          );
+          const result = await response.json();
+          setData(result.namesAndId);
+        }
+      } catch (error) {
+        if (error.name === "AbortError") {
+          console.log("La requête fetchData a été annulée.");
+        } else {
+          console.error(error);
+        }
+      }
+    };
+
+    // Fonction pour fetch les dernières recherches
+    const fetchLastSearch = async () => {
+      // vérifier la présence de token et bloquer si pas de token (et informer le user)
+      try {
         const response = await fetch(
-          `http://${IP_ADDRESS}:3000/drugs/allNames`
+          `http://${IP_ADDRESS}:3000/searches/last5Searches/${token}`,
+          { signal: fetchLastSearchController.signal }
         );
         const result = await response.json();
-        setData(result.namesAndId);
-        // console.log(data);
+        setSearches(result.search);
       } catch (error) {
-        console.error(error);
+        if (error.name === "AbortError") {
+          console.log("La requête fetchLastSearch a été annulée.");
+        } else {
+          console.error(error);
+        }
       }
     };
 
     fetchData();
-
-    const fetchLastSearch = async () => {
-      try {
-        const response = await fetch(
-          `http://${IP_ADDRESS}:3000/searches/last5Searches/${token}`
-        );
-        const result = await response.json();
-        console.log("dans fetch lastsearch",result.search);
-        setSearches(result.search);
-  
-        // console.log(data);
-      } catch (error) {
-        console.error(error);
-      }
-    };
     fetchLastSearch();
 
-  }, []);
+    // Annuler la requête fetchData à chaque modification de query
+    return () => fetchDataController.abort();
+  }, [query]); // le useEffect se relance si query change
 
 
-  // Lancer la recherche en cliquant sur le bouton
+  // Lancer la recherche en cliquant sur le bouton loupe
   const handleSearch = () => {
     const fetchQuery = async () => {
       try {
@@ -73,15 +91,15 @@ export default function SearchScreen({ navigation }) {
           `http://${IP_ADDRESS}:3000/drugs/byName/${query}`
         );
         const result = await response.json();
-        setSearchQuery(result.name);
-        // console.log(data);
+        setQueryResults(result); // enregistre les résultats de la recherche
+        setShowSearchResults(true); // Afficher les résultats de la recherche
       } catch (error) {
         console.error(error);
       }
-      console.log("Recherche lancée pour :", query);
     };
     fetchQuery();
     setQuery("");
+    setSuggestions([]);
   };
 
   // Filtrer les suggestions en fonction de la valeur de l'input
@@ -99,30 +117,81 @@ export default function SearchScreen({ navigation }) {
   const onSuggestionPress = (suggestion) => {
     // Cherche le name et extrait son _id :
     const selectedDrug = data.find((item) => item.name === suggestion)._id;
-    console.log("selectedDrug :", selectedDrug);
-    dispatch(addLastSearch(selectedDrug)); // Dispatch l'id pour pouvoir le récupérer sur la page infoDrugScreen
+    // enregistre la recherche dans la DB
+ fetch(`http://${IP_ADDRESS}:3000/searches/addLastSearch/${token}`,{
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              _id: selectedDrug,
+            }),
+          })
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.result) {
+            dispatch(addLastSearch(selectedDrug)); // Dispatch l'id pour pouvoir le récupérer sur la page infoDrugScreen
+            navigation.navigate("InfoDrugScreen");
+            setQuery("");
+            setSuggestions([]);
+          }
+        })};
+
+  // Quand click sur un résultat de recherche, redirige vers l'info du médicament
+  const onSearchResultClick = (data) => {
+    fetch(`http://${IP_ADDRESS}:3000/searches/addLastSearch/${token}`,{
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        _id: selectedDrug,
+      }),
+    })
+  .then((response) => response.json())
+  .then((data) => {
+    if (data.result) {
+    dispatch(addLastSearch(data._id));
     navigation.navigate("InfoDrugScreen");
     setQuery("");
+    setQueryResults([]);
+    setShowSearchResults(false);
+    setSuggestions([]);}})
   };
 
+
+  // Quand click sur une des dernières recherches, redirige vers la page info du médicament
   const onLastSearchClick = (data) => {
     dispatch(addLastSearch(data._id));
     navigation.navigate("InfoDrugScreen");
     setQuery("");
+    setQueryResults([]);
+    setShowSearchResults(false);
+    setSuggestions([]);
   };
 
   // Map pour afficher les dernières recherches si elles existent
-  const lastSearches = data.drug_id === null ? (
-    <View></View>
-  ) : (
-    searches.map((data, i) => (
-      <View key={i} style={styles.lastSearchesContainer}>
-        <TouchableOpacity onPress={() => onLastSearchClick(data)}>
-          <Text style={styles.searchName}>{data.drug_id.name}</Text>
-        </TouchableOpacity>
-      </View>
-    ))
-  );
+  const lastSearches =
+    data.drug_id === null ? (
+      <View></View>
+    ) : (
+      searches.map((data, i) => (
+        <View key={i} style={styles.searchesContainer}>
+          <TouchableOpacity onPress={() => onLastSearchClick(data)}>
+            <Text style={styles.searchName}>{data.drug_id.name}</Text>
+          </TouchableOpacity>
+        </View>
+      ))
+    );
+
+  // Map pour afficher les résultats de la recherche
+  const newSearch = queryResults.map((data, i) => (
+    <View key={i} style={styles.searchesContainer}>
+      <TouchableOpacity onPress={() => onSearchResultClick(data)}>
+        <Text style={styles.searchName}>{data.name}</Text>
+      </TouchableOpacity>
+    </View>
+  ));
 
   return (
     // masque le clavier quand on clique en dehors de la zone input :
@@ -134,7 +203,6 @@ export default function SearchScreen({ navigation }) {
       }}
     >
       <View style={styles.container}>
-        <Text style={styles.title}>Recherche</Text>
         <View style={styles.searchContainer}>
           <Autocomplete
             data={suggestions}
@@ -152,15 +220,33 @@ export default function SearchScreen({ navigation }) {
                 </TouchableOpacity>
               ),
             }}
-            placeholder="Nom du médicament..."
+            placeholder="Rechercher un médicament..."
             containerStyle={styles.autocompleteContainer}
           />
           <TouchableOpacity onPress={handleSearch} style={styles.searchButton}>
             <FontAwesome name="search" size={30} color="white" />
           </TouchableOpacity>
         </View>
-        <Text style={styles.titleLastSearches}>Mes dernières recherches</Text>
-        {lastSearches}
+        {showSearchResults ? (
+          // Afficher les résultats de la recherche si on en a lancé une
+          <View>
+            <Text style={styles.titleSearches}>
+              Résultats de la recherche :
+            </Text>
+            <ScrollView
+              style={styles.scrollView}
+              showsVerticalScrollIndicator={false}
+            >
+              {newSearch}
+            </ScrollView>
+          </View>
+        ) : (
+          // Afficher Mes dernières recherches (par défaut)
+          <View>
+            <Text style={styles.titleSearches}>Mes dernières recherches</Text>
+            {lastSearches}
+          </View>
+        )}
       </View>
     </TouchableWithoutFeedback>
   );
@@ -170,9 +256,10 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: "bold",
   },
-  titleLastSearches: {
+  titleSearches: {
     marginTop: 40,
     fontSize: 20,
+    textAlign: "center",
   },
   container: {
     flex: 1,
@@ -182,9 +269,13 @@ const styles = StyleSheet.create({
   },
   searchContainer: {
     flexDirection: "row",
-    alignItems: "top",
+    alignItems: "center",
+    justifyContent: "space-between",
     marginTop: 20,
     paddingHorizontal: 16,
+    alignItems: "flex-end",
+    position: "relative",
+    zIndex: 1,
   },
   autocompleteContainer: {
     flex: 1,
@@ -223,11 +314,15 @@ const styles = StyleSheet.create({
   buttonText: {
     color: "#fff",
   },
-  lastSearchesContainer: {
+  searchesContainer: {
     marginTop: 20,
   },
   searchName: {
     color: "blue",
     textDecorationLine: "underline",
+  },
+  scrollView: {
+    flexGrow: 1,
+    width: "100%",
   },
 });
