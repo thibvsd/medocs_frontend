@@ -79,12 +79,49 @@ export default function HomeScreen({ navigation }) {
     }
   };
 
-  // Click déclenche le dispatch de l'élement et redirige vers l'info du médicament
   const onSuggestionPress = (suggestion) => {
+    // Cherche le name et extrait son _id :
     const selectedDrug = data.find((item) => item.name === suggestion)._id;
-    console.log("selectedDrug :", selectedDrug);
-    dispatch(addLastSearch(selectedDrug));
+    // enregistre la recherche dans la DB
+ fetch(`http://${IP_ADDRESS}:3000/searches/addLastSearch/${token}`,{
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              _id: selectedDrug,
+            }),
+          })
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.result) {
+            dispatch(addLastSearch(selectedDrug)); // Dispatch l'id pour pouvoir le récupérer sur la page infoDrugScreen
+            navigation.navigate("InfoDrugScreen"); // redirige vers l'info du médicament
+            setQuery("");
+            setSuggestions([]);
+          }
+        })};
+
+// Click sur la loupe, lance la recherche
+  const handleSearch = () => {
+    const fetchQuery = async () => {
+      try {
+        const response = await fetch(
+          `http://${IP_ADDRESS}:3000/drugs/byName/${query}`
+        );
+        const result = await response.json();
+        console.log(result);
+        setQueryResults(result); // enregistre les résultats de la recherche
+        setShowSearchResults(true); // Afficher les résultats de la recherche
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    fetchQuery();
+    setQuery("");
+    setSuggestions([]);
     navigation.navigate("InfoDrugScreen");
+
   };
 
   // Ouvre l'url
@@ -186,6 +223,9 @@ export default function HomeScreen({ navigation }) {
             placeholder="Rechercher un médicament..."
             containerStyle={styles.autocompleteContainer}
           />
+                    <TouchableOpacity onPress={handleSearch} style={styles.searchButton}>
+            <FontAwesome name="search" size={30} color="white" />
+          </TouchableOpacity>
         </View>
         <Text style={styles.title}>Feed</Text>
         <View style={styles.filterButtonContainer}>
@@ -258,7 +298,7 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    marginTop: 100,
+    marginTop: 120,
     justifyContent: "top",
     alignItems: "center",
   },
@@ -384,4 +424,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "white",
   },
+  searchButton:{
+  height: 44,
+  width: 44,
+  flexDirection: "row",
+  alignItems: "center",
+  justifyContent: "center",
+  backgroundColor: "#3498db",
+  borderRadius: 5,}
 });

@@ -1,7 +1,6 @@
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-
 import React, { useEffect, useState } from "react";
 
 import { StyleSheet } from "react-native";
@@ -19,27 +18,27 @@ import FAQScreen from "./screens/FAQScreen.js";
 import OnboardingScreen from "./screens/OnboardingScreen";
 import InfoDrugScreen from "./screens/InfoDrugScreen";
 
-import { persistStore, persistReducer } from 'redux-persist';
-import { PersistGate } from 'redux-persist/integration/react';
+import { persistStore, persistReducer } from "redux-persist";
+import { PersistGate } from "redux-persist/integration/react";
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 // redux imports
-import { Provider, useSelector } from 'react-redux';
-import { combineReducers, configureStore } from '@reduxjs/toolkit';
-import user from './reducers/user';
-import drugs from './reducers/drugs';
-
+import { Provider, useSelector, useDispatch } from "react-redux";
+import { combineReducers, configureStore } from "@reduxjs/toolkit";
+import user from "./reducers/user";
+import drugs from "./reducers/drugs";
 
 const reducers = combineReducers({ user, drugs });
 const persistConfig = {
-  key: 'medidoc',
+  key: "medidoc",
   storage: AsyncStorage,
 };
 
 const store = configureStore({
   reducer: persistReducer(persistConfig, reducers),
-  middleware: (getDefaultMiddleware) => getDefaultMiddleware({ serializableCheck: false }),
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({ serializableCheck: false }),
 });
 
 const persistor = persistStore(store);
@@ -48,24 +47,26 @@ const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
 export default function App() {
+  // const dispatch = useDispatch();
 
-  const [token, setToken] = useState(null);
+  // AsyncStorage.clear();
+const [token, setToken] = useState(null);
+const [isFirstLaunch, setIsFirstLaunch] = useState(null);
+
+  // Réduire en 1 seul useEffect
   useEffect(() => {
     async function checkToken() {
       try {
         const userToken = await AsyncStorage.getItem("token");
         if (userToken) {
           setToken(userToken);
+          // dispatch(addAsyncStoragetoken(token));
         }
       } catch (error) {
         console.error("Erreur lors de la vérification du token:", error);
       }
     }
     checkToken();
-  }, []);
-
-  const [isFirstLaunch, setIsFirstLaunch] = useState(null);
-  useEffect(() => {
     async function checkIfFirstLaunch() {
       try {
         const hasLaunched = await AsyncStorage.getItem("appLaunched");
@@ -122,7 +123,11 @@ export default function App() {
       <Stack.Navigator>
         {!isToken ? (
           // Si l'utilisateur est connecté
-          <Stack.Screen name="Login" component={LoginScreen} options={{ headerShown: false }} />
+          <Stack.Screen
+            name="Login"
+            component={LoginScreen}
+            options={{ headerShown: false }}
+          />
         ) : (
           <>
             <Stack.Screen name="ProfileScreen" component={ProfileScreen} />
@@ -140,8 +145,16 @@ export default function App() {
   const SearchScreenStack = () => {
     return (
       <Stack.Navigator>
-        <Stack.Screen name="SearchSreen" component={SearchScreen} options={{ headerShown: false }} />
-        <Stack.Screen name="InfoDrugScreen" component={InfoDrugScreen} options={{ headerShown: false }} />
+        <Stack.Screen
+          name="SearchSreen"
+          component={SearchScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="InfoDrugScreen"
+          component={InfoDrugScreen}
+          options={{ headerShown: false }}
+        />
       </Stack.Navigator>
     );
   };
@@ -149,15 +162,23 @@ export default function App() {
   const HomeScreenStack = () => {
     return (
       <Stack.Navigator>
-        <Stack.Screen name="SearchSreen" component={HomeScreen} options={{ headerShown: false }} />
-        <Stack.Screen name="InfoDrugScreen" component={InfoDrugScreen} options={{ headerShown: false }} />
+        <Stack.Screen
+          name="SearchSreen"
+          component={HomeScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="InfoDrugScreen"
+          component={InfoDrugScreen}
+          options={{ headerShown: false }}
+        />
       </Stack.Navigator>
     );
   };
 
   return (
     <Provider store={store}>
-      <PersistGate persistor={persistor}>  
+      <PersistGate persistor={persistor}>
         <NavigationContainer>
         {isFirstLaunch ? (
           <Stack.Navigator screenOptions={{ headerShown: false }}>            
@@ -179,7 +200,7 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
 });
