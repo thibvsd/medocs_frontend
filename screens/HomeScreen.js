@@ -79,11 +79,21 @@ export default function HomeScreen({ navigation }) {
     }
   };
 
+
+  const onLogin = () => {
+    navigation.navigate('TabNavigator', {
+      screen: 'Search',
+      params: {
+        screen: 'InfoDrugScreen'
+      },
+    });
+  }
+
   const onSuggestionPress = (suggestion) => {
     // Cherche le name et extrait son _id :
     const selectedDrug = data.find((item) => item.name === suggestion)._id;
     // enregistre la recherche dans la DB
- fetch(`http://${IP_ADDRESS}:3000/searches/addLastSearch/${token}`,{
+    fetch(`http://${IP_ADDRESS}:3000/searches/addLastSearch/${token}`,{
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -283,6 +293,11 @@ export default function HomeScreen({ navigation }) {
         >
           <TouchableOpacity>{feed}</TouchableOpacity>
         </ScrollView>
+        
+        <TouchableOpacity onPress={onLogin}>
+              <Text style={{color: '#000000'}}>TEST MEDOC
+              </Text>
+            </TouchableOpacity>
       </View>
     </TouchableWithoutFeedback>
   );

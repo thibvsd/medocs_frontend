@@ -9,6 +9,7 @@ import {
   StyleSheet,
   TouchableOpacity,
 } from "react-native";
+
 import { Border, FontFamily, FontSize, Color } from "../assets/GlobalStyles";
 
 const Dots = ({ selected }) => {
