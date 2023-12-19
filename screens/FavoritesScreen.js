@@ -29,7 +29,6 @@ export default function FavoritesScreen({ navigation }) {
 
   return (
     <View>
-      <Text style={styles.title}>My favorites</Text>
       {favoDrugs}
     </View>
   );

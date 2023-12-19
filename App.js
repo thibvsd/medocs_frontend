@@ -139,11 +139,10 @@ const [fontsLoaded, error] = useFonts({
           />
         ) : (
           <>
-            <Stack.Screen name="ProfileScreen" component={ProfileScreen} />
-            <Stack.Screen name="Favoris" component={FavoritesScreen} />
-            <Stack.Screen name="Traitements" component={TreatmentsScreen} />
-            <Stack.Screen name="Parametres" component={SettingsScreen} />
-            <Stack.Screen name="FAQ" component={FAQScreen} />
+            <Stack.Screen name="ProfileScreen" component={ProfileScreen} options={{ headerShown: false, headerBackTitle: false }} />
+            <Stack.Screen name="Favoris" component={FavoritesScreen} options={{ title: "Mes favoris"}} />
+            <Stack.Screen name="Traitements" component={TreatmentsScreen} options={{ title: "Traitements en cours", headerBackTitle: false }} />
+            <Stack.Screen name="Parametres" component={SettingsScreen} options={{ title: "Paramètres de mon compte"}} />
             <Stack.Screen name="Se déconnecter" component={HomeScreen} />
           </>
         )}
@@ -162,7 +161,6 @@ const [fontsLoaded, error] = useFonts({
         <Stack.Screen
           name="InfoDrugScreen"
           component={InfoDrugScreen}
-          options={{ headerShown: false }}
         />
       </Stack.Navigator>
     );
