@@ -4,6 +4,7 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import React, { useEffect, useState } from "react";
 
 import { StyleSheet } from "react-native";
+import { useFonts } from "expo-font";
 
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 
@@ -52,6 +53,14 @@ export default function App() {
   // AsyncStorage.clear();
 const [token, setToken] = useState(null);
 const [isFirstLaunch, setIsFirstLaunch] = useState(null);
+
+const [fontsLoaded, error] = useFonts({
+  "Inter-Regular": require("./assets/fonts/Inter-Regular.ttf"),
+  "Inter-Medium": require("./assets/fonts/Inter-Medium.ttf"),
+  "Inter-SemiBold": require("./assets/fonts/Inter-SemiBold.ttf"),
+  "Inter-Bold": require("./assets/fonts/Inter-Bold.ttf"),
+  "Montserrat-Bold": require("./assets/fonts/Montserrat-Bold.ttf"),
+});
 
   // Réduire en 1 seul useEffect
   useEffect(() => {
@@ -146,7 +155,7 @@ const [isFirstLaunch, setIsFirstLaunch] = useState(null);
     return (
       <Stack.Navigator>
         <Stack.Screen
-          name="SearchSreen"
+          name="SearchScreen"
           component={SearchScreen}
           options={{ headerShown: false }}
         />
@@ -163,7 +172,7 @@ const [isFirstLaunch, setIsFirstLaunch] = useState(null);
     return (
       <Stack.Navigator>
         <Stack.Screen
-          name="SearchSreen"
+          name="SearchScreen"
           component={HomeScreen}
           options={{ headerShown: false }}
         />

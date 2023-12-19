@@ -17,8 +17,7 @@ import { addLastSearch } from "../reducers/drugs";
 import { IP_ADDRESS } from "../config.js";
 
 // ECRAN DE RECHERCHE
-
-export default function SearchScreen({ navigation }) {
+export default function SearchScreen({ route, navigation }) {
   const dispatch = useDispatch();
   // const token = "kTe-BIKeY40kJaYz6JMm9sEcJFtpxVpD"; // Token avec des lastSearches pour tester
   //  const token = "XkXnvWcBQXW4ortC2mvsTyeX7_XU5xLb"; // Token sans  lastSearches pour tester
@@ -32,9 +31,30 @@ export default function SearchScreen({ navigation }) {
   const token = useSelector((state) => state.user.value.token);
 
   useEffect(() => {
+    if (route.params.query) {
+    setShowSearchResults(true);
+    console.log("queryparam", route.params.query);
+    const fetchQuery = async () => {
+      try {
+        const response = await fetch(
+          `http://${IP_ADDRESS}:3000/drugs/byName/${route.params.query}`
+        );
+        const result = await response.json();
+        console.log("result", result);
+        setQueryResults(result); // enregistre les résultats de la recherche
+        console.log("queryResults", queryResults);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    fetchQuery();
+    setQuery("");
+    setSuggestions([]);    }
+  }, [route.params]); 
+
+  useEffect(() => {
     // AbortController pour arrêter la requête si query est modifié
     const fetchDataController = new AbortController();
-    const fetchLastSearchController = new AbortController();
 
     // Fonction pour fetch les noms des médicaments (pour l'autocomplétion)
     const fetchData = async () => {
@@ -62,7 +82,6 @@ export default function SearchScreen({ navigation }) {
       try {
         const response = await fetch(
           `http://${IP_ADDRESS}:3000/searches/last5Searches/${token}`,
-          { signal: fetchLastSearchController.signal }
         );
         const result = await response.json();
         setSearches(result.search);
@@ -92,7 +111,6 @@ export default function SearchScreen({ navigation }) {
         );
         const result = await response.json();
         setQueryResults(result); // enregistre les résultats de la recherche
-        setShowSearchResults(true); // Afficher les résultats de la recherche
       } catch (error) {
         console.error(error);
       }
@@ -100,6 +118,8 @@ export default function SearchScreen({ navigation }) {
     fetchQuery();
     setQuery("");
     setSuggestions([]);
+    setShowSearchResults(true);
+
   };
 
   // Filtrer les suggestions en fonction de la valeur de l'input
@@ -138,14 +158,15 @@ export default function SearchScreen({ navigation }) {
         })};
 
   // Quand click sur un résultat de recherche, redirige vers l'info du médicament
-  const onSearchResultClick = (data) => {
+  const onSearchResultClick = (suggestion) => {
+
     fetch(`http://${IP_ADDRESS}:3000/searches/addLastSearch/${token}`,{
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        _id: selectedDrug,
+        _id: suggestion._id,
       }),
     })
   .then((response) => response.json())
@@ -184,7 +205,7 @@ export default function SearchScreen({ navigation }) {
       ))
     );
 
-  // Map pour afficher les résultats de la recherche
+    // Map pour afficher les résultats de la recherche
   const newSearch = queryResults.map((data, i) => (
     <View key={i} style={styles.searchesContainer}>
       <TouchableOpacity onPress={() => onSearchResultClick(data)}>
@@ -243,7 +264,7 @@ export default function SearchScreen({ navigation }) {
         ) : (
           // Afficher Mes dernières recherches (par défaut)
           <View>
-            <Text style={styles.titleSearches}>Mes dernières recherches</Text>
+            <Text style={styles.titleSearches}>Dernières fiches consultées</Text>
             {lastSearches}
           </View>
         )}
@@ -283,7 +304,6 @@ const styles = StyleSheet.create({
     right: 0,
     top: 0,
     zIndex: 1,
-    marginBottom: 10,
     backgroundColor: "white",
   },
   searchInput: {
@@ -295,8 +315,8 @@ const styles = StyleSheet.create({
     color: "#333",
   },
   searchButton: {
-    height: 44,
-    width: 44,
+    height: 40,
+    width: 40,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
@@ -316,6 +336,8 @@ const styles = StyleSheet.create({
   },
   searchesContainer: {
     marginTop: 20,
+    marginLeft:20,
+    marginRight:20,
   },
   searchName: {
     color: "blue",
