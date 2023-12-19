@@ -39,7 +39,7 @@ useEffect(() => {
 
   return (
     <View>
-      <Text style={styles.title}>My favorites</Text>
+      <Text style={styles.title}>Mes favoris</Text>
       {favoDrugs}
     </View>
   );
@@ -55,6 +55,8 @@ title: {
   fontSize: 24,
   fontWeight: 'bold',
   marginBottom: 20,
+  textAlign:"center",
+  marginTop:20,
 },
 card: {
   flexDirection: 'row',

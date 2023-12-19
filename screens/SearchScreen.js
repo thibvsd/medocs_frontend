@@ -283,7 +283,6 @@ const styles = StyleSheet.create({
     right: 0,
     top: 0,
     zIndex: 1,
-    marginBottom: 10,
     backgroundColor: "white",
   },
   searchInput: {
@@ -295,8 +294,8 @@ const styles = StyleSheet.create({
     color: "#333",
   },
   searchButton: {
-    height: 44,
-    width: 44,
+    height: 40,
+    width: 40,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
