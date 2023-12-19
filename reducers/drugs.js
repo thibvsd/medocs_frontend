@@ -1,7 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
-  value: { search: "", token: null, ShowSearchResults:false },
+  value: { search: "", favo: "", token: null, ShowSearchResults:false },
 };
 
 export const drugsSlice = createSlice({
@@ -12,9 +12,12 @@ export const drugsSlice = createSlice({
   addLastSearch: (state, action) => {
     state.value.search = action.payload;
   },
+  addFavorite: (state, action) => {
+    state.value.favo = action.payload;
+  },
 
   },
 });
 
-export const { addLastSearch, addSearchQuery } = drugsSlice.actions;
+export const { addLastSearch, addSearchQuery, addFavorite } = drugsSlice.actions;
 export default drugsSlice.reducer;

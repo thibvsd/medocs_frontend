@@ -39,7 +39,6 @@ useEffect(() => {
 
   return (
     <View>
-      <Text style={styles.title}>Mes favoris</Text>
       {favoDrugs}
     </View>
   );

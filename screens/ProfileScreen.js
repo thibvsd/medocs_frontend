@@ -37,12 +37,6 @@ const ProfileScreen = ({ navigation }) => {
         <Text style={styles.buttonText}>Paramètres de mon profil</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() => navigation.navigate('FAQ')}
-      >
-        <Text style={styles.buttonText}>FAQ</Text>
-      </TouchableOpacity>
 
       <TouchableOpacity
         style={styles.button}
