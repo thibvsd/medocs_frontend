@@ -1,7 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
-  value: { search: "", token: null },
+  value: { search: "", token: null, ShowSearchResults:false },
 };
 
 export const drugsSlice = createSlice({
@@ -16,5 +16,5 @@ export const drugsSlice = createSlice({
   },
 });
 
-export const { addLastSearch } = drugsSlice.actions;
+export const { addLastSearch, addSearchQuery } = drugsSlice.actions;
 export default drugsSlice.reducer;

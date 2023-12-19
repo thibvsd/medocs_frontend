@@ -146,7 +146,7 @@ const [isFirstLaunch, setIsFirstLaunch] = useState(null);
     return (
       <Stack.Navigator>
         <Stack.Screen
-          name="SearchSreen"
+          name="SearchScreen"
           component={SearchScreen}
           options={{ headerShown: false }}
         />
