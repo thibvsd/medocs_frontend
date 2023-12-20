@@ -130,9 +130,9 @@ export default function TreatmentsScreen({ navigation }) {
 
   return (
     <View style={styles.mainContainer}>
-      <Text style={styles.title}>Treatments in progress</Text>
+      <Text style={styles.title}>Traitements en cours</Text>
       <View>
-        <Text style={styles.title}>Drugs</Text>
+        <Text style={styles.subtitle}>Ajouter un médicaments :</Text>
         <View style={styles.drugsBox}>
           <Autocomplete
             data={suggestions}
@@ -157,31 +157,71 @@ export default function TreatmentsScreen({ navigation }) {
         </View>
       </View>
       <View>
-        <Text style={styles.title}>Raison médicale</Text>
+        <Text style={styles.subtitle}>Raison médicale :</Text>
+        <TextInput
+    style={styles.reasonInput}
+    value={med_reason}
+    onChangeText={(text) => setMed_reason(text)}
+    placeholder="Saisissez la raison médicale..."
+  />
         <View></View>
       </View>
       <View>
-        <Text style={styles.title}>Mes ordonnances</Text>
+        <Text style={styles.subtitle}>Mes ordonnances</Text>
         <View></View>
       </View>
-      <TouchableOpacity onPress={onSave}>
-        <Text>Save</Text>
+      <TouchableOpacity onPress={onSave} syle={styles.saveButton}>
+        <Text style={styles.saveButtonText}>Save</Text>
       </TouchableOpacity>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+  title: {
+  fontSize:24,  
+  fontWeight:"bold",
+  marginBottom:20,
+  },
+  subtitle:{
+    fontSize:18,
+  },
   mainContainer: {
     flex: 1,
     marginTop: 120,
     justifyContent: "top",
     alignItems: "center",
   },
+  autocompleteContainer:{
+width: "60%",
+margin:10,
+  },
   drugsBox: {
     height: '30%',
     width: '90%',
     flexDirection: 'column',
     justifyContent: 'space-between',
+  },
+  reasonInput: {
+    height: 80,
+    borderColor: 'gray',
+    borderWidth: 1,
+    marginBottom: 10,
+    paddingLeft: 10,
+    width: '80%', // Ajustez la largeur selon vos besoins
+    backgroundColor: 'white',
+  },
+
+  saveButton: {
+    marginTop: 20,
+    backgroundColor: '#3FB4B1',
+    borderRadius: 30,
+    paddingVertical: 10,
+    paddingHorizontal: 18,
+    alignSelf: 'center',
+  },
+  saveButtonText: {
+    fontSize: 16,
+    color: "black",
   },
 });
