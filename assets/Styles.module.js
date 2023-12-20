@@ -8,7 +8,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingHorizontal: 20,
     fontFamily: FontFamily.interRegular,
-  },  
+  },
   contentContainer: {
     flex: 1,
     fontFamily: FontFamily.interRegular,

@@ -138,11 +138,39 @@ const [fontsLoaded, error] = useFonts({
             options={{ headerShown: false }}
           />
         ) : (
-          <> */}
-            <Stack.Screen name="ProfileScreen" component={ProfileScreen} options={{ headerShown: false, headerBackTitle: false }} />
-            <Stack.Screen name="Favoris" component={FavoritesScreen} options={{ title: "Mes favoris"}} />
-            <Stack.Screen name="Traitements" component={TreatmentsScreen} options={{ title: "Traitements en cours" }} />
-            <Stack.Screen name="Parametres" component={SettingsScreen} options={{ title: "Paramètres de mon compte"}} />
+          <>
+            <Stack.Screen name="ProfileScreen" component={ProfileScreen} options={{ headerShown: false }} />
+            <Stack.Screen name="Favoris" component={FavoritesScreen} options={{ title: "Mes favoris",
+            headerStyle: {
+              backgroundColor: '#199a8e',
+              shadowColor: '#199a8e',
+            },
+            headerTitleAlign: 'center',
+            headerTintColor: '#fff',
+            headerTitleStyle: {
+              fontWeight: 'bold',
+            }}} />
+            <Stack.Screen name="Traitements" component={TreatmentsScreen} options={{ title: "Traitements en cours",
+            headerStyle: {
+              backgroundColor: '#199a8e',
+              shadowColor: '#199a8e',
+            },
+            headerTitleAlign: 'center',
+            headerTintColor: '#fff',
+            headerTitleStyle: {
+              fontWeight: 'bold',
+            } }} />
+            <Stack.Screen name="Parametres" component={SettingsScreen} options={{ title: "Paramètres de mon compte",
+            headerStyle: {
+              backgroundColor: '#199a8e',
+              shadowColor: '#199a8e',
+            },
+            headerTitleAlign: 'center',
+            headerTintColor: '#fff',
+            headerTitleStyle: {
+              fontWeight: 'bold',
+            }
+            }} />
             <Stack.Screen name="Se déconnecter" component={HomeScreen} />
           {/* </>
         )} */}
@@ -161,8 +189,17 @@ const [fontsLoaded, error] = useFonts({
         <Stack.Screen
           name="InfoDrugScreen"
           component={InfoDrugScreen}
-          options={{ title: "Infos médicament" }}
-        />
+          options={{ title: "Fiche médicament" ,
+            headerStyle: {
+              backgroundColor: '#199a8e',
+              shadowColor: '#199a8e',
+            },
+            headerTitleAlign: 'center',
+            headerTintColor: '#fff',
+            headerTitleStyle: {
+              fontWeight: 'bold',
+            }
+          }} />
       </Stack.Navigator>
     );
   };
@@ -178,7 +215,16 @@ const [fontsLoaded, error] = useFonts({
         <Stack.Screen
           name="InfoDrugScreen"
           component={InfoDrugScreen}
-          options={{ headerShown: false, title: "Infos médicament" }}
+          options={{ headerShown: false, title: "Infos médicament",
+          headerStyle: {
+            backgroundColor: '#199a8e',
+            shadowColor: '#199a8e',
+          },
+          headerTitleAlign: 'center',
+          headerTintColor: '#fff',
+          headerTitleStyle: {
+            fontWeight: 'bold',
+          } }}
         />
       </Stack.Navigator>
     );
