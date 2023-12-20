@@ -23,15 +23,19 @@ export default function InfoDrugScreen({ navigation }) {
     const [data, setData] = useState([]);
     const [listArticles, setListArticles] = useState([]);
 
-
     const [showUsePrecaution, setShowUsePrecaution] = useState(false);
     const [showIndesirableEff, setShowIndesirableEff] = useState(false);
+    
+    const currentDrug = useSelector((state) => state.drugs.value.search);
+    const favo = useSelector((state) => state.drugs.value.favo);
+    const isIdInFavo = favo && favo.includes(currentDrug);
+    //const isIdInFavo = vafo && vafo.filter((drug) => drug._id === currentDrug).length > 0;
 
     useEffect(() => {
       const fetchData = async () => {
         try {
           const response = await fetch(
-            `http://${IP_ADDRESS}:3000/drugs/byId/657dca53926ab996fec1053f`
+            `http://${IP_ADDRESS}:3000/drugs/byId/${currentDrug}`
           );
           const result = await response.json();
           if (result) {
@@ -40,8 +44,8 @@ export default function InfoDrugScreen({ navigation }) {
               `http://${IP_ADDRESS}:3000/articles/byId/${result.drug._id}`
             );
             const result_articles = await response_articles.json();
+            console.log('result_articles', result_articles);
             if(result_articles) setListArticles(result_articles.drugArticles);
-            //console.log('result_articles', result_articles.title);
           }
           else {
             setData(null);
@@ -53,6 +57,8 @@ export default function InfoDrugScreen({ navigation }) {
       };
       fetchData();
     }, []);
+
+console.log('listArticles', listArticles);
 
     const openUrl = (url) => {
       Linking.openURL(url)
@@ -80,24 +86,51 @@ export default function InfoDrugScreen({ navigation }) {
       <SafeAreaView style={styles.container} contentContainerStyle={styles.container}>
         { data && data.drug ?           
           <View style={styles.contentFlexBox}>
-            <Text style={styles.headline}>{data.drug.name}</Text>          
+            <Text style={styles.headline}>{data.drug.name}
+            
+
+            <TouchableOpacity onPress={() => openUrl(data.url)}>
+              
+            { favo ?   
+              <FontAwesome  size={25} 
+                name={isIdInFavo ? 'star' : 'star'}
+                color={isIdInFavo ? '#199a8e' : '#000'}/>
+                :             
+              <FontAwesome  size={25} name='star' color='#000'/>            
+            }
+            </TouchableOpacity>            
+
+            </Text>          
             <View style={stylesMed.container}>
-                { data.drug.survey_indic ? 
-                <TouchableOpacity style={[stylesMed.button, { backgroundColor: 'red' } ]}><Text style= {[stylesMed.buttonText, { marginLeft: 10 } ]}
-                >{data.drug.survey_indic}Indice de surveillance</Text></TouchableOpacity>
-                :                 
-                <TouchableOpacity style={[stylesMed.button]}>
-                  <Text style= {[stylesMed.buttonText, { marginLeft: 10 } ]}>{data.drug.survey_indic}Indice de surveillance</Text></TouchableOpacity>
-                }              
+              <TouchableOpacity style={[stylesMed.button,{ backgroundColor: data.drug.survey_indic ? 'red' : 'black' },]} >
+                <Text style={[ stylesMed.buttonText,{ marginLeft: 10 },]}>{data.drug.survey_indic ? 'Indice de surveillance' : 'Autre texte'}
+                </Text>
+              </TouchableOpacity>
               <TouchableOpacity style={stylesMed.button}>
                 <Text style={stylesMed.buttonText}>{data.drug.smr}</Text>
               </TouchableOpacity>
+              <TouchableOpacity style={[stylesMed.button,{ backgroundColor: data.drug.breastfeed_alert ? 'red' : 'black' },]} >
+                <Text style={[ stylesMed.buttonText,{ marginLeft: 10 },]}>{data.drug.breastfeed_alert ? 'Allaitement' : 'Allaitement'}
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={[stylesMed.button,{ backgroundColor: data.drug.pregnancy_alert ? 'red' : 'black' },]} >
+                <Text style={[ stylesMed.buttonText,{ marginLeft: 10 },]}>{data.drug.pregnancy_alert ? 'Grossesse' : 'Grossesse'}
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={[stylesMed.button,{ backgroundColor: data.drug.driving_alert ? 'red' : 'black' },]} >
+                <Text style={[ stylesMed.buttonText,{ marginLeft: 10 },]}>{data.drug.driving_alert ? 'Conduite' : 'Conduite'}
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={[stylesMed.button,{ backgroundColor: data.drug.on_prescription ? 'orange' : 'black' },]} >
+                <Text style={[ stylesMed.buttonText,{ marginLeft: 10 },]}>{data.drug.on_prescription ? 'Sur ordonnance' : 'Sur ordonnance'}
+                </Text>
+              </TouchableOpacity>
             </View>
-              { listArticles ?              
+            { listArticles ?              
               <ScrollView contentContainerStyle={styles.containerArticles} style={styles.scrollView}>
                 {listArticles.map((article, index) => (                  
                   <View key={index} style={styles.articleBox}>
-                    <Text style={styles.articleTitle}>{article.title} - {formatFrenchDate(article.date)}
+                    <Text style={styles.articleTitle}>{article.title} - {formatFrenchDate(article.date)} 
                       <TouchableOpacity onPress={() => openUrl(data.url)}>
                         <FontAwesome name="external-link" size={25} color="#ec6e5b" />
                       </TouchableOpacity>
@@ -106,43 +139,51 @@ export default function InfoDrugScreen({ navigation }) {
                 ))}
               </ScrollView>
               :
-              <Text>Data not available</Text>
+              <Text></Text>
               }
+              <View style={styles.container}>
+                <View style={styles.box}>
+                  <Text>{data.drug.therap_indic}</Text>
+                </View>
+              </View>
+
+              <View style={styles.containerInfosDrugs}>
+                <TouchableOpacity style={[styles.button]}>
+                  <Text style= {[styles.buttonText, { marginLeft: 10 } ]}>
+                    Effets{'\n'}indésirables
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={[styles.button ]}>
+                  <Text style= {[styles.buttonText, { marginLeft: 10 } ]}>
+                    Contre indications &{'\n'}précautions d'emploi
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={[styles.button ]}>
+                  <Text style= {[styles.buttonText, { marginLeft: 10 } ]}>Posolgie
+                    indications &{'\n'}thérapeutiques
+                  </Text>
+                </TouchableOpacity>
+                </View>
+                <ScrollView contentContainerStyle={styles.containerInfosDrugs} style={styles.scrollView}>
+                  <View style={styles.box}>
+                    <Text>{data.drug.indesirable_eff}</Text>
+                  </View>
+                  <View style={styles.box}>
+                    <Text>{data.drug.use_precaution}</Text>
+                  </View>
+                  <View style={styles.box}>
+                    <Text>{data.drug.dosage}</Text>
+                  </View>
+                  <View style={styles.box}>
+                    <Text>{data.drug.dosage}</Text>
+                  </View>
+                </ScrollView>
             </View>
             :
             <><Text>Data not available</Text>
             </>
         }
         
-        <View style={styles.containerInfosDrugs}>
-          <TouchableOpacity style={[styles.button]}>
-            <Text style= {[styles.buttonText, { marginLeft: 10 } ]}>
-              Effets{'\n'}indésirables
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={[styles.button ]}>
-            <Text style= {[styles.buttonText, { marginLeft: 10 } ]}>
-              Contre indications &{'\n'}précautions d'emploi
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={[styles.button ]}>
-            <Text style= {[styles.buttonText, { marginLeft: 10 } ]}>
-              indications &{'\n'}thérapeutiques
-            </Text>
-          </TouchableOpacity>
-          </View>
-        <ScrollView contentContainerStyle={styles.containerInfosDrugs} style={styles.scrollView}>
-          
-          <View key="1">
-            <Text>First page</Text>
-          </View>
-          <View key="2">
-            <Text>Second page</Text>
-          </View>
-          <View key="3">
-            <Text>3e page</Text>
-          </View>
-        </ScrollView>
       </SafeAreaView>
     )
   }

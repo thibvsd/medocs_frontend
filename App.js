@@ -161,6 +161,7 @@ const [fontsLoaded, error] = useFonts({
         <Stack.Screen
           name="InfoDrugScreen"
           component={InfoDrugScreen}
+          options={{ title: "Infos médicament" }}
         />
       </Stack.Navigator>
     );
@@ -177,7 +178,7 @@ const [fontsLoaded, error] = useFonts({
         <Stack.Screen
           name="InfoDrugScreen"
           component={InfoDrugScreen}
-          options={{ headerShown: false }}
+          options={{ headerShown: false, title: "Infos médicament" }}
         />
       </Stack.Navigator>
     );

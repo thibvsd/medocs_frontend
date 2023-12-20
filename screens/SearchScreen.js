@@ -199,7 +199,7 @@ export default function SearchScreen({ route, navigation }) {
     ) : (
       searches.map((data, i) => (
         <View key={i} style={styles.searchesContainer}>
-          <TouchableOpacity onPress={() => onLastSearchClick(data)}>
+          <TouchableOpacity onPress={() => onLastSearchClick(data.drug_id)}>
             <Text style={styles.searchName}>{data.drug_id.name}</Text>
           </TouchableOpacity>
         </View>

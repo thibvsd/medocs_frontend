@@ -22,6 +22,13 @@ const styles = StyleSheet.create({
     margin: 10,
     borderRadius: 5
   },
+  box: {
+    width: '80%',
+    padding: 20,
+    margin: 10,
+    backgroundColor: 'lightblue',
+    alignItems: 'center',
+  },
   containerInfosDrugs: {
     flexDirection: 'row',
     justifyContent: 'space-between',

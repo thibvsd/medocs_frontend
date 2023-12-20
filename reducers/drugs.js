@@ -15,7 +15,9 @@ export const drugsSlice = createSlice({
   addFavorite: (state, action) => {
     state.value.favo = action.payload;
   },
-
+  removeFavorite: (state, action) => {
+    state.value.favo = state.value.filter(favo => favo._id !== action.payload._id);
+  }
   },
 });
 
