@@ -18,6 +18,8 @@ import SettingsScreen from "./screens/SettingsScreen";
 import FAQScreen from "./screens/FAQScreen.js";
 import OnboardingScreen from "./screens/OnboardingScreen";
 import InfoDrugScreen from "./screens/InfoDrugScreen";
+import CameraScreen from "./screens/CameraScreen";
+
 
 import { persistStore, persistReducer } from "redux-persist";
 import { PersistGate } from "redux-persist/integration/react";
@@ -125,6 +127,15 @@ const [fontsLoaded, error] = useFonts({
     );
   };
 
+  const TreatmentsScreenStack = () => {
+    return (
+      <Stack.Navigator>
+        <Stack.Screen name="Traitements" component={TreatmentsScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="Camera" component={CameraScreen} options={{ headerShown: false }} />
+      </Stack.Navigator>
+    );
+  }
+
   //GERE L'AFFICHAGE DU PROFIL AU CLICK SUR USER ICON
   const ProfileScreenStack = () => {
     // const isToken = useSelector((state) => state.user.value.token);
@@ -141,7 +152,7 @@ const [fontsLoaded, error] = useFonts({
           <> */}
             <Stack.Screen name="ProfileScreen" component={ProfileScreen} options={{ headerShown: false, headerBackTitle: false }} />
             <Stack.Screen name="Favoris" component={FavoritesScreen} options={{ title: "Mes favoris"}} />
-            <Stack.Screen name="Traitements" component={TreatmentsScreen} options={{ title: "Traitements en cours" }} />
+            <Stack.Screen name="Traitements" component={TreatmentsScreenStack} options={{ title: "Traitements en cours" }} />
             <Stack.Screen name="Parametres" component={SettingsScreen} options={{ title: "Paramètres de mon compte"}} />
             <Stack.Screen name="Se déconnecter" component={HomeScreen} />
           {/* </>

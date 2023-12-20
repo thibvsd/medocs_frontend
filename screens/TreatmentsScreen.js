@@ -1,7 +1,19 @@
 import React, { useState, useEffect } from "react";
-import { Image, StyleSheet, Text, View, TouchableOpacity, TextInput } from "react-native";
+import {
+  Image,
+  StyleSheet,
+  Text,
+  View,
+  TouchableOpacity,
+  ScrollView,
+  TextInput,
+} from "react-native";
 import Autocomplete from "react-native-autocomplete-input";
 import { IP_ADDRESS } from "../config.js";
+import FontAwesome from "react-native-vector-icons/FontAwesome";
+import { removePhoto } from "../reducers/user";
+import { useSelector } from 'react-redux';
+
 
 export default function TreatmentsScreen({ navigation }) {
   const token = "mYZ2UayAiPjfhaQRy0FXQH-1oktu1Xi9";
@@ -11,6 +23,9 @@ export default function TreatmentsScreen({ navigation }) {
   const [doseInput, setDoseInput] = useState("");
   const [med_reason, setMed_reason] = useState("");
   const [drugAdd, setDrugAdd] = useState([]);
+
+  const userPhotos = useSelector((state) => state.user.value.photoUris);
+  console.log("USER: ", userPhotos);
 
   useEffect(() => {
     // AbortController pour arrêter la requête si query est modifié
@@ -77,26 +92,28 @@ export default function TreatmentsScreen({ navigation }) {
   useEffect(() => {
     loadDrugs();
   }, []);
-  
-    const loadDrugs = async () => {
-      try {
-        const response = await fetch(
-          `http://${IP_ADDRESS}:3000/treatments/${token}`
-        );
-        const data = await response.json();
-        // Récupère les noms des médicaments et les met à jour dans setDrugAdd
-        const drugNames = data.treatment.drugs.map((drug) => {
-          const match = drug.drug_id.name.match(/^([^,]+),/);
-          const cleanedName = match ? match[1] : drug.drug_id.name;
-          return cleanedName.trim();
-        });
-        console.log(drugNames);
-        setDrugAdd(drugNames);
-      } catch (error) {
-        // Gérer les erreurs réseau
-        console.error("Erreur réseau :", error);
-      }
-    };
+
+  const loadDrugs = async () => {
+    try {
+      const response = await fetch(
+        `http://${IP_ADDRESS}:3000/treatments/${token}`
+      );
+      const data = await response.json();
+      // Récupère les noms des médicaments et les met à jour dans setDrugAdd
+      const drugNames = data.treatment.drugs.map((drug) => {
+        const match = drug.drug_id.name.match(/^([^,]+),/);
+        const cleanedName = match ? match[1] : drug.drug_id.name;
+        return cleanedName.trim();
+      });
+      console.log("loaddrugs",drugNames);
+      setDrugAdd(drugNames);
+    } catch (error) {
+      // Gérer les erreurs réseau
+      console.error("Erreur réseau :", error);
+    }
+    setQuery("");
+
+  };
 
   // Filtrer les suggestions en fonction de la valeur de l'input
   const filterData = (text) => {
@@ -110,137 +127,229 @@ export default function TreatmentsScreen({ navigation }) {
     }
   };
 
-  const drugTreatment = drugAdd.map((drug, index) => {
-    console.log("dans le jsx: " + drug);
-    return (
-      <View key={index} style={styles.medoc}>
-        <Text style={styles.drugList}>{drug}</Text>
-        <Text style={styles.doseList}>Doses:</Text>
-        <TextInput
-          // value={drug.dose}
-          // onChangeText={(text) => handleDoseChange(text, drug.name)}
+  const onDeleteDrugPress = async (drug) => {
+        try {
+          const response = await fetch(
+            `http://${IP_ADDRESS}:3000/treatments/deleteDrugTreatment/${token}`,
+            {
+              method: "DELETE",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ shortName: drug }),
+            }
+          );
+          const resJson = response.json();
+          if (resJson.result) {
+            loadDrugs(); // Recharge les médicaments
+          }
+        } catch (error) {
+          // Gérer les erreurs réseau
+          console.error("Erreur réseau :", error);
+        }
+      }
+
+      const onAddPrescriptionPress = async () => {
+       navigation.navigate("Camera"); 
+      }
+
+  const drugTreatment = drugAdd.map((drug, index) => (
+    <View key={index} style={styles.drugContainer}>
+      <TouchableOpacity onPress={() => onDeleteDrugPress(drug)}>
+                <FontAwesome
+            name="trash"
+            size={20}
+            color="#3FB4B1"
+            style={styles.deleteButton}
+          />
+          </TouchableOpacity>
+      <Text style={styles.drugList}>{drug}</Text>
+      <View style={styles.doseContainer}>
+        <Text style={styles.doseText}>Dose :</Text>
+        <TextInput style={styles.doseInput}
           placeholder="0"
         />
-        <TouchableOpacity onPress={() => removeDrug(drug.name)}>
-          {/* Icône de poubelle */}
-        </TouchableOpacity>
       </View>
-    );
-  });
+    </View>
+  ));
+
+  const photos = userPhotos ? (
+    userPhotos.map((data, i) => (
+      <View key={i} style={styles.photoContainer}>
+        <TouchableOpacity onPress={() => dispatch(removePhoto(data))}>
+          <FontAwesome name='times' size={20} color='#000000' style={styles.deleteIcon} />
+        </TouchableOpacity>
+        <Image source={{ uri: data }} style={styles.photo} />
+      </View>
+    ))
+  ) : (
+    <View />
+  );
 
   return (
+    <ScrollView>
     <View style={styles.mainContainer}>
-      <Text style={styles.title}></Text>
-      <View style={styles.drugContainer}>
-        <Text style={styles.subtitle}>Ajouter un médicaments :</Text>
-        <View style={styles.drugsBox}>
-          <Autocomplete
-            data={suggestions}
-            // value={query}
-            onChangeText={(text) => {
-              setQuery(text);
-              filterData(text);
-            }}
-            // Affiche les suggestions :
-            flatListProps={{
-              keyExtractor: (_, idx) => idx.toString(),
-              renderItem: ({ item }) => (
-                <TouchableOpacity onPress={() => addDrugPress(item)}>
-                  <Text style={styles.suggestionItem}>{item}</Text>
-                </TouchableOpacity>
-              ),
-            }}
-            placeholder="Nom du médicament..."
-            containerStyle={styles.autocompleteContainer}
-          />
-          <View style={styles.drugList}>{drugTreatment}</View>
-        </View>
+      <Text style={styles.subtitle}>Ajouter un médicament</Text>
+      <View style={styles.searchContainer}>
+        <Autocomplete
+          data={suggestions}
+          onChangeText={(text) => {
+            setQuery(text);
+            filterData(text);
+          }}
+          flatListProps={{
+            keyExtractor: (_, idx) => idx.toString(),
+            renderItem: ({ item }) => (
+              <TouchableOpacity onPress={() => addDrugPress(item)}>
+                <Text style={styles.suggestionItem}>{item}</Text>
+              </TouchableOpacity>
+            ),
+          }}
+          placeholder="Nom du médicament..."
+          containerStyle={styles.autocompleteContainer}
+        />
       </View>
+
+        <View style={styles.drugContainer}>{drugTreatment}</View>
       <View style={styles.reasonContainer}>
-        <Text style={styles.subtitle}>Raison médicale :</Text>
+        <Text style={styles.subtitle}>Raison médicale</Text>
         <TextInput
-    style={styles.reasonInput}
-    value={med_reason}
-    onChangeText={(text) => setMed_reason(text)}
-    placeholder="Saisissez la raison médicale..."
-  />
+          style={styles.reasonInput}
+          value={med_reason}
+          onChangeText={(text) => setMed_reason(text)}
+          placeholder="Saisissez la raison médicale..."
+        />
         <View></View>
       </View>
       <View>
         <Text style={styles.subtitle}>Mes ordonnances</Text>
-        <View></View>
+        <View style={styles.ordonnanceContainer}>
+          <Text>Ajouter une ordonnance  </Text>
+          <TouchableOpacity onPress={onAddPrescriptionPress}>
+<FontAwesome
+  name="camera"
+  size={20}
+  color="#3FB4B1"
+  style={styles.filterButtonCaret}
+/>
+</TouchableOpacity>  
+<View>{photos}</View>      
+</View>
       </View>
-      <TouchableOpacity onPress={onSave} syle={styles.saveButton}>
+      <TouchableOpacity onPress={onSave} style={styles.saveButton}>
         <Text style={styles.saveButtonText}>Save</Text>
       </TouchableOpacity>
     </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   title: {
-  fontSize:24,  
-  fontWeight:"bold",
-  marginBottom:20,
+    fontSize: 24,
+    fontWeight: "bold",
+    marginBottom: 10,
   },
-  subtitle:{
-    fontSize:18,
-    margin:10,
+  subtitle: {
+    fontSize: 18,
+    textAlign:"center",
+    margin: 10,
+    fontWeight: "bold",
   },
   mainContainer: {
-    flex: 1,
-    marginTop: 120,
-    justifyContent: "top",
+    marginTop: 30,
+    justifyContent: "flex-start",
     alignItems: "center",
   },
   drugContainer: {
     width: "80%",
     marginBottom: 10,
+
   },
-  medoc:{
-  flexDirection: "row", 
-  justifyContent: "space-between", 
+  medoc: {
+    marginTop:10,
+    flexDirection: "row",
+    justifyContent: "space-between",
   },
-  drugList:{
-fontSize:16,
+  filterButtonCaret:{
+marginRight:10,
   },
-  doseList:{
-    marginLeft:10,
-fontSize:16,
+  drugList: {
+    marginVertical:5,
+    fontSize: 16,
+  },
+  doseText: {
+    flex:1,
+    flexDirection:"row",
+    alignItems: "center",
+    marginHorizontal: 10,
+    fontSize: 16,
+  },
+  doseInput:{
+    height: 30,
+    width:200,
+    borderColor: "gray",
+    borderWidth: 1,
+    marginVertical: 10,
+    paddingLeft: 10,
+    backgroundColor: "white",
   },
   reasonContainer: {
-    width: "80%",
+    width: "90%",
     marginBottom: 10,
   },
-  autocompleteContainer:{
-    width: 300,
-margin:10,
+  autocompleteContainer: {
+    flex: 1,
+    left: 0,
+    right: 0,
+    top: 0,
+    zIndex: 1,
+    marginBottom:10,
   },
-  drugsBox: {
-    height: '30%',
-    width: '100%',
-    flexDirection: 'column',
-    justifyContent: 'space-between',
+  suggestionItem: {
+    backgroundColor: "#fff", // Utilisez une couleur solide
+    padding: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: "#ccc",
+    opacity: 1,
+    
+  },
+  searchContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginTop: 20,
+    paddingHorizontal: 16,
+    alignItems: "flex-end",
+    position: "relative",
+    zIndex: 1,
   },
   reasonInput: {
     height: 80,
-    borderColor: 'gray',
+    borderColor: "gray",
     borderWidth: 1,
     marginBottom: 10,
     paddingLeft: 10,
-    backgroundColor: 'white',
+    backgroundColor: "white",
+  },
+  ordonnanceContainer:{
+flexDirection:"row",
   },
 
   saveButton: {
     marginTop: 20,
-    backgroundColor: '#3FB4B1',
+    width: 100,
+    height: 50,
+    backgroundColor: "#3FB4B1",
     borderRadius: 30,
     paddingVertical: 10,
     paddingHorizontal: 18,
-    alignSelf: 'center',
+    alignSelf: "center",
+    justifyContent: "center",
   },
   saveButtonText: {
     fontSize: 16,
-    color: "black",
+    color: "white",
+    fontWeight: "bold",
+    textAlign: "center",
+    justifyContent: "center",
   },
 });
