@@ -279,6 +279,58 @@ export default function SearchScreen({ route, navigation }) {
   );
 }
 const styles = StyleSheet.create({
+container: {
+  flexDirection: 'row', // This makes the child elements arrange horizontally
+  justifyContent: 'space-between', // This provides equal space between the buttons
+  padding: 10,
+},
+contentTab: {
+  flex: 1,
+  flexDirection: 'row', // This makes the child elements arrange horizontally
+  justifyContent: 'space-between', // This provides equal space between the buttons
+},
+articleBox: {
+  backgroundColor: '#fff',
+  marginBottom: 10,
+  padding: 10,
+  borderRadius: 5,
+  borderColor: '#ddd',
+  borderWidth: 1,
+},
+scrollViewArticles: {
+  flex: 1,
+  backgroundColor: '#ffffff',
+  marginBottom: 20,
+  padding: 10, 
+  margin: 10,
+  borderRadius: 5
+},
+
+articleTitle: {
+  fontSize: 18,
+  fontWeight: 'bold',
+  marginBottom: 5,
+},
+articleDate: {
+  fontSize: 14,
+  color: '#888',
+  marginBottom: 5,
+},
+articleContent: {
+  fontSize: 16,
+},
+button: {
+  backgroundColor: '#3498db',
+  padding: 10,
+  borderRadius: 5,
+},
+buttonText: {
+  color: '#ffffff',
+  fontSize: 16,
+  textAlign: 'center',
+},
+
+///
   title: {
     fontSize: 24,
     fontWeight: "bold",

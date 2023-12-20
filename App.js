@@ -229,7 +229,6 @@ const [fontsLoaded, error] = useFonts({
       </Stack.Navigator>
     );
   };
-
   return (
     <Provider store={store}>
       <PersistGate persistor={persistor}>
