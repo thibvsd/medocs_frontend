@@ -3,6 +3,8 @@ import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import { useDispatch, useSelector } from 'react-redux';
 import {logout} from '../reducers/user';
+import Svg, { Path } from 'react-native-svg';
+
 
 const ProfileScreen = ({ navigation }) => {
 
@@ -47,6 +49,8 @@ const ProfileScreen = ({ navigation }) => {
         style={styles.button}
         onPress={() => navigation.navigate('Traitements')}
       >
+                        <Svg source={require("../assets/medic.svg")} style={styles.pills}
+                  />
         <Text style={styles.buttonText}>Traitements en cours</Text>
         <FontAwesome
                   name="caret-right"
