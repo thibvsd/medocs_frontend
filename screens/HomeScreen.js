@@ -70,7 +70,6 @@ export default function HomeScreen({ navigation }) {
       const response = await fetch(`http://${IP_ADDRESS}:3000/articles/codes`);
       const resultLabels = await response.json();
       setLoadFamille(resultLabels.codes);
-      console.log("dans le label", resultLabels.codes);
     } catch (error) {
       console.error(error);
     }
@@ -79,7 +78,6 @@ export default function HomeScreen({ navigation }) {
   useEffect(() => {
     // AbortController pour arrêter la requête si query est modifié
     const fetchDataController = new AbortController();
-
     // Fonction pour fetch les noms des médicaments (pour l'autocomplétion)
     const fetchData = async () => {
       try {
@@ -99,7 +97,11 @@ export default function HomeScreen({ navigation }) {
         }
       }
     };
+    fetchData();
+    return () => fetchDataController.abort();
+  }, [query]);
 
+  useEffect(() => {
     // Fetch pour récupérer les 3 derniers articles
     const fetchArticles = async () => {
       try {
@@ -112,12 +114,9 @@ export default function HomeScreen({ navigation }) {
         console.error(error);
       }
     };
-
-    fetchData();
     fetchArticles();
     fetchSources();
     fetchFamilles();
-    return () => fetchDataController.abort();
   }, []);
 
   // Filtre les suggestions en fonction de la valeur de l'input

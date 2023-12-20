@@ -33,7 +33,6 @@ export default function SearchScreen({ route, navigation }) {
   useEffect(() => {
     if (route.params && route.params.query) {
       setShowSearchResults(true);
-      console.log("queryparam", route.params.query);
       const fetchQuery = async () => {
         try {
           const response = await fetch(
@@ -268,7 +267,7 @@ export default function SearchScreen({ route, navigation }) {
         ) : (
           // Afficher Mes dernières recherches (par défaut)
           <View>
-            { token ? <><Text style={styles.titleSearches}>Dernières fiches consultées{lastSearches}</Text></> : 
+            { token ? <><Text style={styles.titleSearches}>Dernières fiches consultées</Text><View>{lastSearches}</View></> : 
               <View></View>
             }
           </View>
@@ -281,11 +280,6 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: "bold",
-  },
-  titleSearches: {
-    marginTop: 40,
-    fontSize: 20,
-    textAlign: "center",
   },
   container: {
     flex: 1,
@@ -336,15 +330,23 @@ const styles = StyleSheet.create({
     borderBottomColor: "#ccc",
     opacity: 1,
   },
+  titleSearches: {
+    marginTop: 20,
+    fontSize: 24, 
+    fontWeight: "bold",
+    textAlign: "center",
+  },
   buttonText: {
     color: "#fff",
   },
   searchesContainer: {
+    textAlign:"center",
     marginTop: 20,
     marginLeft: 20,
     marginRight: 20,
   },
   searchName: {
+    textAlign:"center",
     color: "blue",
     textDecorationLine: "underline",
   },
