@@ -127,10 +127,10 @@ const [fontsLoaded, error] = useFonts({
 
   //GERE L'AFFICHAGE DU PROFIL AU CLICK SUR USER ICON
   const ProfileScreenStack = () => {
-    // const isToken = useSelector((state) => state.user.value.token);
+    const isToken = useSelector((state) => state.user.value.token);
     return (
       <Stack.Navigator>
-        {/* {!isToken ? (
+        {!isToken ? (
           // Si l'utilisateur est connecté
           <Stack.Screen
             name="Login"
@@ -172,8 +172,8 @@ const [fontsLoaded, error] = useFonts({
             }
             }} />
             <Stack.Screen name="Se déconnecter" component={HomeScreen} />
-          {/* </>
-        )} */}
+          </>
+        )}
       </Stack.Navigator>
     );
   };
