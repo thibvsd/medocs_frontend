@@ -3,7 +3,6 @@ import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import { useDispatch, useSelector } from 'react-redux';
 import {logout} from '../reducers/user';
-import Svg, { Path } from 'react-native-svg';
 
 
 const ProfileScreen = ({ navigation }) => {
