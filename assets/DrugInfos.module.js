@@ -3,6 +3,19 @@ import { Border, FontFamily, FontSize, Color } from "./GlobalStyles";
 
 const styles = StyleSheet.create({
 
+headline: {
+    fontSize: 22,
+    lineHeight: 30,
+    fontFamily: FontFamily.interBold,
+    color: "#101623",
+    display: "flex",
+    marginTop: 53,
+    width: 311,
+    textAlign: "center",
+    fontWeight: "700",
+    justifyContent: "center",
+    alignItems: "center",
+    },
 ficheMedicament: {
     backgroundColor: Color.colorWhite,
     flex: 1,

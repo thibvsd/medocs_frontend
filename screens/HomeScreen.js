@@ -397,10 +397,6 @@ export default function HomeScreen({ navigation }) {
         >
           <TouchableOpacity>{feed}</TouchableOpacity>
         </ScrollView>
-
-        <TouchableOpacity onPress={onLogin}>
-          <Text style={{ color: "#000000" }}>TEST MEDOC</Text>
-        </TouchableOpacity>
       </View>
     </TouchableWithoutFeedback>
   );
