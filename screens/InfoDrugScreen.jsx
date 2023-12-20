@@ -61,11 +61,11 @@ export default function InfoDrugScreen({ navigation }) {
       fetchData();
     }, []);
 
-    const addToFavo = () => {
+    const addToFavorites = (select) => {
       const fetchQuery = async () => {
         try {
           const response = await fetch(
-            `http://${IP_ADDRESS}:3000/drugs/addFavorites/${query}`
+            `http://${IP_ADDRESS}:3000/drugs/addFavorites/${select}`
           );
           const result = await response.json();
           setQueryResults(result); // enregistre les résultats de la recherche
@@ -101,10 +101,9 @@ return (
   { data && data.drug ?  
     <View >
       <Text
-        style={[globalStyles.headline]}
-      >
-        {data.drug.name}
-        <TouchableOpacity onPress={() => addToFavorite(data._id)}>              
+        style={[globalStyles.headline, {width: '100%', alignContent: 'center', justifyContent: 'center'}]}
+      >{data.drug.name}
+        <TouchableOpacity onPress={() => addToFavorites(data._id)}>              
         { favo ?   
           <FontAwesome  size={25} 
             name={isIdInFavo ? 'star' : 'star'}
@@ -214,18 +213,20 @@ return (
     <Text
       style={[styles.lastestNews, styles.lastestNewsTypo]}
     >
-            { listArticles ?              
-              <ScrollView>
+            { listArticles ?
+              <>
                 {listArticles.map((article, index) => (                  
-                  <View key={index} style={styles.articleBox}>
-                    <Text style={styles.articleTitle}>{article.title} - {formatFrenchDate(article.date)} 
-                      <TouchableOpacity onPress={() => openUrl(data.url)}>
-                        <FontAwesome name="external-link" size={25} color="#ec6e5b" />
-                      </TouchableOpacity>
-                    </Text>
-                  </View>                  
+                  <ScrollView>
+                    <View key={index} style={styles.articleBox}>
+                      <Text style={styles.articleTitle}>{article.title} - {formatFrenchDate(article.date)} 
+                        <TouchableOpacity onPress={() => openUrl(data.url)}>
+                          <FontAwesome name="external-link" size={25} color="#ec6e5b" />
+                        </TouchableOpacity>
+                      </Text>
+                    </View>
+                  </ScrollView>             
                 ))}
-              </ScrollView>
+              </>
               :
               <Text></Text>
               }
