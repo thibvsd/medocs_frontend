@@ -113,9 +113,9 @@ export default function TreatmentsScreen({ navigation }) {
   const drugTreatment = drugAdd.map((drug, index) => {
     console.log("dans le jsx: " + drug);
     return (
-      <View key={index} style={{ flexDirection: "row", alignItems: "center" }}>
-        <Text>{drug}</Text>
-        <Text>Doses:</Text>
+      <View key={index} style={styles.medoc}>
+        <Text style={styles.drugList}>{drug}</Text>
+        <Text style={styles.doseList}>Doses:</Text>
         <TextInput
           // value={drug.dose}
           // onChangeText={(text) => handleDoseChange(text, drug.name)}
@@ -130,8 +130,8 @@ export default function TreatmentsScreen({ navigation }) {
 
   return (
     <View style={styles.mainContainer}>
-      <Text style={styles.title}>Traitements en cours</Text>
-      <View>
+      <Text style={styles.title}></Text>
+      <View style={styles.drugContainer}>
         <Text style={styles.subtitle}>Ajouter un médicaments :</Text>
         <View style={styles.drugsBox}>
           <Autocomplete
@@ -153,10 +153,10 @@ export default function TreatmentsScreen({ navigation }) {
             placeholder="Nom du médicament..."
             containerStyle={styles.autocompleteContainer}
           />
-          <View>{drugTreatment}</View>
+          <View style={styles.drugList}>{drugTreatment}</View>
         </View>
       </View>
-      <View>
+      <View style={styles.reasonContainer}>
         <Text style={styles.subtitle}>Raison médicale :</Text>
         <TextInput
     style={styles.reasonInput}
@@ -185,6 +185,7 @@ const styles = StyleSheet.create({
   },
   subtitle:{
     fontSize:18,
+    margin:10,
   },
   mainContainer: {
     flex: 1,
@@ -192,13 +193,32 @@ const styles = StyleSheet.create({
     justifyContent: "top",
     alignItems: "center",
   },
+  drugContainer: {
+    width: "80%",
+    marginBottom: 10,
+  },
+  medoc:{
+  flexDirection: "row", 
+  justifyContent: "space-between", 
+  },
+  drugList:{
+fontSize:16,
+  },
+  doseList:{
+    marginLeft:10,
+fontSize:16,
+  },
+  reasonContainer: {
+    width: "80%",
+    marginBottom: 10,
+  },
   autocompleteContainer:{
-width: "60%",
+    width: 300,
 margin:10,
   },
   drugsBox: {
     height: '30%',
-    width: '90%',
+    width: '100%',
     flexDirection: 'column',
     justifyContent: 'space-between',
   },
@@ -208,7 +228,6 @@ margin:10,
     borderWidth: 1,
     marginBottom: 10,
     paddingLeft: 10,
-    width: '80%', // Ajustez la largeur selon vos besoins
     backgroundColor: 'white',
   },
 

@@ -68,7 +68,7 @@ export default function ProfileSettingScreen() {
       }}
     >
       <View>
-        <Text style={styles.title}>Paramètres de mon compte</Text>
+        <Text style={styles.title}></Text>
         <Text style={styles.inputTitle}>Nom d'utilisateur</Text>
         <TextInput
           style={styles.input}
@@ -126,6 +126,9 @@ const styles = StyleSheet.create({
   },
   inputTitle: {
     marginLeft: 20,
+    fontSize:16,
+    fontWeight: "bold",
+
   },
   label: {
     marginLeft: 20,
@@ -142,13 +145,14 @@ const styles = StyleSheet.create({
   },
   saveButton: {
     backgroundColor: "#3FB4B1",
-    width: "40%",
+    width: "50%",
     height: 50,
     margin: 40,
     padding: 10,
     borderRadius: 20,
     alignItems: "center",
     justifyContent: "center",
+    alignSelf: 'center',
   },
   saveButtonText: {
     color: "white",
