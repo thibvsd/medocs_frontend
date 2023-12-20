@@ -18,6 +18,8 @@ import SettingsScreen from "./screens/SettingsScreen";
 import FAQScreen from "./screens/FAQScreen.js";
 import OnboardingScreen from "./screens/OnboardingScreen";
 import InfoDrugScreen from "./screens/InfoDrugScreen";
+import CameraScreen from "./screens/CameraScreen";
+
 
 import { persistStore, persistReducer } from "redux-persist";
 import { PersistGate } from "redux-persist/integration/react";
@@ -124,6 +126,15 @@ const [fontsLoaded, error] = useFonts({
       </Tab.Navigator>
     );
   };
+
+  const TreatmentsScreenStack = () => {
+    return (
+      <Stack.Navigator>
+        <Stack.Screen name="Traitements" component={TreatmentsScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="Camera" component={CameraScreen} options={{ headerShown: false }} />
+      </Stack.Navigator>
+    );
+  }
 
   //GERE L'AFFICHAGE DU PROFIL AU CLICK SUR USER ICON
   const ProfileScreenStack = () => {

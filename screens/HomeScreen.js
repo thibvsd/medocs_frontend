@@ -555,13 +555,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "white",
   },
-  searchButton: {
-    height: 40,
-    width: 40,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "#3498db",
-    borderRadius: 5,
-  },
+  searchButton:{
+  height: 40,
+  width: 40,
+  flexDirection: "row",
+  alignItems: "center",
+  justifyContent: "center",
+  backgroundColor: "#3FB4B1",
+  borderRadius: 5,}
 });
