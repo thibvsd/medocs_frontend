@@ -16,7 +16,10 @@ import { useDispatch, useSelector } from "react-redux";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import { IP_ADDRESS } from "../config.js";
 
-import styles from '../assets/Styles.module.js';
+import { Button } from "react-native-paper";
+
+import styles from '../assets/DrugInfos.module.js';
+import globalStyles from '../assets/Styles.module.js';
 
 export default function InfoDrugScreen({ navigation }) {
   
@@ -58,7 +61,23 @@ export default function InfoDrugScreen({ navigation }) {
       fetchData();
     }, []);
 
-console.log('listArticles', listArticles);
+    const addToFavo = () => {
+      const fetchQuery = async () => {
+        try {
+          const response = await fetch(
+            `http://${IP_ADDRESS}:3000/drugs/addFavorites/${query}`
+          );
+          const result = await response.json();
+          setQueryResults(result); // enregistre les résultats de la recherche
+        } catch (error) {
+          console.error(error);
+        }
+      };
+      fetchQuery();
+      setQuery("");
+      setSuggestions([]);
+      setShowSearchResults(true);  
+    };
 
     const openUrl = (url) => {
       Linking.openURL(url)
@@ -77,11 +96,153 @@ console.log('listArticles', listArticles);
     const frenchDate = new Date(dateString).toLocaleDateString('fr-FR', options);
     return frenchDate;
   };
-  /*breastfeed_alert
-  pregnancy_alert
-  driving_alert
-  on_prescription
-  survey_indic*/
+return (
+<SafeAreaView style={styles.container} contentContainerStyle={styles.container}>
+  { data && data.drug ?  
+    <View >
+      <Text
+        style={[globalStyles.headline]}
+      >
+        {data.drug.name}
+        <TouchableOpacity onPress={() => addToFavorite(data._id)}>              
+        { favo ?   
+          <FontAwesome  size={25} 
+            name={isIdInFavo ? 'star' : 'star'}
+            color={isIdInFavo ? '#199a8e' : '#000'}/>
+            :             
+          <FontAwesome  size={25} name='star' color='#000'/>            
+        }
+        </TouchableOpacity>
+      </Text>
+    <View style={[styles.ficheMedicamentChild, styles.fichePosition]} />
+    <View style={[styles.ficheMedicamentItem, styles.fichePosition]} />
+    <View style={[styles.ficheMedicamentInner, styles.fichePosition]} />
+    <View style={[styles.sousMenus, styles.sousMenusFlexBox]}>
+      <View style={[styles.ciPe, styles.itBorder]}>
+        <Text
+          style={[styles.contreIndicationEtPrcautio, styles.lastestNewsTypo]}
+        >
+          Contre-indication et précautions d’emploi
+        </Text>
+        <Image
+          style={styles.buttonmodalIcon}
+          contentFit="cover"
+          source={require("../assets/buttonmodal.png")}
+        />
+      </View>
+      <View style={[styles.it, styles.itBorder]}>
+        <Text
+          style={[styles.contreIndicationEtPrcautio, styles.lastestNewsTypo]}
+        >
+          Indice thérapeuthique
+        </Text>
+        <Image
+          style={styles.buttonmodalIcon}
+          contentFit="cover"
+          source={require("../assets/buttonmodal.png")}
+        />
+      </View>
+      <View style={[styles.it, styles.itBorder]}>
+        <Text
+          style={[styles.contreIndicationEtPrcautio, styles.lastestNewsTypo]}
+        >
+          Posologie
+        </Text>
+        <Image
+          style={styles.buttonmodalIcon}
+          contentFit="cover"
+          source={require("../assets/buttonmodal.png")}
+        />
+      </View>
+      <View style={[styles.it, styles.itBorder]}>
+        <Text
+          style={[styles.contreIndicationEtPrcautio, styles.lastestNewsTypo]}
+        >
+          Effets indésirables
+        </Text>
+        <Image
+          style={styles.buttonmodalIcon}
+          contentFit="cover"
+          source={require("../assets/buttonmodal.png")}
+        />
+      </View>
+      <View style={[styles.it, styles.itBorder]}>
+        <Text
+          style={[styles.contreIndicationEtPrcautio, styles.lastestNewsTypo]}
+        >
+          Mode d’administration
+        </Text>
+        <Image
+          style={styles.buttonmodalIcon}
+          contentFit="cover"
+          source={require("../assets/buttonmodal.png")}
+        />
+      </View>
+    </View>
+    <View style={styles.indiceSurveillanceParent}>
+      <Image
+        style={styles.indiceSurveillanceIcon}
+        contentFit="cover"
+        source={require("../assets/indice-surveillance.png")}
+      />
+      <Image
+        style={styles.indiceSurveillanceIcon}
+        contentFit="cover"
+        source={require("../assets/smr.png")}
+      />
+      <Image
+        style={styles.indiceSurveillanceIcon}
+        contentFit="cover"
+        source={require("../assets/grosesse.png")}
+      />
+      <Image
+        style={styles.allaitementIcon}
+        contentFit="cover"
+        source={require("../assets/allaitement.png")}
+      />
+      <Image
+        style={styles.vigilanceIcon}
+        contentFit="cover"
+        source={require("../assets/vigilance.png")}
+      />
+      <Image
+        style={styles.ordonnanceIcon}
+        contentFit="cover"
+        source={require("../assets/ordonnance.png")}
+      />
+    </View>
+    <Text
+      style={[styles.lastestNews, styles.lastestNewsTypo]}
+    >
+            { listArticles ?              
+              <ScrollView>
+                {listArticles.map((article, index) => (                  
+                  <View key={index} style={styles.articleBox}>
+                    <Text style={styles.articleTitle}>{article.title} - {formatFrenchDate(article.date)} 
+                      <TouchableOpacity onPress={() => openUrl(data.url)}>
+                        <FontAwesome name="external-link" size={25} color="#ec6e5b" />
+                      </TouchableOpacity>
+                    </Text>
+                  </View>                  
+                ))}
+              </ScrollView>
+              :
+              <Text></Text>
+              }
+    </Text>
+  </View>
+  :
+  <><Text>Data not available</Text>
+  </>
+  }
+
+</SafeAreaView>
+
+
+)
+
+{/*}
+
     return (
       <SafeAreaView style={styles.container} contentContainerStyle={styles.container}>
         { data && data.drug ?           
@@ -185,9 +346,9 @@ console.log('listArticles', listArticles);
         }
         
       </SafeAreaView>
-    )
+      ) */}
   }
-
+{/*
 const stylesMed = StyleSheet.create({
   container: {
     flexDirection: 'row', // This makes the child elements arrange horizontally
@@ -239,4 +400,4 @@ const stylesMed = StyleSheet.create({
     fontSize: 16,
     textAlign: 'center',
   },
-});
+});*/}

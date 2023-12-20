@@ -80,6 +80,10 @@ export default function SearchScreen({ route, navigation }) {
     // Fonction pour fetch les dernières recherches
     const fetchLastSearch = async () => {
       // vérifier la présence de token et bloquer si pas de token (et informer le user)
+      if(!token){
+        console.log("Pas de token");
+        return;
+      }
       try {
         const response = await fetch(
           `http://${IP_ADDRESS}:3000/searches/last5Searches/${token}`,
@@ -194,7 +198,7 @@ export default function SearchScreen({ route, navigation }) {
 
   // Map pour afficher les dernières recherches si elles existent
   const lastSearches =
-    data.drug_id === null ? (
+    data.drug_id === null || !token ? (
       <View></View>
     ) : (
       searches.map((data, i) => (
@@ -265,8 +269,9 @@ export default function SearchScreen({ route, navigation }) {
         ) : (
           // Afficher Mes dernières recherches (par défaut)
           <View>
-            <Text style={styles.titleSearches}>Dernières fiches consultées</Text>
-            {lastSearches}
+            { token ? <><Text style={styles.titleSearches}>Dernières fiches consultées{lastSearches}</Text></> : 
+              <View></View>
+            }
           </View>
         )}
       </View>
