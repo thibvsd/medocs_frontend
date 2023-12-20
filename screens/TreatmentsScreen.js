@@ -5,6 +5,7 @@ import {
   Text,
   View,
   TouchableOpacity,
+  TouchableWithoutFeedback,
   ScrollView,
   TextInput,
 } from "react-native";
@@ -24,8 +25,8 @@ export default function TreatmentsScreen({ navigation }) {
   const [med_reason, setMed_reason] = useState("");
   const [drugAdd, setDrugAdd] = useState([]);
 
-  const userPhotos = useSelector((state) => state.user.value.photoUris);
-  console.log("USER: ", userPhotos);
+  const userPhotos = useSelector((state) => state.user.value.photo);
+  console.log("USER photo ", userPhotos);
 
   useEffect(() => {
     // AbortController pour arrêter la requête si query est modifié
@@ -78,8 +79,8 @@ export default function TreatmentsScreen({ navigation }) {
             body: JSON.stringify({ _id: isSelected }),
           }
         );
-        const resJson = response.json();
-        if (resJson.result) {
+        const result = await response.json();
+        if (result.result) {
           loadDrugs(); // Recharge les médicaments
         }
       } catch (error) {
@@ -87,6 +88,8 @@ export default function TreatmentsScreen({ navigation }) {
         console.error("Erreur réseau :", error);
       }
     }
+    setSuggestions([]);
+    setQuery("");
   };
 
   useEffect(() => {
@@ -100,18 +103,21 @@ export default function TreatmentsScreen({ navigation }) {
       );
       const data = await response.json();
       // Récupère les noms des médicaments et les met à jour dans setDrugAdd
-      const drugNames = data.treatment.drugs.map((drug) => {
+      const nameAndId = data.treatment.drugs.map((drug) => {
         const match = drug.drug_id.name.match(/^([^,]+),/);
-        const cleanedName = match ? match[1] : drug.drug_id.name;
-        return cleanedName.trim();
+        const cleanedName = match ? match[1].trim() : drug.drug_id.name;
+        const drugId = drug.drug_id._id;
+      
+        // Créer un objet avec les propriétés name et id
+        return { name: cleanedName, _id: drugId };
       });
-      console.log("loaddrugs",drugNames);
-      setDrugAdd(drugNames);
+      setDrugAdd(nameAndId);
     } catch (error) {
       // Gérer les erreurs réseau
       console.error("Erreur réseau :", error);
     }
     setQuery("");
+    setSuggestions([]);
 
   };
 
@@ -128,18 +134,20 @@ export default function TreatmentsScreen({ navigation }) {
   };
 
   const onDeleteDrugPress = async (drug) => {
+    console.log("ondelete drug", drug);
         try {
           const response = await fetch(
             `http://${IP_ADDRESS}:3000/treatments/deleteDrugTreatment/${token}`,
             {
               method: "DELETE",
               headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ shortName: drug }),
+              body: JSON.stringify({ _id: drug }),
             }
           );
-          const resJson = response.json();
-          if (resJson.result) {
-            loadDrugs(); // Recharge les médicaments
+          const result = await response.json();
+          if (result.result) {
+            setDrugAdd(drugAdd.filter((d) => d._id !== drug));
+            // loadDrugs(); // Recharge les médicaments
           }
         } catch (error) {
           // Gérer les erreurs réseau
@@ -153,7 +161,7 @@ export default function TreatmentsScreen({ navigation }) {
 
   const drugTreatment = drugAdd.map((drug, index) => (
     <View key={index} style={styles.drugContainer}>
-      <TouchableOpacity onPress={() => onDeleteDrugPress(drug)}>
+      <TouchableOpacity onPress={() => onDeleteDrugPress(drug._id)}>
                 <FontAwesome
             name="trash"
             size={20}
@@ -161,7 +169,7 @@ export default function TreatmentsScreen({ navigation }) {
             style={styles.deleteButton}
           />
           </TouchableOpacity>
-      <Text style={styles.drugList}>{drug}</Text>
+      <Text style={styles.drugList}>{drug.name}</Text>
       <View style={styles.doseContainer}>
         <Text style={styles.doseText}>Dose :</Text>
         <TextInput style={styles.doseInput}
@@ -185,6 +193,7 @@ export default function TreatmentsScreen({ navigation }) {
   );
 
   return (
+    <TouchableWithoutFeedback>
     <ScrollView>
     <View style={styles.mainContainer}>
       <Text style={styles.subtitle}>Ajouter un médicament</Text>
@@ -239,6 +248,7 @@ export default function TreatmentsScreen({ navigation }) {
       </TouchableOpacity>
     </View>
     </ScrollView>
+        </TouchableWithoutFeedback>
   );
 }
 

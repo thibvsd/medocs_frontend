@@ -161,7 +161,7 @@ const [fontsLoaded, error] = useFonts({
             headerTitleStyle: {
               fontWeight: 'bold',
             }}} />
-            <Stack.Screen name="Traitements" component={TreatmentsScreen} options={{ title: "Traitements en cours",
+            <Stack.Screen name="Traitements" component={TreatmentsScreenStack} options={{ title: "Traitements en cours",
             headerStyle: {
               backgroundColor: '#199a8e',
               shadowColor: '#199a8e',

@@ -3,7 +3,7 @@ import { StyleSheet, View, TouchableOpacity } from "react-native";
 import { Camera, CameraType, FlashMode } from "expo-camera";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import { useDispatch } from "react-redux";
-import { addPhotoUri } from "../reducers/user";
+import { addPhoto } from "../reducers/user";
 import { useNavigation, useIsFocused } from "@react-navigation/native";
 
 export default function SnapScreen() {
@@ -34,7 +34,7 @@ export default function SnapScreen() {
         const photo = await cameraRef.takePictureAsync({
           quality: 0.3,
         });
-        dispatch(addPhotoUri(photo.uri));
+        dispatch(addPhoto(photo.uri));
         navigation.navigate("Traitements");
   };
 
