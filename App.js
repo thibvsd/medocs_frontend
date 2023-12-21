@@ -29,8 +29,6 @@ import SplashScreen from "./screens/SplashScreen.js";
 import Lgn from "./screens/Lgn.js";
 
 AsyncStorage.clear();
-const reducers = combineReducers({ user, drugs });
-
 // Configure Redux persist
 const persistConfig = {
   key: "medidoc",
@@ -84,38 +82,38 @@ export default function App() {
     return null;
   }*/
 
-// Réduire en 1 seul useEffect
-useEffect(() => {
-  async function checkToken() {
-    try {
-      const userToken = await AsyncStorage.getItem("token");
-      if (userToken) {
-        setToken(userToken);
-        // dispatch(addAsyncStoragetoken(token));
+  // Réduire en 1 seul useEffect
+  useEffect(() => {
+    async function checkToken() {
+      try {
+        const userToken = await AsyncStorage.getItem("token");
+        if (userToken) {
+          setToken(userToken);
+          // dispatch(addAsyncStoragetoken(token));
+        }
+      } catch (error) {
+        console.error("Erreur lors de la vérification du token:", error);
       }
-    } catch (error) {
-      console.error("Erreur lors de la vérification du token:", error);
     }
-  }
-  checkToken();
-  async function checkIfFirstLaunch() {
-    try {
-      const hasLaunched = await AsyncStorage.getItem("appLaunched");
-      if (hasLaunched === null) {
-        setIsFirstLaunch(true);
-        await AsyncStorage.setItem("appLaunched", "true");
-      } else {
-        setIsFirstLaunch(false);
+    checkToken();
+    async function checkIfFirstLaunch() {
+      try {
+        const hasLaunched = await AsyncStorage.getItem("appLaunched");
+        if (hasLaunched === null) {
+          setIsFirstLaunch(true);
+          await AsyncStorage.setItem("appLaunched", "true");
+        } else {
+          setIsFirstLaunch(false);
+        }
+      } catch (error) {
+        console.error("Error checking app launch status:", error);
       }
-    } catch (error) {
-      console.error("Error checking app launch status:", error);
     }
+    checkIfFirstLaunch();
+  }, []);
+  if (isFirstLaunch === null) {
+    return null;
   }
-  checkIfFirstLaunch();
-}, []);
-if (isFirstLaunch === null) {
-  return null;
-}
 
   const TabNavigator = () => {
     return (
