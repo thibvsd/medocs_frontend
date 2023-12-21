@@ -97,7 +97,6 @@ export default function LoginScreen({ route, navigation }) {
   };
 
   const handleConnection = () => {
-    console.log("dans la connection", signInEmail, " ",signInPassword);
     fetch(`http://${IP_ADDRESS}:3000/users/signin`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -108,11 +107,7 @@ export default function LoginScreen({ route, navigation }) {
     })
       .then((response) => response.json())
       .then((data) => {
-        
-        console.log(`http://${IP_ADDRESS}:3000/users/signin`);
         if (data.result) {
-          console.log("dans le then de la connection", data);
-          console.log("dans le then de la connection", data.username);
           dispatch(
             login({
               email: signInEmail,
@@ -172,8 +167,20 @@ export default function LoginScreen({ route, navigation }) {
         value={confirmPassword} // Utilisation de confirmPassword au lieu de signUpPassword
         onChangeText={(text) => setConfirmPassword(text)}
       />
+      {/* <View style={styles.checkboxContainer}>
+        <CheckBox value={isChecked} onValueChange={toggleCheckBox} />
+        <Text style={styles.checkboxText}>
+          J’accepte les conditions d’utilisation de l’application :
+        </Text>
+        <TouchableOpacity onPress={() => navigation.navigate("FAQ")}>
+          <Text style={styles.linkText}>FAQ</Text>
+        </TouchableOpacity>
+      </View> */}
       <TouchableOpacity style={styles.link} onPress={toggleForm}>
         <Text>Vous avez déjà un compte ?{'\n'}Connectez-vous ici !</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.button} onPress={handleRegister}>
+        <Text style={styles.buttonText}>S'inscrire</Text>
       </TouchableOpacity>
     </>
   );
