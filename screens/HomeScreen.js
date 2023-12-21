@@ -140,6 +140,7 @@ export default function HomeScreen({ navigation }) {
   const onSuggestionPress = (suggestion) => {
     // Cherche le name et extrait son _id :
     const selectedDrug = data.find((item) => item.name === suggestion)._id;
+    if(token){
     // enregistre la recherche dans la DB
     fetch(`http://${IP_ADDRESS}:3000/searches/addLastSearch/${token}`, {
       method: "POST",
@@ -158,7 +159,11 @@ export default function HomeScreen({ navigation }) {
           setQuery("");
           setSuggestions([]);
         }
-      });
+      });}
+      else {dispatch(addLastSearch(selectedDrug)); // Dispatch l'id pour pouvoir le récupérer sur la page infoDrugScreen
+      navigation.navigate("InfoDrugScreen");
+      setQuery("");
+      setSuggestions([]);}
   };
 
   // Click sur la loupe, lance la recherche
