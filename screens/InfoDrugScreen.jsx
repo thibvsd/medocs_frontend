@@ -136,9 +136,10 @@ return (
 
       <Text style={[styles.title, { alignContent: 'center',textAlign: 'center', }]}>{data.drug.name.split(',')[0].trim()}{'\n'}
       <Text style={[{ textAlign: 'center', }]}>{data.drug.name.split(',')[1].trim()}</Text>      
-     {/*} {data.drug.classification.label && (
-        <Text style={{ alignContent: 'center',textAlign: 'center', fontStyle: 'italic', fontSize: 10  }}>Famille {data.drug.classification.label}</Text>
-      )}*/}
+      {data.drug.classification && (
+        <Text style={{ alignContent: 'center',textAlign: 'center', fontStyle: 'italic', fontSize: 12  }}>
+          {'\n'}Famille {data.drug.classification.label}</Text>
+      )}
      </Text>
 
       { token ? 
@@ -174,7 +175,16 @@ return (
           </>
           :
             <View key={index} style={styles.articleBox}>
-              <Text>Vous pouvez retrouver d'autres informations sur les sites
+              <Text>Vous pouvez retrouver des informations sur les sites suivants :{'\n'}
+              Sources officielles :{'\n'}
+              Ministère de la santé et de la prévention http://sante.gouv.fr/{'\n'}
+              Agence Nationale de Sécurité des médicaments ANSM https://ansm.sante.fr/
+              Sources indépendantes :{'\n'}
+              Site du Collège National de Pharmacologie {'\n'}
+              Haute autorité de santé Autorité publique indépendante à caractère scientifique{'\n'}
+              UFC que choisir{'\n'}
+              Prescrire.org et sa liste des médicaments à écarter{'\n'}
+              https://www.prescrire.org/Fr/CAB420E670595F025E19F60B1D364181/Download.aspx
                 <TouchableOpacity onPress={() => openUrl(data.url)} style={[{ marginTop: 10, paddingLeft: 2 }]}>
                   <FontAwesome name="external-link" size={20} color="#199a8e" />
                 </TouchableOpacity>
@@ -238,6 +248,13 @@ return (
             Contre indications précautions d'emploi
           </Text>
         </TouchableOpacity>
+
+        <TouchableOpacity style={[styles.button ]}>
+          <Text style= {[styles.buttonText ]}>
+          Liste noire des médicaments - pdf
+          </Text>
+        </TouchableOpacity>
+
       </View>
     </View>
 
