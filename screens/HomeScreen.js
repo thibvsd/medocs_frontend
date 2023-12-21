@@ -40,7 +40,7 @@ export default function HomeScreen({ navigation }) {
     motCle: false,
   });
   const [sourceValue, setSourceValue] = useState(null);
-  const [familleValue, setFamilleValue] = useState(null);
+  const [keyword, setKeyword] = useState('');
 
   const pickerRef = useRef();
 
@@ -204,31 +204,28 @@ export default function HomeScreen({ navigation }) {
   };
 
   const handleDropdownSource = (item) => {
-    setSourceValue(item.value);
-
-    // Envoi de la requête à la route souhaitée avec la valeur sélectionnée
-    fetch(`http://${IP_ADDRESS}:3000/articles/bySource/${item.value}`)
-      .then((response) => response.json())
-      .then((data) => {
-        setArticles(data.sourceArticles);
-      })
-      .catch((error) => {
-        console.error("Erreur lors de la requête :", error);
-      });
+    const selectedSource = item.value;
+    setSourceValue(selectedSource);
+    handleCombinedFilter();
+  };
+  
+  const handleSearchKeyword = () => {
+    handleCombinedFilter();
   };
 
-  const handleDropdownFamille = (item) => {
-    setSourceValue(item.value);
-
-    // Envoi de la requête à la route souhaitée avec la valeur sélectionnée
-    fetch(`http://${IP_ADDRESS}:3000/articles/bySource/${item.value}`)
-      .then((response) => response.json())
-      .then((data) => {
-        setArticles(data.sourceArticles);
-      })
-      .catch((error) => {
-        console.error("Erreur lors de la requête :", error);
-      });
+  const handleCombinedFilter = async () => {
+    try {
+      const formattedSource = encodeURIComponent(sourceValue || 'undefined');
+      const formattedKeyword = encodeURIComponent(keyword || 'undefined');
+  
+      const response = await fetch(`http://${IP_ADDRESS}:3000/articles/bySourceAndKeyword/${formattedSource}/${formattedKeyword}`);
+      const data = await response.json();
+  
+      setArticles(data.combinedArticles); // Mettre à jour les articles filtrés dans l'état
+    } catch (error) {
+      console.error(error);
+      // Gérez les erreurs
+    }
   };
 
   const tabSource = loadSource.map((source) => ({
@@ -291,9 +288,9 @@ export default function HomeScreen({ navigation }) {
         </View>
       );
     });
-    return filterdArticles
+    return filterdArticles;
   };
-  
+
   // Utilisation de generateFeed chaque fois que articles est modifié
   const feed = generateFeed(articles);
 
@@ -356,37 +353,20 @@ export default function HomeScreen({ navigation }) {
               onChange={handleDropdownSource}
             />
 
-            <Dropdown
-              style={styles.dropdown}
-              placeholderStyle={styles.placeholderStyle}
-              selectedTextStyle={styles.selectedTextStyle}
-              inputSearchStyle={styles.inputSearchStyle}
-              iconStyle={styles.iconStyle}
-              data={tabFamille}
-              search
-              maxHeight={300}
-              labelField="label"
-              valueField="value"
-              placeholder="famille"
-              searchPlaceholder="Search..."
-              value={familleValue}
-              onChange={handleDropdownFamille}
-            />
-
-            <TouchableOpacity
-              style={styles.filterButton}
-              onPress={() => openFilterModal("motCle")}
-            >
-              <Text style={styles.filterButtonText}>
-                Mot-clé{" "}
-                <FontAwesome
-                  name="caret-down"
-                  size={20}
-                  color="white"
-                  style={styles.filterButtonCaret}
-                />
-              </Text>
-            </TouchableOpacity>
+            <View style={styles.searchContainer}>
+              <TextInput
+                style={styles.input}
+                placeholder="Rechercher..."
+                onChangeText={(text) => setKeyword(text)}
+                value={keyword}
+              />
+              <TouchableOpacity
+                style={styles.searchButton}
+                onPress={handleSearchKeyword}
+              >
+                {/* Insérez ici votre icône de recherche ou un composant Text "Search" */}
+              </TouchableOpacity>
+            </View>
           </View>
           {selectedFilter &&
             filterModals[selectedFilter] &&
