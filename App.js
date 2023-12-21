@@ -165,7 +165,7 @@ export default function App() {
             />
             <Stack.Screen
               name="Traitements"
-              component={TreatmentsScreen}
+              component={TreatmentsScreenStack}
               options={{
                 title: "Traitements en cours",
                 headerStyle: {

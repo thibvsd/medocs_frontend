@@ -1,20 +1,55 @@
 import * as React from "react";
 import { StyleSheet, View, Text, Image } from "react-native";
 import { Border, FontFamily, FontSize, Color } from "../assets/GlobalStyles";
+import { useNavigation } from "@react-navigation/native";
 
+const onLogin = () => {
+  navigation.navigate("TabNavigator", {
+    screen: "Profile",
+    params: {
+      screen: "Login",
+      params: {
+        IsSignup: false,
+      },
+    },
+  });
+};
+
+const onInscription = () => {
+  navigation.navigate("TabNavigator", {
+    screen: "Profile",
+    params: {
+      screen: "Login",
+      params: {
+        IsSignup: true,
+      },
+    },
+  });
+};
+
+const onGuest = () => {
+  navigation.navigate("TabNavigator", "Home");
+};
 const Lgn = () => {
+  navigation = useNavigation();
+
   return (
     <View style={styles.onboardingFinal}>
       <View style={[styles.buttons, styles.frame1Position]}>
         <View style={styles.buttonLayout}>
           <View style={[styles.loginButtonChild, styles.buttonChildPosition]} />
-          <Text style={styles.connexion}>Connexion</Text>
+          <Text onPress={onLogin} style={styles.connexion}>
+            Connexion
+          </Text>
         </View>
         <View style={[styles.signupButton, styles.buttonLayout]}>
           <View
             style={[styles.signupButtonChild, styles.buttonChildPosition]}
           />
-          <Text style={[styles.inscription, styles.inscriptionTypo]}>
+          <Text
+            onPress={onInscription}
+            style={[styles.inscription, styles.inscriptionTypo]}
+          >
             Inscription
           </Text>
         </View>
@@ -25,7 +60,7 @@ const Lgn = () => {
             <Image
               style={styles.vectorIcon}
               contentFit="cover"
-              source={require("../assets/vector2.png")}
+              source={require("../assets/Logo2.png")}
             />
             <Text style={styles.medidoc}>Medidoc</Text>
           </View>
@@ -41,7 +76,10 @@ const Lgn = () => {
       <View style={[styles.frame1, styles.frame1Position]}>
         <Text style={[styles.ou, styles.ouTypo]}>ou</Text>
         <View style={[styles.signupButton1, styles.buttonLayout]}>
-          <Text style={[styles.continuerEnTant, styles.inscriptionTypo]}>
+          <Text
+            onPress={onGuest}
+            style={[styles.continuerEnTant, styles.inscriptionTypo]}
+          >
             Continuer en tant qu’invité
           </Text>
         </View>
