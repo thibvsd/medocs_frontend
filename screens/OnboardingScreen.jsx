@@ -53,9 +53,9 @@ const OnboardingScreen = () => {
 
 const navigation = useNavigation();
 
-const onDone = () => {
-  navigation.replace('TabNavigator','Home'); 
-};
+// const onDone = () => {
+//   navigation.replace('TabNavigator','Home'); 
+// };
 
   return (
     <Onboarding     
@@ -66,7 +66,7 @@ const onDone = () => {
       bottomBarHighlight = {false}
       skipToPage={2}
       controlStatusBar={false}     
-      onDone={() => navigation.navigate("TabNavigator")}
+      onDone={() => navigation.navigate("Lgn")}
       pages={[
         {
           backgroundColor: "#fdeb93",

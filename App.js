@@ -26,6 +26,7 @@ import OnboardingScreen from "./screens/OnboardingScreen";
 import InfoDrugScreen from "./screens/InfoDrugScreen";
 import CameraScreen from "./screens/CameraScreen";
 import SplashScreen from "./screens/SplashScreen.js";
+import Lgn from "./screens/Lgn.js";
 
 AsyncStorage.clear();
 const reducers = combineReducers({ user, drugs });
@@ -53,7 +54,7 @@ export default function App() {
   const [token, setToken] = useState(null);
   const [isFirstLaunch, setIsFirstLaunch] = useState(null);
 
-  const [fontsLoaded, error] = useFonts({
+  const [fontsLoaded] = useFonts({
     "Inter-Regular": require("./assets/fonts/Inter-Regular.ttf"),
     "Inter-Medium": require("./assets/fonts/Inter-Medium.ttf"),
     "Inter-SemiBold": require("./assets/fonts/Inter-SemiBold.ttf"),
@@ -270,6 +271,7 @@ export default function App() {
                 name="OnboardingScreen"
                 component={OnboardingScreen}
               />
+              <Stack.Screen name="Lgn" component={Lgn} />
             </Stack.Navigator>
           ) : (
             <Stack.Navigator screenOptions={{ headerShown: false }}>
