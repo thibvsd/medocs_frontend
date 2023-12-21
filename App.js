@@ -62,6 +62,7 @@ export default function App() {
     "Montserrat-Bold": require("./assets/fonts/Montserrat-Bold.ttf"),
   });
 
+  /*
   useEffect(() => {
     async function checkTokenAndLaunchStatus() {
       try {
@@ -70,6 +71,7 @@ export default function App() {
 
         const hasLaunched = await AsyncStorage.getItem("appLaunched");
         setIsFirstLaunch(hasLaunched === null);
+
       } catch (error) {
         console.error("Error checking token and launch status:", error);
       }
@@ -78,9 +80,42 @@ export default function App() {
     checkTokenAndLaunchStatus();
   }, []);
 
-  if (isFirstLaunch === null || !fontsLoaded) {
+  if (isFirstLaunch === null) {
     return null;
+  }*/
+
+// Réduire en 1 seul useEffect
+useEffect(() => {
+  async function checkToken() {
+    try {
+      const userToken = await AsyncStorage.getItem("token");
+      if (userToken) {
+        setToken(userToken);
+        // dispatch(addAsyncStoragetoken(token));
+      }
+    } catch (error) {
+      console.error("Erreur lors de la vérification du token:", error);
+    }
   }
+  checkToken();
+  async function checkIfFirstLaunch() {
+    try {
+      const hasLaunched = await AsyncStorage.getItem("appLaunched");
+      if (hasLaunched === null) {
+        setIsFirstLaunch(true);
+        await AsyncStorage.setItem("appLaunched", "true");
+      } else {
+        setIsFirstLaunch(false);
+      }
+    } catch (error) {
+      console.error("Error checking app launch status:", error);
+    }
+  }
+  checkIfFirstLaunch();
+}, []);
+if (isFirstLaunch === null) {
+  return null;
+}
 
   const TabNavigator = () => {
     return (
