@@ -209,6 +209,7 @@ export default function SearchScreen({ route, navigation }) {
     data.drug_id === null || !token ? (
       <View></View>
     ) : (
+      
       searches.map((data, i) => (
         <View key={i} style={styles.searchesContainer}>
           <TouchableOpacity onPress={() => onLastSearchClick(data.drug_id)}>

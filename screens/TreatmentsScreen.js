@@ -13,10 +13,11 @@ import Autocomplete from "react-native-autocomplete-input";
 import { IP_ADDRESS } from "../config.js";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import { removePhoto } from "../reducers/user";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 
 export default function TreatmentsScreen({ navigation }) {
-  const token = "mYZ2UayAiPjfhaQRy0FXQH-1oktu1Xi9";
+  const dispatch = useDispatch();
+  const token = useSelector((state) => state.user.value.token);
   const [suggestions, setSuggestions] = useState([]);
   const [data, setData] = useState([]);
   const [query, setQuery] = useState("");
@@ -25,6 +26,7 @@ export default function TreatmentsScreen({ navigation }) {
   const [drugAdd, setDrugAdd] = useState([]);
 
   const userPhotos = useSelector((state) => state.user.value.photos);
+
   // console.log("USER photo ", userPhotos);
 
   console.log('query state', query);
@@ -233,6 +235,7 @@ export default function TreatmentsScreen({ navigation }) {
             <Text style={styles.subtitle}>Mes ordonnances</Text>
             <View style={styles.ordonnanceContainer}>
               <Text>Ajouter une ordonnance </Text>
+              <View style={styles}>
               <TouchableOpacity onPress={onAddPrescriptionPress}>
                 <FontAwesome
                   name="camera"
@@ -241,7 +244,8 @@ export default function TreatmentsScreen({ navigation }) {
                   style={styles.filterButtonCaret}
                 />
               </TouchableOpacity>
-              <View>{photos}</View>
+              <View style={styles.ordonnancePhotoContainer}>{photos}</View>
+              </View>
             </View>
           </View>
           <TouchableOpacity onPress={onSave} style={styles.saveButton}>
@@ -341,8 +345,7 @@ const styles = StyleSheet.create({
     textAlignVertical: "top",
   },
   ordonnanceContainer: {
-    flexDirection: "row",
-  },
+alignItems: "center", },
 
   saveButton: {
     marginTop: 20,
@@ -361,5 +364,15 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     textAlign: "center",
     justifyContent: "center",
+  },
+  ordonnancePhotoContainer: {
+    flexWrap: 'wrap',
+    flexDirection: 'row',
+    justifyContent: 'center',
+  },
+  photo: {
+    margin: 10,
+    width: 150,
+    height: 150,
   },
 });
