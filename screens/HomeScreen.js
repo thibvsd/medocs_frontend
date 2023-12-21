@@ -66,7 +66,6 @@ export default function HomeScreen({ navigation }) {
 
   const fetchFamilles = async () => {
     try {
-      console.log("ici");
       const response = await fetch(`http://${IP_ADDRESS}:3000/articles/codes`);
       const resultLabels = await response.json();
       setLoadFamille(resultLabels.codes);
