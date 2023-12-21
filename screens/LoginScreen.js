@@ -108,8 +108,11 @@ export default function LoginScreen({ route, navigation }) {
     })
       .then((response) => response.json())
       .then((data) => {
+        
+        console.log(`http://${IP_ADDRESS}:3000/users/signin`);
         if (data.result) {
-          console.log("dans le then de la connection");
+          console.log("dans le then de la connection", data);
+          console.log("dans le then de la connection", data.username);
           dispatch(
             login({
               email: signInEmail,
