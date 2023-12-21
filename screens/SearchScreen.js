@@ -55,18 +55,17 @@ export default function SearchScreen({ route, navigation }) {
   useEffect(() => {
     // AbortController pour arrêter la requête si query est modifié
     const fetchDataController = new AbortController();
-
+    const queryToFilter = query;
     // Fonction pour fetch les noms des médicaments (pour l'autocomplétion)
     const fetchData = async () => {
       try {
-        if (query.length >= 3) {
-          const response = await fetch(
-            `http://${IP_ADDRESS}:3000/drugs/query3characters/${query}`,
-            { signal: fetchDataController.signal }
-          );
-          const result = await response.json();
-          setData(result.namesAndId);
-        }
+        const response = await fetch(
+          `http://${IP_ADDRESS}:3000/drugs/query3characters/${queryToFilter}`,
+          { signal: fetchDataController.signal }
+        );
+        const result = await response.json();
+        setData(result.namesAndId);
+        return result.namesAndId;
       } catch (error) {
         if (error.name === "AbortError") {
           console.log("La requête fetchData a été annulée.");
@@ -75,6 +74,15 @@ export default function SearchScreen({ route, navigation }) {
         }
       }
     };
+    fetchData().then((responseData) => {
+      if(!responseData) return;
+      const filteredData = responseData
+        .filter((item) =>
+          item.name.toLowerCase().includes(queryToFilter.toLowerCase())
+        )
+        .slice(0, 10); // Limite à 10 suggestions
+      setSuggestions(filteredData.map((item) => item.name)); // map pour n'avoir que les names sans clé
+    });
 
     // Fonction pour fetch les dernières recherches
     const fetchLastSearch = async () => {
@@ -122,18 +130,6 @@ export default function SearchScreen({ route, navigation }) {
     setQuery("");
     setSuggestions([]);
     setShowSearchResults(true);
-  };
-
-  // Filtrer les suggestions en fonction de la valeur de l'input
-  const filterData = (text) => {
-    if (text.length >= 3) {
-      const filteredData = data
-        .filter((item) => item.name.toLowerCase().includes(text.toLowerCase()))
-        .slice(0, 10); // Limite à 10 suggestions
-      setSuggestions(filteredData.map((item) => item.name)); // map pour n'avoir que les names sans clé
-    } else {
-      setSuggestions([]);
-    }
   };
 
   const onSuggestionPress = (suggestion) => {
@@ -230,10 +226,11 @@ export default function SearchScreen({ route, navigation }) {
         <View style={styles.searchContainer}>
           <Autocomplete
             data={suggestions}
-            value={query}
             onChangeText={(text) => {
-              setQuery(text);
-              filterData(text);
+              if (text.length > 2) {
+                setQuery(text);
+              }
+              if(!text.length) setSuggestions([]);
             }}
             // Affiche les suggestions :
             flatListProps={{
