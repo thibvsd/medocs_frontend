@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   View,
   Text,
@@ -18,16 +18,20 @@ import { addLastSearch } from "../reducers/drugs";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import { Linking } from "react-native";
 import { IP_ADDRESS } from "../config.js";
+import { Dropdown } from "react-native-element-dropdown";
 
 export default function HomeScreen({ navigation }) {
   const dispatch = useDispatch();
   const { navigate } = navigation;
 
   const token = useSelector((state) => state.user.value.token);
-  const [query, setQuery] = useState('');
+  const [query, setQuery] = useState("");
   const [data, setData] = useState([]);
   const [suggestions, setSuggestions] = useState([]);
   const [articles, setArticles] = useState([]);
+  const [selectedSource, setSelectedSource] = useState(null);
+  const [loadSource, setLoadSource] = useState([]);
+  const [loadFamille, setLoadFamille] = useState([]);
   const [selectedFilter, setSelectedFilter] = useState(null);
   const [filterModals, setFilterModals] = useState({
     boutonFiltre: false,
@@ -35,37 +39,83 @@ export default function HomeScreen({ navigation }) {
     famille: false,
     motCle: false,
   });
+  const [sourceValue, setSourceValue] = useState(null);
+  const [keyword, setKeyword] = useState('');
+
+  const pickerRef = useRef();
+
+  function open() {
+    pickerRef.current.focus();
+  }
+
+  function close() {
+    pickerRef.current.blur();
+  }
+
+  const fetchSources = async () => {
+    try {
+      const response = await fetch(
+        `http://${IP_ADDRESS}:3000/articles/sources`
+      );
+      const resultSources = await response.json();
+      setLoadSource(resultSources.sources);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const fetchFamilles = async () => {
+    try {
+      console.log("ici");
+      const response = await fetch(`http://${IP_ADDRESS}:3000/articles/codes`);
+      const resultLabels = await response.json();
+      setLoadFamille(resultLabels.codes);
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   useEffect(() => {
-   // AbortController pour arrêter la requête si query est modifié
-   const fetchDataController = new AbortController();
+    // AbortController pour arrêter la requête si query est modifié
+    const fetchDataController = new AbortController();
+    const queryToFilter = query;
+    // Fonction pour fetch les noms des médicaments (pour l'autocomplétion)
+    const fetchData = async () => {
+      try {
+        const response = await fetch(
+          `http://${IP_ADDRESS}:3000/drugs/query3characters/${queryToFilter}`,
+          { signal: fetchDataController.signal }
+        );
+        const result = await response.json();
+        setData(result.namesAndId);
+        return result.namesAndId;
+      } catch (error) {
+        if (error.name === "AbortError") {
+          console.log("La requête fetchData a été annulée.");
+        } else {
+          console.error(error);
+        }
+      }
+    };
+    fetchData().then((responseData) => {
+      if(!responseData) return;
+      const filteredData = responseData
+        .filter((item) =>
+          item.name.toLowerCase().includes(queryToFilter.toLowerCase())
+        )
+        .slice(0, 10); // Limite à 10 suggestions
+      setSuggestions(filteredData.map((item) => item.name)); // map pour n'avoir que les names sans clé
+    });
 
-   // Fonction pour fetch les noms des médicaments (pour l'autocomplétion)
-   const fetchData = async () => {
-     try {
-       if (query.length >= 3) {
-         const response = await fetch(
-           `http://${IP_ADDRESS}:3000/drugs/query3characters/${query}`,
-           { signal: fetchDataController.signal }
-         );
-         const result = await response.json();
-         setData(result.namesAndId);
-       }
-     } catch (error) {
-       if (error.name === "AbortError") {
-         console.log("La requête fetchData a été annulée.");
-       } else {
-         console.error(error);
-       }
-     }
-   };
+    return () => fetchDataController.abort();
+  }, [query]);
 
+  useEffect(() => {
     // Fetch pour récupérer les 3 derniers articles
     const fetchArticles = async () => {
       try {
         const response = await fetch(
-          `http://${IP_ADDRESS}:3000/articles/latestNews`, 
-
+          `http://${IP_ADDRESS}:3000/articles/latestNews`
         );
         const result = await response.json();
         setArticles(result.latestNews);
@@ -73,91 +123,51 @@ export default function HomeScreen({ navigation }) {
         console.error(error);
       }
     };
-
-    const fetchSources = async () => {
-      try {
-        const response = await fetch(
-          `http://${IP_ADDRESS}:3000/articles/sources`, 
-    
-        );
-        const resultSources = await response.json();
-      } catch (error) {
-        console.error(error);
-      }
-    };
-    
-// !! la route ne fonctionne pas
-    const fetchFamilles = async () => {
-      try {
-        const response = await fetch(
-          `http://${IP_ADDRESS}:3000/articles/labels`, 
-    
-        );
-        const resultLabels = await response.json();
-      } catch (error) {
-        console.error(error);
-      }
-    };
-
-    fetchData();
     fetchArticles();
     fetchSources();
     fetchFamilles();
-    return () => fetchDataController.abort();
   }, []);
 
 
-  // Filtre les suggestions en fonction de la valeur de l'input
-  const filterData = (text) => {
-    if (text.length >= 3) {
-      const filteredData = data
-        .filter((item) => item.name.toLowerCase().includes(text.toLowerCase()))
-        .slice(0, 10);
-      setSuggestions(filteredData.map((item) => item.name));
-    } else {
-      setSuggestions([]);
-    }
-  };
-
-
   const onLogin = () => {
-    navigation.navigate('TabNavigator', {
-      screen: 'Search',
+    navigation.navigate("TabNavigator", {
+      screen: "Search",
       params: {
-        screen: 'InfoDrugScreen'
+        screen: "InfoDrugScreen",
       },
     });
-  }
+  };
 
   const onSuggestionPress = (suggestion) => {
     // Cherche le name et extrait son _id :
     const selectedDrug = data.find((item) => item.name === suggestion)._id;
     // enregistre la recherche dans la DB
-    fetch(`http://${IP_ADDRESS}:3000/searches/addLastSearch/${token}`,{
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              _id: selectedDrug,
-            }),
-          })
-        .then((response) => response.json())
-        .then((data) => {
-          if (data.result) {
-            dispatch(addLastSearch(selectedDrug)); // Dispatch l'id pour pouvoir le récupérer sur la page infoDrugScreen
-            navigation.navigate("InfoDrugScreen"); // redirige vers l'info du médicament
-            setQuery("");
-            setSuggestions([]);
-          }
-        })};
+    fetch(`http://${IP_ADDRESS}:3000/searches/addLastSearch/${token}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        _id: selectedDrug,
+      }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.result) {
+          dispatch(addLastSearch(selectedDrug)); // Dispatch l'id pour pouvoir le récupérer sur la page infoDrugScreen
+          navigation.navigate("InfoDrugScreen"); // redirige vers l'info du médicament
+          setQuery("");
+          setSuggestions([]);
+        }
+      });
+  };
 
-// Click sur la loupe, lance la recherche
+  // Click sur la loupe, lance la recherche
   const handleSearch = () => {
-    navigation.navigate('TabNavigator',{
-      screen: 'Search',
+    navigation.navigate("TabNavigator", {
+      screen: "Search",
       params: {
-        screen: 'SearchScreen',
+        screen: "SearchScreen",
         params: {
           query: query,
         },
@@ -166,7 +176,6 @@ export default function HomeScreen({ navigation }) {
     setQuery("");
     setSuggestions([]);
     Keyboard.dismiss();
-
   };
 
   // Ouvre l'url
@@ -187,63 +196,100 @@ export default function HomeScreen({ navigation }) {
     setFilterModals((prev) => ({ ...prev, [filter]: true }));
   };
 
-  const closeFilterModal = () => {
-    setSelectedFilter(null);
-    setFilterModals((prev) => ({ ...prev, [selectedFilter]: false }));
+  const handleSourceChange = (value) => {
+    setSelectedSource(value);
   };
 
-  const renderFilterMenu = (filter) => {
-    // <TextInput
-    // style={styles.input}
-    // placeholder="Enter your filter"
-    // value={inputValue}
-    // onChangeText={(text) => setInputValue(text)}
-  // />
-    // Implement your filter menu content here
-    // It should contain an input area and check buttons
-    return (
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={filterModals[filter]}
-        onRequestClose={closeFilterModal}
-      >
-        <View style={styles.modalContainer}>
-          <Text style={styles.modalText}>Filter Options - {filter}</Text>
-          {/* Your filter menu content */}
-          <TouchableOpacity onPress={closeFilterModal}>
-            <Text style={styles.closeModalText}>Close Modal</Text>
-          </TouchableOpacity>
-        </View>
-      </Modal>
-    );
+  const handleDropdownSource = (item) => {
+    const selectedSource = item.value;
+    setSourceValue(selectedSource);
+    handleCombinedFilter();
   };
+  
+  const handleSearchKeyword = () => {
+    handleCombinedFilter();
+  };
+
+  const handleCombinedFilter = async () => {
+    try {
+      const formattedSource = encodeURIComponent(sourceValue || 'undefined');
+      const formattedKeyword = encodeURIComponent(keyword || 'undefined');
+  
+      const response = await fetch(`http://${IP_ADDRESS}:3000/articles/bySourceAndKeyword/${formattedSource}/${formattedKeyword}`);
+      const data = await response.json();
+  
+      setArticles(data.combinedArticles); // Mettre à jour les articles filtrés dans l'état
+    } catch (error) {
+      console.error(error);
+      // Gérez les erreurs
+    }
+  };
+
+  const tabSource = loadSource.map((source) => ({
+    label: source,
+    value: source,
+  }));
+
+  const tabFamille = loadFamille.map((source) => ({
+    label: source.label,
+    value: source.label,
+  }));
 
   // Affichage des articles récupérés via le fetch
-  const feed = articles.map((data, i) => {
-    const options = { day: "2-digit", month: "2-digit", year: "numeric" };
-    const formattedDate = new Date(data.date).toLocaleDateString(
-      "fr-FR",
-      options
-    );
-    return (
-      <View key={i} style={styles.articleContainer}>
-        <View style={styles.articleTextContainer}>
-          <Text style={styles.articleTitle}>{data.title}</Text>
-          <Text style={styles.articleDate}>{formattedDate}</Text>
+  // const feed = articles.map((data, i) => {
+  //   const options = { day: "2-digit", month: "2-digit", year: "numeric" };
+  //   const formattedDate = new Date(data.date).toLocaleDateString(
+  //     "fr-FR",
+  //     options
+  //   );
+  //   return (
+  //     <View key={i} style={styles.articleContainer}>
+  //       <View style={styles.articleTextContainer}>
+  //         <Text style={styles.articleTitle}>{data.title}</Text>
+  //         <Text style={styles.articleDate}>{formattedDate}</Text>
 
-          <Text style={styles.articleContent}>{data.content}</Text>
+  //         <Text style={styles.articleContent}>{data.content}</Text>
+  //       </View>
+  //       <TouchableOpacity onPress={() => openUrl(data.url)}>
+  //         <FontAwesome name="external-link" size={25} color="#3FB4B1" />
+  //       </TouchableOpacity>
+  //       <Image
+  //         source={{ uri: data.illustration }}
+  //         style={styles.articleImage}
+  //       />
+  //     </View>
+  //   );
+  // });
+
+  const generateFeed = (articles) => {
+    const filterdArticles = articles.map((data, i) => {
+      const options = { day: "2-digit", month: "2-digit", year: "numeric" };
+      const formattedDate = new Date(data.date).toLocaleDateString(
+        "fr-FR",
+        options
+      );
+      return (
+        <View key={i} style={styles.articleContainer}>
+          <View style={styles.articleTextContainer}>
+            <Text style={styles.articleTitle}>{data.title}</Text>
+            <Text style={styles.articleDate}>{formattedDate}</Text>
+            <Text style={styles.articleContent}>{data.content}</Text>
+          </View>
+          <TouchableOpacity onPress={() => openUrl(data.url)}>
+            <FontAwesome name="external-link" size={25} color="#3FB4B1" />
+          </TouchableOpacity>
+          <Image
+            source={{ uri: data.illustration }}
+            style={styles.articleImage}
+          />
         </View>
-        <TouchableOpacity onPress={() => openUrl(data.url)}>
-          <FontAwesome name="external-link" size={25} color="#3FB4B1" />
-        </TouchableOpacity>
-        <Image
-          source={{ uri: data.illustration }}
-          style={styles.articleImage}
-        />
-      </View>
-    );
-  });
+      );
+    });
+    return filterdArticles;
+  };
+
+  // Utilisation de generateFeed chaque fois que articles est modifié
+  const feed = generateFeed(articles);
 
   return (
     <TouchableWithoutFeedback
@@ -257,10 +303,11 @@ export default function HomeScreen({ navigation }) {
         <View style={styles.searchContainer}>
           <Autocomplete
             data={suggestions}
-            value={query}
             onChangeText={(text) => {
-              setQuery(text);
-              filterData(text);
+              if (text.length > 2) {
+                setQuery(text);
+              }
+              if(!text.length) setSuggestions([]);
             }}
             flatListProps={{
               //définit comment chaque élément de la liste générée par Autocomplete sera affiché
@@ -274,7 +321,7 @@ export default function HomeScreen({ navigation }) {
             placeholder="Rechercher un médicament..."
             containerStyle={styles.autocompleteContainer}
           />
-                    <TouchableOpacity onPress={handleSearch} style={styles.searchButton}>
+          <TouchableOpacity onPress={handleSearch} style={styles.searchButton}>
             <FontAwesome name="search" size={30} color="white" />
           </TouchableOpacity>
         </View>
@@ -287,45 +334,37 @@ export default function HomeScreen({ navigation }) {
             >
               <FontAwesome name="filter" size={25} color="#3FB4B1" />
             </TouchableOpacity>
+            <Dropdown
+              style={styles.dropdown}
+              placeholderStyle={styles.placeholderStyle}
+              selectedTextStyle={styles.selectedTextStyle}
+              inputSearchStyle={styles.inputSearchStyle}
+              iconStyle={styles.iconStyle}
+              data={tabSource}
+              search
+              maxHeight={300}
+              labelField="label"
+              valueField="value"
+              placeholder="Source"
+              searchPlaceholder="Search..."
+              value={sourceValue}
+              onChange={handleDropdownSource}
+            />
 
-            <TouchableOpacity style={styles.filterButton}
-            onPress={() =>openFilterModal('source')}>
-              <Text style={styles.filterButtonText}>
-                Source{" "}
-                <FontAwesome
-                  name="caret-down"
-                  size={20}
-                  color="white"
-                  style={styles.filterButtonCaret}
-                />
-              </Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity style={styles.filterButton}
-            onPress={() =>openFilterModal('famille')}>
-              <Text style={styles.filterButtonText}>
-                Famille{" "}
-                <FontAwesome
-                  name="caret-down"
-                  size={20}
-                  color="white"
-                  style={styles.filterButtonCaret}
-                />
-              </Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity style={styles.filterButton}
-            onPress={() =>openFilterModal('motCle')}>
-              <Text style={styles.filterButtonText}>
-                Mot-clé{" "}
-                <FontAwesome
-                  name="caret-down"
-                  size={20}
-                  color="white"
-                  style={styles.filterButtonCaret}
-                />
-              </Text>
-            </TouchableOpacity>
+            <View style={styles.searchContainer}>
+              <TextInput
+                style={styles.input}
+                placeholder="Rechercher..."
+                onChangeText={(text) => setKeyword(text)}
+                value={keyword}
+              />
+              <TouchableOpacity
+                style={styles.searchButton}
+                onPress={handleSearchKeyword}
+              >
+                {/* Insérez ici votre icône de recherche ou un composant Text "Search" */}
+              </TouchableOpacity>
+            </View>
           </View>
           {selectedFilter &&
             filterModals[selectedFilter] &&
@@ -343,6 +382,19 @@ export default function HomeScreen({ navigation }) {
 }
 
 const styles = StyleSheet.create({
+  dropdown: {
+    margin: 16,
+    height: 50,
+    borderBottomColor: "gray",
+    borderBottomWidth: 0.5,
+  },
+  selectedTextStyle: {
+    fontSize: 16,
+  },
+  inputSearchStyle: {
+    height: 40,
+    fontSize: 16,
+  },
   title: {
     fontSize: 24,
     fontWeight: "bold",
@@ -483,6 +535,6 @@ const styles = StyleSheet.create({
   flexDirection: "row",
   alignItems: "center",
   justifyContent: "center",
-  backgroundColor: "#3498db",
+  backgroundColor: "#3FB4B1",
   borderRadius: 5,}
 });

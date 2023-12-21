@@ -10,7 +10,8 @@ import {
   ScrollView,
   StyleSheet,
   Image,
-  SafeAreaView
+  SafeAreaView,
+  Modal
 } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
@@ -29,11 +30,14 @@ export default function InfoDrugScreen({ navigation }) {
     const [showUsePrecaution, setShowUsePrecaution] = useState(false);
     const [showIndesirableEff, setShowIndesirableEff] = useState(false);
     
+    
+    const token = useSelector((state) => state.user.value.token);
     const currentDrug = useSelector((state) => state.drugs.value.search);
+    console.log('currentDrug', currentDrug);
     const favo = useSelector((state) => state.drugs.value.favo);
     const isIdInFavo = favo && favo.includes(currentDrug);
     //const isIdInFavo = vafo && vafo.filter((drug) => drug._id === currentDrug).length > 0;
-
+//65796586925493df6fa6ec2a
     useEffect(() => {
       const fetchData = async () => {
         try {
@@ -47,7 +51,6 @@ export default function InfoDrugScreen({ navigation }) {
               `http://${IP_ADDRESS}:3000/articles/byId/${result.drug._id}`
             );
             const result_articles = await response_articles.json();
-            console.log('result_articles', result_articles);
             if(result_articles) setListArticles(result_articles.drugArticles);
           }
           else {
@@ -68,7 +71,7 @@ export default function InfoDrugScreen({ navigation }) {
             `http://${IP_ADDRESS}:3000/drugs/addFavorites/${select}`
           );
           const result = await response.json();
-          setQueryResults(result); // enregistre les résultats de la recherche
+          setFavo(result); // enregistre les résultats de la recherche
         } catch (error) {
           console.error(error);
         }
@@ -97,6 +100,15 @@ export default function InfoDrugScreen({ navigation }) {
     return frenchDate;
   };
 
+  const [isModalVisible, setModalVisible] = useState(false);
+
+  const openEff = () => {
+    setModalVisible(true);
+  };
+
+  const closeEff = () => {
+    setModalVisible(false);
+  };
 
 return (
 
@@ -105,7 +117,9 @@ return (
       <>
       
     <View style={styles.containerRow}>
-      <TouchableOpacity onPress={() => openUrl(data.url)} style={[{ paddingTop: 20, paddingLeft: 2 }]}>              
+
+    { token ? 
+        <TouchableOpacity onPress={() => openUrl(data.url)} style={[{ paddingTop: 20, paddingLeft: 2 }]}>             
         { favo ?   
           <FontAwesome  size={25} 
             name={isIdInFavo ? 'plus' : 'plus'}
@@ -113,17 +127,36 @@ return (
             :             
           <FontAwesome  size={25} name='plus' color='#000'/>            
         }
-      </TouchableOpacity>
-      <Text style={[styles.title, styles.text, { alignContent: 'center', textAlign: 'center', }]}>{data.drug.name}</Text>     
-      <TouchableOpacity onPress={() => openUrl(data.url)} activeOpacity={0.8} style={[{ paddingTop: 20, paddingLeft: 2 }]}>
-        { favo ?   
-          <FontAwesome size={25} 
-            name={isIdInFavo ? 'star' : 'star'}
-            color={isIdInFavo ? '#199a8e' : '#000'}/>
-            :             
-          <FontAwesome size={25} name='star' color='#000'/>            
-        }
-      </TouchableOpacity>
+        </TouchableOpacity>
+      :
+        <TouchableOpacity style={[{ paddingTop: 20, paddingLeft: 2 }]}>             
+          <FontAwesome  size={25} name='plus' color='#f0f0f0'/> 
+        </TouchableOpacity>      
+      }
+
+      <Text style={[styles.title, { alignContent: 'center',textAlign: 'center', }]}>{data.drug.name.split(',')[0].trim()}{'\n'}
+      <Text style={[{ textAlign: 'center', }]}>{data.drug.name.split(',')[1].trim()}</Text>      
+      {data.drug.classification.label && (
+        <Text style={{ alignContent: 'center',textAlign: 'center', fontStyle: 'italic', fontSize: 10  }}>Famille {data.drug.classification.label}</Text>
+      )}
+      </Text>
+
+      { token ? 
+        <TouchableOpacity onPress={() => openUrl(data.url)} activeOpacity={0.8} style={[{ paddingTop: 20, paddingLeft: 2 }]}>
+          { favo ?   
+            <FontAwesome size={25} 
+              name={isIdInFavo ? 'star' : 'star'}
+              color={isIdInFavo ? '#199a8e' : '#000'}/>
+              :             
+            <FontAwesome size={25} name='star' color='#000'/>            
+          }
+        </TouchableOpacity>
+      :
+        <TouchableOpacity style={[{ paddingTop: 20, paddingLeft: 2 }]}>             
+          <FontAwesome  size={25} name='star' color='#f0f0f0'/> 
+        </TouchableOpacity>      
+      }
+
       </View>
 
       <ScrollView contentContainerStyle={[styles.scrollView]}>
@@ -144,7 +177,9 @@ return (
           }
       </ScrollView>
 
-      <View style={styles.containerRow}>
+      <View style={styles.containerColumn}>
+        <View style={[styles.containerRow,{marginTop: 10, marginBottom: 10}]}>
+
         <Image
           style={styles.indiceSurveillanceIcon}
           contentFit="cover"
@@ -175,32 +210,58 @@ return (
           contentFit="cover"
           source={data.drug.on_prescription ? require("../assets/ordonnance.png") : require("../assets/ordonnance.png")}        />
       </View>
-
-      <View styles={styles.containerRow}>
+      
+      <View style={styles.containerColumn}>
+        {/*}
         <TouchableOpacity style={[styles.button ]}>
-          <Text style= {[styles.buttonText, { marginLeft: 10 } ]}>indications &{'\n'}thérapeutiques
+          <Text style= {[styles.buttonText ]}>Indications thérapeutiques
+          </Text>
+        </TouchableOpacity>*/}
+        <TouchableOpacity style={[styles.button ]}>
+          <Text style= {[styles.buttonText ]}>Posolgie
+          </Text>
+        </TouchableOpacity>
+          
+        <TouchableOpacity style={styles.button} onPress={openEff}>
+          <Text style= {[styles.buttonText ]}>
+            Effets indésirables
           </Text>
         </TouchableOpacity>
         <TouchableOpacity style={[styles.button ]}>
-          <Text style= {[styles.buttonText, { marginLeft: 10 } ]}>Posolgie
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={[styles.button]}>
-          <Text style= {[styles.buttonText, { marginLeft: 10 } ]}>
-            Effets{'\n'}indésirables
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={[styles.button ]}>
-          <Text style= {[styles.buttonText, { marginLeft: 10 } ]}>
-            Contre indications &{'\n'}précautions d'emploi
+          <Text style= {[styles.buttonText ]}>
+            Contre indications précautions d'emploi
           </Text>
         </TouchableOpacity>
       </View>
-      <ScrollView contentContainerStyle={[styles.scrollView]}>
-        <View style={styles.box}>
-          <Text>{data.drug.therap_indic}</Text>
-        </View>
-      </ScrollView>
+    </View>
+
+    <ScrollView contentContainerStyle={[styles.scrollView, { marginTop: 10 }]}>
+      <View>
+        <Text style={[styles.text, { textAlign: 'justify', lineHeight: 17 }]}>{data.drug.therap_indic}</Text>
+      </View>
+    </ScrollView>
+      
+
+    <Modal
+        visible={isModalVisible}
+        animationType="slide"
+        transparent={false}
+        onRequestClose={closeEff}
+      >
+        {/* Your modal content goes here */}
+        
+        <ScrollView contentContainerStyle={[styles.scrollView]}>
+            <View style={styles.modalContainer}>
+              <Text>{data.drug.indesirable_eff}</Text>
+              <TouchableOpacity onPress={closeEff}>
+                <Text>fermer</Text>
+              </TouchableOpacity>
+            </View>
+        </ScrollView>
+      </Modal>
+
+      
+      {/*}
       <ScrollView contentContainerStyle={[styles.scrollView]}>
         <View style={styles.box}>
           <Text>{data.drug.indesirable_eff}</Text>
@@ -215,7 +276,8 @@ return (
         <View style={styles.box}>
           <Text>{data.drug.dosage}</Text>
         </View>
-      </ScrollView>
+        </ScrollView>*/}
+
 
       </>
         :
@@ -225,20 +287,27 @@ return (
       );
     }
 
-
 const styles = StyleSheet.create({
-
   container: {
     flex: 1,
-    verticalAlign: 'flex-start',
     backgroundColor: '#f2f2f2',
     alignItems: 'center',
-    flexGrow: 1,
+    verticalAlign: 'flex-start',
+    alignContent: 'center',
+    width: '100%',
   },
   containerRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    width: '90%',
+    width: '95%',
+    verticalAlign: 'flex-start',
+  },
+  containerColumn: {
+    flexDirection: 'column',
+    alignContent: 'center',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    width: '95%',
     verticalAlign: 'flex-start',
   },
   containerInfosDrugs: {
@@ -252,25 +321,31 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     marginTop: 10,
-    marginBottom: 10,
+    marginBottom: 30,
   },
   text: {
-    flex: 1, 
+    flex: 1,
     marginLeft: 10, 
   },
   scrollView: {
     backgroundColor: '#ffffff',
     marginBottom: 10,
     padding: 10, 
-    margin: 10,
     borderRadius: 5,
+    width: '90%',
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0)',
+    zIndex: 100,
   },
   box: {
-    width: '80%',
-    padding: 20,
     margin: 10,
     backgroundColor: 'lightblue',
     alignItems: 'center',
+    width: '100%',
   },
   card: {
     flexDirection: 'row',
@@ -303,11 +378,17 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   button: {
-    width: '30%',
+    width: '100%',
     alignItems: 'center',
+    verticalAlign: 'center',
+    justifyItems: 'center',
     paddingTop: 8,
-    backgroundColor: '#ec6e5b',
+    backgroundColor: '#ffffff',
+    borderColor: '#999999',
     borderRadius: 10,
+    marginTop: 10,
+    borderWidth: 1,
+    padding: 10,
   },
   textButton: {
     color: '#ffffff',

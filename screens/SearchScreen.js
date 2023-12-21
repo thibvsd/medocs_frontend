@@ -29,45 +29,43 @@ export default function SearchScreen({ route, navigation }) {
   const [queryResults, setQueryResults] = useState([]);
   const [showSearchResults, setShowSearchResults] = useState(false);
   const token = useSelector((state) => state.user.value.token);
-  
 
   useEffect(() => {
     if (route.params && route.params.query) {
-    setShowSearchResults(true);
-    console.log("queryparam", route.params.query);
-    const fetchQuery = async () => {
-      try {
-        const response = await fetch(
-          `http://${IP_ADDRESS}:3000/drugs/byName/${route.params.query}`
-        );
-        const result = await response.json();
-        console.log("result", result);
-        setQueryResults(result); // enregistre les résultats de la recherche
-        console.log("queryResults", queryResults);
-      } catch (error) {
-        console.error(error);
-      }
-    };
-    fetchQuery();
-    setQuery("");
-    setSuggestions([]);    }
-  }, [route.params]); 
+      setShowSearchResults(true);
+      const fetchQuery = async () => {
+        try {
+          const response = await fetch(
+            `http://${IP_ADDRESS}:3000/drugs/byName/${route.params.query}`
+          );
+          const result = await response.json();
+          console.log("result", result);
+          setQueryResults(result); // enregistre les résultats de la recherche
+          console.log("queryResults", queryResults);
+        } catch (error) {
+          console.error(error);
+        }
+      };
+      fetchQuery();
+      setQuery("");
+      setSuggestions([]);
+    }
+  }, [route.params]);
 
   useEffect(() => {
     // AbortController pour arrêter la requête si query est modifié
     const fetchDataController = new AbortController();
-
+    const queryToFilter = query;
     // Fonction pour fetch les noms des médicaments (pour l'autocomplétion)
     const fetchData = async () => {
       try {
-        if (query.length >= 3) {
-          const response = await fetch(
-            `http://${IP_ADDRESS}:3000/drugs/query3characters/${query}`,
-            { signal: fetchDataController.signal }
-          );
-          const result = await response.json();
-          setData(result.namesAndId);
-        }
+        const response = await fetch(
+          `http://${IP_ADDRESS}:3000/drugs/query3characters/${queryToFilter}`,
+          { signal: fetchDataController.signal }
+        );
+        const result = await response.json();
+        setData(result.namesAndId);
+        return result.namesAndId;
       } catch (error) {
         if (error.name === "AbortError") {
           console.log("La requête fetchData a été annulée.");
@@ -76,6 +74,15 @@ export default function SearchScreen({ route, navigation }) {
         }
       }
     };
+    fetchData().then((responseData) => {
+      if(!responseData) return;
+      const filteredData = responseData
+        .filter((item) =>
+          item.name.toLowerCase().includes(queryToFilter.toLowerCase())
+        )
+        .slice(0, 10); // Limite à 10 suggestions
+      setSuggestions(filteredData.map((item) => item.name)); // map pour n'avoir que les names sans clé
+    });
 
     // Fonction pour fetch les dernières recherches
     const fetchLastSearch = async () => {
@@ -86,7 +93,7 @@ export default function SearchScreen({ route, navigation }) {
       }
       try {
         const response = await fetch(
-          `http://${IP_ADDRESS}:3000/searches/last5Searches/${token}`,
+          `http://${IP_ADDRESS}:3000/searches/last5Searches/${token}`
         );
         const result = await response.json();
         setSearches(result.search);
@@ -106,7 +113,6 @@ export default function SearchScreen({ route, navigation }) {
     return () => fetchDataController.abort();
   }, [query]); // le useEffect se relance si query change
 
-
   // Lancer la recherche en cliquant sur le bouton loupe
   const handleSearch = () => {
     const fetchQuery = async () => {
@@ -124,48 +130,35 @@ export default function SearchScreen({ route, navigation }) {
     setQuery("");
     setSuggestions([]);
     setShowSearchResults(true);
-
-  };
-
-  // Filtrer les suggestions en fonction de la valeur de l'input
-  const filterData = (text) => {
-    if (text.length >= 3) {
-      const filteredData = data
-        .filter((item) => item.name.toLowerCase().includes(text.toLowerCase()))
-        .slice(0, 10); // Limite à 10 suggestions
-      setSuggestions(filteredData.map((item) => item.name)); // map pour n'avoir que les names sans clé
-    } else {
-      setSuggestions([]);
-    }
   };
 
   const onSuggestionPress = (suggestion) => {
     // Cherche le name et extrait son _id :
     const selectedDrug = data.find((item) => item.name === suggestion)._id;
     // enregistre la recherche dans la DB
- fetch(`http://${IP_ADDRESS}:3000/searches/addLastSearch/${token}`,{
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              _id: selectedDrug,
-            }),
-          })
-        .then((response) => response.json())
-        .then((data) => {
-          if (data.result) {
-            dispatch(addLastSearch(selectedDrug)); // Dispatch l'id pour pouvoir le récupérer sur la page infoDrugScreen
-            navigation.navigate("InfoDrugScreen");
-            setQuery("");
-            setSuggestions([]);
-          }
-        })};
+    fetch(`http://${IP_ADDRESS}:3000/searches/addLastSearch/${token}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        _id: selectedDrug,
+      }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.result) {
+          dispatch(addLastSearch(selectedDrug)); // Dispatch l'id pour pouvoir le récupérer sur la page infoDrugScreen
+          navigation.navigate("InfoDrugScreen");
+          setQuery("");
+          setSuggestions([]);
+        }
+      });
+  };
 
   // Quand click sur un résultat de recherche, redirige vers l'info du médicament
   const onSearchResultClick = (suggestion) => {
-
-    fetch(`http://${IP_ADDRESS}:3000/searches/addLastSearch/${token}`,{
+    fetch(`http://${IP_ADDRESS}:3000/searches/addLastSearch/${token}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -174,17 +167,18 @@ export default function SearchScreen({ route, navigation }) {
         _id: suggestion._id,
       }),
     })
-  .then((response) => response.json())
-  .then((data) => {
-    if (data.result) {
-    dispatch(addLastSearch(data._id));
-    navigation.navigate("InfoDrugScreen");
-    setQuery("");
-    setQueryResults([]);
-    setShowSearchResults(false);
-    setSuggestions([]);}})
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.result) {
+          dispatch(addLastSearch(data._id));
+          navigation.navigate("InfoDrugScreen");
+          setQuery("");
+          setQueryResults([]);
+          setShowSearchResults(false);
+          setSuggestions([]);
+        }
+      });
   };
-
 
   // Quand click sur une des dernières recherches, redirige vers la page info du médicament
   const onLastSearchClick = (data) => {
@@ -210,7 +204,7 @@ export default function SearchScreen({ route, navigation }) {
       ))
     );
 
-    // Map pour afficher les résultats de la recherche
+  // Map pour afficher les résultats de la recherche
   const newSearch = queryResults.map((data, i) => (
     <View key={i} style={styles.searchesContainer}>
       <TouchableOpacity onPress={() => onSearchResultClick(data)}>
@@ -232,10 +226,11 @@ export default function SearchScreen({ route, navigation }) {
         <View style={styles.searchContainer}>
           <Autocomplete
             data={suggestions}
-            value={query}
             onChangeText={(text) => {
-              setQuery(text);
-              filterData(text);
+              if (text.length > 2) {
+                setQuery(text);
+              }
+              if(!text.length) setSuggestions([]);
             }}
             // Affiche les suggestions :
             flatListProps={{
@@ -269,7 +264,7 @@ export default function SearchScreen({ route, navigation }) {
         ) : (
           // Afficher Mes dernières recherches (par défaut)
           <View>
-            { token ? <><Text style={styles.titleSearches}>Dernières fiches consultées{lastSearches}</Text></> : 
+            { token ? <><Text style={styles.titleSearches}>Dernières fiches consultées</Text><View>{lastSearches}</View></> : 
               <View></View>
             }
           </View>
@@ -335,11 +330,6 @@ buttonText: {
     fontSize: 24,
     fontWeight: "bold",
   },
-  titleSearches: {
-    marginTop: 40,
-    fontSize: 20,
-    textAlign: "center",
-  },
   container: {
     flex: 1,
     marginTop: 120,
@@ -378,7 +368,7 @@ buttonText: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#3498db",
+    backgroundColor: "#3FB4B1",
     borderRadius: 5,
   },
 
@@ -389,15 +379,23 @@ buttonText: {
     borderBottomColor: "#ccc",
     opacity: 1,
   },
+  titleSearches: {
+    marginTop: 20,
+    fontSize: 24, 
+    fontWeight: "bold",
+    textAlign: "center",
+  },
   buttonText: {
     color: "#fff",
   },
   searchesContainer: {
+    textAlign:"center",
     marginTop: 20,
-    marginLeft:20,
-    marginRight:20,
+    marginLeft: 20,
+    marginRight: 20,
   },
   searchName: {
+    textAlign:"center",
     color: "blue",
     textDecorationLine: "underline",
   },

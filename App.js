@@ -1,13 +1,19 @@
+import React, { useEffect, useState } from "react";
+import { StyleSheet } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import React, { useEffect, useState } from "react";
-
-import { StyleSheet } from "react-native";
 import { useFonts } from "expo-font";
-
 import FontAwesome from "react-native-vector-icons/FontAwesome";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { persistStore, persistReducer } from "redux-persist";
+import { PersistGate } from "redux-persist/integration/react";
+import { Provider, useSelector, useDispatch } from "react-redux";
+import { combineReducers, configureStore } from "@reduxjs/toolkit";
+import user from "./reducers/user";
+import drugs from "./reducers/drugs";
 
+// Import your screens
 import HomeScreen from "./screens/HomeScreen";
 import LoginScreen from "./screens/LoginScreen";
 import ProfileScreen from "./screens/ProfileScreen";
@@ -18,81 +24,61 @@ import SettingsScreen from "./screens/SettingsScreen";
 import FAQScreen from "./screens/FAQScreen.js";
 import OnboardingScreen from "./screens/OnboardingScreen";
 import InfoDrugScreen from "./screens/InfoDrugScreen";
+import CameraScreen from "./screens/CameraScreen";
+import SplashScreen from "./screens/SplashScreen.js";
+import Lgn from "./screens/Lgn.js";
 
-import { persistStore, persistReducer } from "redux-persist";
-import { PersistGate } from "redux-persist/integration/react";
-
-import AsyncStorage from "@react-native-async-storage/async-storage";
-
-// redux imports
-import { Provider, useSelector, useDispatch } from "react-redux";
-import { combineReducers, configureStore } from "@reduxjs/toolkit";
-import user from "./reducers/user";
-import drugs from "./reducers/drugs";
-
+// AsyncStorage.clear();
 const reducers = combineReducers({ user, drugs });
+
+// Configure Redux persist
 const persistConfig = {
   key: "medidoc",
   storage: AsyncStorage,
 };
 
+// Create Redux store
 const store = configureStore({
   reducer: persistReducer(persistConfig, reducers),
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({ serializableCheck: false }),
 });
 
+// Create persistor
 const persistor = persistStore(store);
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
 export default function App() {
-  // const dispatch = useDispatch();
+  const [token, setToken] = useState(null);
+  const [isFirstLaunch, setIsFirstLaunch] = useState(null);
 
-  // AsyncStorage.clear();
-const [token, setToken] = useState(null);
-const [isFirstLaunch, setIsFirstLaunch] = useState(null);
+  const [fontsLoaded] = useFonts({
+    "Inter-Regular": require("./assets/fonts/Inter-Regular.ttf"),
+    "Inter-Medium": require("./assets/fonts/Inter-Medium.ttf"),
+    "Inter-SemiBold": require("./assets/fonts/Inter-SemiBold.ttf"),
+    "Inter-Bold": require("./assets/fonts/Inter-Bold.ttf"),
+    "Montserrat-Bold": require("./assets/fonts/Montserrat-Bold.ttf"),
+  });
 
-const [fontsLoaded, error] = useFonts({
-  "Inter-Regular": require("./assets/fonts/Inter-Regular.ttf"),
-  "Inter-Medium": require("./assets/fonts/Inter-Medium.ttf"),
-  "Inter-SemiBold": require("./assets/fonts/Inter-SemiBold.ttf"),
-  "Inter-Bold": require("./assets/fonts/Inter-Bold.ttf"),
-  "Montserrat-Bold": require("./assets/fonts/Montserrat-Bold.ttf"),
-});
-
-  // Réduire en 1 seul useEffect
   useEffect(() => {
-    async function checkToken() {
+    async function checkTokenAndLaunchStatus() {
       try {
         const userToken = await AsyncStorage.getItem("token");
-        if (userToken) {
-          setToken(userToken);
-          // dispatch(addAsyncStoragetoken(token));
-        }
-      } catch (error) {
-        console.error("Erreur lors de la vérification du token:", error);
-      }
-    }
-    checkToken();
-    async function checkIfFirstLaunch() {
-      try {
+        setToken(userToken);
+
         const hasLaunched = await AsyncStorage.getItem("appLaunched");
-        if (hasLaunched === null) {
-          setIsFirstLaunch(true);
-          await AsyncStorage.setItem("appLaunched", "true");
-        } else {
-          setIsFirstLaunch(false);
-        }
+        setIsFirstLaunch(hasLaunched === null);
       } catch (error) {
-        console.error("Error checking app launch status:", error);
+        console.error("Error checking token and launch status:", error);
       }
     }
-    checkIfFirstLaunch();
+
+    checkTokenAndLaunchStatus();
   }, []);
 
-  if (isFirstLaunch === null) {
+  if (isFirstLaunch === null || !fontsLoaded) {
     return null;
   }
 
@@ -125,13 +111,30 @@ const [fontsLoaded, error] = useFonts({
     );
   };
 
-  //GERE L'AFFICHAGE DU PROFIL AU CLICK SUR USER ICON
+  const TreatmentsScreenStack = () => {
+    return (
+      <Stack.Navigator>
+        <Stack.Screen
+          name="Traitements"
+          component={TreatmentsScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="Camera"
+          component={CameraScreen}
+          options={{ headerShown: false }}
+        />
+      </Stack.Navigator>
+    );
+  };
+
   const ProfileScreenStack = () => {
     const isToken = useSelector((state) => state.user.value.token);
+    const dispatch = useDispatch();
+
     return (
       <Stack.Navigator>
         {!isToken ? (
-          // Si l'utilisateur est connecté
           <Stack.Screen
             name="Login"
             component={LoginScreen}
@@ -139,38 +142,59 @@ const [fontsLoaded, error] = useFonts({
           />
         ) : (
           <>
-            <Stack.Screen name="ProfileScreen" component={ProfileScreen} options={{ headerShown: false }} />
-            <Stack.Screen name="Favoris" component={FavoritesScreen} options={{ title: "Mes favoris",
-            headerStyle: {
-              backgroundColor: '#199a8e',
-              shadowColor: '#199a8e',
-            },
-            headerTitleAlign: 'center',
-            headerTintColor: '#fff',
-            headerTitleStyle: {
-              fontWeight: 'bold',
-            }}} />
-            <Stack.Screen name="Traitements" component={TreatmentsScreen} options={{ title: "Traitements en cours",
-            headerStyle: {
-              backgroundColor: '#199a8e',
-              shadowColor: '#199a8e',
-            },
-            headerTitleAlign: 'center',
-            headerTintColor: '#fff',
-            headerTitleStyle: {
-              fontWeight: 'bold',
-            } }} />
-            <Stack.Screen name="Parametres" component={SettingsScreen} options={{ title: "Paramètres de mon compte",
-            headerStyle: {
-              backgroundColor: '#199a8e',
-              shadowColor: '#199a8e',
-            },
-            headerTitleAlign: 'center',
-            headerTintColor: '#fff',
-            headerTitleStyle: {
-              fontWeight: 'bold',
-            }
-            }} />
+            <Stack.Screen
+              name="ProfileScreen"
+              component={ProfileScreen}
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen
+              name="Favoris"
+              component={FavoritesScreen}
+              options={{
+                title: "Mes favoris",
+                headerStyle: {
+                  backgroundColor: "#199a8e",
+                  shadowColor: "#199a8e",
+                },
+                headerTitleAlign: "center",
+                headerTintColor: "#fff",
+                headerTitleStyle: {
+                  fontWeight: "bold",
+                },
+              }}
+            />
+            <Stack.Screen
+              name="Traitements"
+              component={TreatmentsScreenStack}
+              options={{
+                title: "Traitements en cours",
+                headerStyle: {
+                  backgroundColor: "#199a8e",
+                  shadowColor: "#199a8e",
+                },
+                headerTitleAlign: "center",
+                headerTintColor: "#fff",
+                headerTitleStyle: {
+                  fontWeight: "bold",
+                },
+              }}
+            />
+            <Stack.Screen
+              name="Parametres"
+              component={SettingsScreen}
+              options={{
+                title: "Paramètres de mon compte",
+                headerStyle: {
+                  backgroundColor: "#199a8e",
+                  shadowColor: "#199a8e",
+                },
+                headerTitleAlign: "center",
+                headerTintColor: "#fff",
+                headerTitleStyle: {
+                  fontWeight: "bold",
+                },
+              }}
+            />
             <Stack.Screen name="Se déconnecter" component={HomeScreen} />
           </>
         )}
@@ -189,17 +213,19 @@ const [fontsLoaded, error] = useFonts({
         <Stack.Screen
           name="InfoDrugScreen"
           component={InfoDrugScreen}
-          options={{ title: "Fiche médicament" ,
+          options={{
+            title: "Fiche médicament",
             headerStyle: {
-              backgroundColor: '#199a8e',
-              shadowColor: '#199a8e',
+              backgroundColor: "#199a8e",
+              shadowColor: "#199a8e",
             },
-            headerTitleAlign: 'center',
-            headerTintColor: '#fff',
+            headerTitleAlign: "center",
+            headerTintColor: "#fff",
             headerTitleStyle: {
-              fontWeight: 'bold',
-            }
-          }} />
+              fontWeight: "bold",
+            },
+          }}
+        />
       </Stack.Navigator>
     );
   };
@@ -215,34 +241,47 @@ const [fontsLoaded, error] = useFonts({
         <Stack.Screen
           name="InfoDrugScreen"
           component={InfoDrugScreen}
-          options={{ headerShown: false, title: "Infos médicament",
-          headerStyle: {
-            backgroundColor: '#199a8e',
-            shadowColor: '#199a8e',
-          },
-          headerTitleAlign: 'center',
-          headerTintColor: '#fff',
-          headerTitleStyle: {
-            fontWeight: 'bold',
-          } }}
+          options={{
+            headerShown: false,
+            title: "Infos médicament",
+            headerStyle: {
+              backgroundColor: "#199a8e",
+              shadowColor: "#199a8e",
+            },
+            headerTitleAlign: "center",
+            headerTintColor: "#fff",
+            headerTitleStyle: {
+              fontWeight: "bold",
+            },
+          }}
         />
       </Stack.Navigator>
     );
   };
+
   return (
     <Provider store={store}>
       <PersistGate persistor={persistor}>
         <NavigationContainer>
-        {isFirstLaunch ? (
-          <Stack.Navigator screenOptions={{ headerShown: false }}>            
-            <Stack.Screen name="Onbording" component={OnboardingScreen} />
-            <Stack.Screen name="TabNavigator" component={TabNavigator} />
-          </Stack.Navigator>
+          {isFirstLaunch ? (
+            <Stack.Navigator screenOptions={{ headerShown: false }}>
+              <Stack.Screen name="SplashScreen" component={SplashScreen} />
+              <Stack.Screen name="TabNavigator" component={TabNavigator} />
+              <Stack.Screen
+                name="OnboardingScreen"
+                component={OnboardingScreen}
+              />
+              <Stack.Screen name="Lgn" component={Lgn} />
+            </Stack.Navigator>
           ) : (
-          <Stack.Navigator screenOptions={{ headerShown: false }}>
-            <Stack.Screen name="TabNavigator" component={TabNavigator} />
-            <Stack.Screen name="LoginScreen" component={LoginScreen} options={{ headerShown: false }} />
-          </Stack.Navigator>
+            <Stack.Navigator screenOptions={{ headerShown: false }}>
+              <Stack.Screen name="TabNavigator" component={TabNavigator} />
+              <Stack.Screen
+                name="LoginScreen"
+                component={LoginScreen}
+                options={{ headerShown: false }}
+              />
+            </Stack.Navigator>
           )}
         </NavigationContainer>
       </PersistGate>
