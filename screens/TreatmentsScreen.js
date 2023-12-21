@@ -13,8 +13,7 @@ import Autocomplete from "react-native-autocomplete-input";
 import { IP_ADDRESS } from "../config.js";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import { removePhoto } from "../reducers/user";
-import { useSelector } from 'react-redux';
-
+import { useSelector } from "react-redux";
 
 export default function TreatmentsScreen({ navigation }) {
   const token = "mYZ2UayAiPjfhaQRy0FXQH-1oktu1Xi9";
@@ -25,23 +24,25 @@ export default function TreatmentsScreen({ navigation }) {
   const [med_reason, setMed_reason] = useState("");
   const [drugAdd, setDrugAdd] = useState([]);
 
-  const userPhotos = useSelector((state) => state.user.value.photo);
-  console.log("USER photo ", userPhotos);
+  const userPhotos = useSelector((state) => state.user.value.photos);
+  // console.log("USER photo ", userPhotos);
+
+  console.log('query state', query);
 
   useEffect(() => {
     // AbortController pour arrêter la requête si query est modifié
     const fetchDataController = new AbortController();
+    const queryToFilter = query;
     // Fonction pour fetch les noms des médicaments (pour l'autocomplétion)
     const fetchData = async () => {
       try {
-        if (query.length >= 3) {
-          const response = await fetch(
-            `http://${IP_ADDRESS}:3000/drugs/query3characters/${query}`,
-            { signal: fetchDataController.signal }
-          );
-          const result = await response.json();
-          setData(result.namesAndId);
-        }
+        const response = await fetch(
+          `http://${IP_ADDRESS}:3000/drugs/query3characters/${queryToFilter}`,
+          { signal: fetchDataController.signal }
+        );
+        const result = await response.json();
+        setData(result.namesAndId);
+        return result.namesAndId;
       } catch (error) {
         if (error.name === "AbortError") {
           console.log("La requête fetchData a été annulée.");
@@ -50,7 +51,15 @@ export default function TreatmentsScreen({ navigation }) {
         }
       }
     };
-    fetchData();
+    fetchData().then((responseData) => {
+      if(!responseData) return;
+      const filteredData = responseData
+        .filter((item) =>
+          item.name.toLowerCase().includes(queryToFilter.toLowerCase())
+        )
+        .slice(0, 10); // Limite à 10 suggestions
+      setSuggestions(filteredData.map((item) => item.name)); // map pour n'avoir que les names sans clé
+    });
 
     return () => fetchDataController.abort();
   }, [query]);
@@ -107,7 +116,7 @@ export default function TreatmentsScreen({ navigation }) {
         const match = drug.drug_id.name.match(/^([^,]+),/);
         const cleanedName = match ? match[1].trim() : drug.drug_id.name;
         const drugId = drug.drug_id._id;
-      
+
         // Créer un objet avec les propriétés name et id
         return { name: cleanedName, _id: drugId };
       });
@@ -118,63 +127,48 @@ export default function TreatmentsScreen({ navigation }) {
     }
     setQuery("");
     setSuggestions([]);
-
-  };
-
-  // Filtrer les suggestions en fonction de la valeur de l'input
-  const filterData = (text) => {
-    if (text.length >= 3) {
-      const filteredData = data
-        .filter((item) => item.name.toLowerCase().includes(text.toLowerCase()))
-        .slice(0, 10); // Limite à 10 suggestions
-      setSuggestions(filteredData.map((item) => item.name)); // map pour n'avoir que les names sans clé
-    } else {
-      setSuggestions([]);
-    }
   };
 
   const onDeleteDrugPress = async (drug) => {
     console.log("ondelete drug", drug);
-        try {
-          const response = await fetch(
-            `http://${IP_ADDRESS}:3000/treatments/deleteDrugTreatment/${token}`,
-            {
-              method: "DELETE",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ _id: drug }),
-            }
-          );
-          const result = await response.json();
-          if (result.result) {
-            setDrugAdd(drugAdd.filter((d) => d._id !== drug));
-            // loadDrugs(); // Recharge les médicaments
-          }
-        } catch (error) {
-          // Gérer les erreurs réseau
-          console.error("Erreur réseau :", error);
+    try {
+      const response = await fetch(
+        `http://${IP_ADDRESS}:3000/treatments/deleteDrugTreatment/${token}`,
+        {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ _id: drug }),
         }
+      );
+      const result = await response.json();
+      if (result.result) {
+        setDrugAdd(drugAdd.filter((d) => d._id !== drug));
+        // loadDrugs(); // Recharge les médicaments
       }
+    } catch (error) {
+      // Gérer les erreurs réseau
+      console.error("Erreur réseau :", error);
+    }
+  };
 
-      const onAddPrescriptionPress = async () => {
-       navigation.navigate("Camera"); 
-      }
+  const onAddPrescriptionPress = async () => {
+    navigation.navigate("Camera");
+  };
 
   const drugTreatment = drugAdd.map((drug, index) => (
     <View key={index} style={styles.drugContainer}>
       <TouchableOpacity onPress={() => onDeleteDrugPress(drug._id)}>
-                <FontAwesome
-            name="trash"
-            size={20}
-            color="#3FB4B1"
-            style={styles.deleteButton}
-          />
-          </TouchableOpacity>
+        <FontAwesome
+          name="trash"
+          size={20}
+          color="#3FB4B1"
+          style={styles.deleteButton}
+        />
+      </TouchableOpacity>
       <Text style={styles.drugList}>{drug.name}</Text>
       <View style={styles.doseContainer}>
         <Text style={styles.doseText}>Dose :</Text>
-        <TextInput style={styles.doseInput}
-          placeholder="0"
-        />
+        <TextInput style={styles.doseInput} placeholder="0" />
       </View>
     </View>
   ));
@@ -183,7 +177,12 @@ export default function TreatmentsScreen({ navigation }) {
     userPhotos.map((data, i) => (
       <View key={i} style={styles.photoContainer}>
         <TouchableOpacity onPress={() => dispatch(removePhoto(data))}>
-          <FontAwesome name='times' size={20} color='#000000' style={styles.deleteIcon} />
+          <FontAwesome
+            name="times"
+            size={20}
+            color="#000000"
+            style={styles.deleteIcon}
+          />
         </TouchableOpacity>
         <Image source={{ uri: data }} style={styles.photo} />
       </View>
@@ -194,61 +193,63 @@ export default function TreatmentsScreen({ navigation }) {
 
   return (
     <TouchableWithoutFeedback>
-    <ScrollView>
-    <View style={styles.mainContainer}>
-      <Text style={styles.subtitle}>Ajouter un médicament</Text>
-      <View style={styles.searchContainer}>
-        <Autocomplete
-          data={suggestions}
-          onChangeText={(text) => {
-            setQuery(text);
-            filterData(text);
-          }}
-          flatListProps={{
-            keyExtractor: (_, idx) => idx.toString(),
-            renderItem: ({ item }) => (
-              <TouchableOpacity onPress={() => addDrugPress(item)}>
-                <Text style={styles.suggestionItem}>{item}</Text>
-              </TouchableOpacity>
-            ),
-          }}
-          placeholder="Nom du médicament..."
-          containerStyle={styles.autocompleteContainer}
-        />
-      </View>
+      <ScrollView>
+        <View style={styles.mainContainer}>
+          <Text style={styles.subtitle}>Ajouter un médicament</Text>
+          <View style={styles.searchContainer}>
+            <Autocomplete
+              data={suggestions}
+              onChangeText={(text) => {
+                if (text.length > 2) {
+                  setQuery(text);
+                }
+                if(!text.length) setSuggestions([]);
+              }}
+              flatListProps={{
+                keyExtractor: (_, idx) => idx.toString(),
+                renderItem: ({ item }) => (
+                  <TouchableOpacity onPress={() => addDrugPress(item)}>
+                    <Text style={styles.suggestionItem}>{item}</Text>
+                  </TouchableOpacity>
+                ),
+              }}
+              placeholder="Nom du médicament..."
+              containerStyle={styles.autocompleteContainer}
+            />
+          </View>
 
-        <View style={styles.drugContainer}>{drugTreatment}</View>
-      <View style={styles.reasonContainer}>
-        <Text style={styles.subtitle}>Raison médicale</Text>
-        <TextInput
-          style={styles.reasonInput}
-          value={med_reason}
-          onChangeText={(text) => setMed_reason(text)}
-          placeholder="Saisissez la raison médicale..."
-        />
-        <View></View>
-      </View>
-      <View>
-        <Text style={styles.subtitle}>Mes ordonnances</Text>
-        <View style={styles.ordonnanceContainer}>
-          <Text>Ajouter une ordonnance  </Text>
-          <TouchableOpacity onPress={onAddPrescriptionPress}>
-<FontAwesome
-  name="camera"
-  size={20}
-  color="#3FB4B1"
-  style={styles.filterButtonCaret}
-/>
-</TouchableOpacity>  
-<View>{photos}</View>      
-</View>
-      </View>
-      <TouchableOpacity onPress={onSave} style={styles.saveButton}>
-        <Text style={styles.saveButtonText}>Save</Text>
-      </TouchableOpacity>
-    </View>
-    </ScrollView>
-        </TouchableWithoutFeedback>
+          <View style={styles.drugContainer}>{drugTreatment}</View>
+          <View style={styles.reasonContainer}>
+            <Text style={styles.subtitle}>Raison médicale</Text>
+            <TextInput
+              style={styles.reasonInput}
+              value={med_reason}
+              onChangeText={(text) => setMed_reason(text)}
+              placeholder="Saisissez la raison médicale..."
+            />
+            <View></View>
+          </View>
+          <View>
+            <Text style={styles.subtitle}>Mes ordonnances</Text>
+            <View style={styles.ordonnanceContainer}>
+              <Text>Ajouter une ordonnance </Text>
+              <TouchableOpacity onPress={onAddPrescriptionPress}>
+                <FontAwesome
+                  name="camera"
+                  size={20}
+                  color="#3FB4B1"
+                  style={styles.filterButtonCaret}
+                />
+              </TouchableOpacity>
+              <View>{photos}</View>
+            </View>
+          </View>
+          <TouchableOpacity onPress={onSave} style={styles.saveButton}>
+            <Text style={styles.saveButtonText}>Save</Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
+    </TouchableWithoutFeedback>
   );
 }
 
@@ -260,7 +261,7 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     fontSize: 18,
-    textAlign:"center",
+    textAlign: "center",
     margin: 10,
     fontWeight: "bold",
   },
@@ -272,30 +273,29 @@ const styles = StyleSheet.create({
   drugContainer: {
     width: "80%",
     marginBottom: 10,
-
   },
   medoc: {
-    marginTop:10,
+    marginTop: 10,
     flexDirection: "row",
     justifyContent: "space-between",
   },
-  filterButtonCaret:{
-marginRight:10,
+  filterButtonCaret: {
+    marginRight: 10,
   },
   drugList: {
-    marginVertical:5,
+    marginVertical: 5,
     fontSize: 16,
   },
   doseText: {
-    flex:1,
-    flexDirection:"row",
+    flex: 1,
+    flexDirection: "row",
     alignItems: "center",
     marginHorizontal: 10,
     fontSize: 16,
   },
-  doseInput:{
+  doseInput: {
     height: 30,
-    width:200,
+    width: 200,
     borderColor: "gray",
     borderWidth: 1,
     marginVertical: 10,
@@ -312,7 +312,7 @@ marginRight:10,
     right: 0,
     top: 0,
     zIndex: 1,
-    marginBottom:10,
+    marginBottom: 10,
   },
   suggestionItem: {
     backgroundColor: "#fff", // Utilisez une couleur solide
@@ -320,7 +320,6 @@ marginRight:10,
     borderBottomWidth: 1,
     borderBottomColor: "#ccc",
     opacity: 1,
-    
   },
   searchContainer: {
     flexDirection: "row",
@@ -339,9 +338,10 @@ marginRight:10,
     marginBottom: 10,
     paddingLeft: 10,
     backgroundColor: "white",
+    textAlignVertical: "top",
   },
-  ordonnanceContainer:{
-flexDirection:"row",
+  ordonnanceContainer: {
+    flexDirection: "row",
   },
 
   saveButton: {

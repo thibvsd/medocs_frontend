@@ -33,9 +33,9 @@ export const userSlice = createSlice({
       console.log('reducer payload', action.payload);
       state.value.photos.push(action.payload);
     },
-    // removePhoto: (state, action: PayloadAction<string>) => {
-    //   state.value.photos = state.value.photos.filter((data) => data !== action.payload);
-    // },
+    removePhoto: (state, action: PayloadAction<string>) => {
+      state.value.photos = state.value.photos.filter((data) => data !== action.payload);
+    },
   },
 });
 
