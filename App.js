@@ -61,22 +61,34 @@ export default function App() {
   });
 
   useEffect(() => {
-    async function checkTokenAndLaunchStatus() {
+    async function checkToken() {
       try {
         const userToken = await AsyncStorage.getItem("token");
-        setToken(userToken);
-
-        const hasLaunched = await AsyncStorage.getItem("appLaunched");
-        setIsFirstLaunch(hasLaunched === null);
+        if (userToken) {
+          setToken(userToken);
+          // dispatch(addAsyncStoragetoken(token));
+        }
       } catch (error) {
-        console.error("Error checking token and launch status:", error);
+        console.error("Erreur lors de la vérification du token:", error);
       }
     }
-
-    checkTokenAndLaunchStatus();
+    checkToken();
+    async function checkIfFirstLaunch() {
+      try {
+        const hasLaunched = await AsyncStorage.getItem("appLaunched");
+        if (hasLaunched === null) {
+          setIsFirstLaunch(true);
+          await AsyncStorage.setItem("appLaunched", "true");
+        } else {
+          setIsFirstLaunch(false);
+        }
+      } catch (error) {
+        console.error("Error checking app launch status:", error);
+      }
+    }
+    checkIfFirstLaunch();
   }, []);
-
-  if (isFirstLaunch === null || !fontsLoaded) {
+  if (isFirstLaunch === null) {
     return null;
   }
 
