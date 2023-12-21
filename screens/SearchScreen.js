@@ -75,7 +75,7 @@ export default function SearchScreen({ route, navigation }) {
       }
     };
     fetchData().then((responseData) => {
-      if(!responseData) return;
+      if (!responseData) return;
       const filteredData = responseData
         .filter((item) =>
           item.name.toLowerCase().includes(queryToFilter.toLowerCase())
@@ -87,7 +87,7 @@ export default function SearchScreen({ route, navigation }) {
     // Fonction pour fetch les dernières recherches
     const fetchLastSearch = async () => {
       // vérifier la présence de token et bloquer si pas de token (et informer le user)
-      if(!token){
+      if (!token) {
         console.log("Pas de token");
         return;
       }
@@ -230,7 +230,7 @@ export default function SearchScreen({ route, navigation }) {
               if (text.length > 2) {
                 setQuery(text);
               }
-              if(!text.length) setSuggestions([]);
+              if (!text.length) setSuggestions([]);
             }}
             // Affiche les suggestions :
             flatListProps={{
@@ -244,8 +244,8 @@ export default function SearchScreen({ route, navigation }) {
             placeholder="Rechercher un médicament..."
             containerStyle={styles.autocompleteContainer}
           />
-          <TouchableOpacity onPress={handleSearch} style={styles.searchButton}>
-            <FontAwesome name="search" size={30} color="white" />
+          <TouchableOpacity onPress={handleSearch} style={styles.searchButton1}>
+            <FontAwesome name="search" size={20} color="white" />
           </TouchableOpacity>
         </View>
         {showSearchResults ? (
@@ -264,9 +264,16 @@ export default function SearchScreen({ route, navigation }) {
         ) : (
           // Afficher Mes dernières recherches (par défaut)
           <View>
-            { token ? <><Text style={styles.titleSearches}>Dernières fiches consultées</Text><View>{lastSearches}</View></> : 
+            {token ? (
+              <>
+                <Text style={styles.titleSearches}>
+                  Dernières fiches consultées
+                </Text>
+                <View>{lastSearches}</View>
+              </>
+            ) : (
               <View></View>
-            }
+            )}
           </View>
         )}
       </View>
@@ -274,65 +281,65 @@ export default function SearchScreen({ route, navigation }) {
   );
 }
 const styles = StyleSheet.create({
-container: {
-  flexDirection: 'row', // This makes the child elements arrange horizontally
-  justifyContent: 'space-between', // This provides equal space between the buttons
-  padding: 10,
-},
-contentTab: {
-  flex: 1,
-  flexDirection: 'row', // This makes the child elements arrange horizontally
-  justifyContent: 'space-between', // This provides equal space between the buttons
-},
-articleBox: {
-  backgroundColor: '#fff',
-  marginBottom: 10,
-  padding: 10,
-  borderRadius: 5,
-  borderColor: '#ddd',
-  borderWidth: 1,
-},
-scrollViewArticles: {
-  flex: 1,
-  backgroundColor: '#ffffff',
-  marginBottom: 20,
-  padding: 10, 
-  margin: 10,
-  borderRadius: 5
-},
+  container: {
+    flexDirection: "row", // This makes the child elements arrange horizontally
+    justifyContent: "space-between", // This provides equal space between the buttons
+    padding: 10,
+  },
+  contentTab: {
+    flex: 1,
+    flexDirection: "row", // This makes the child elements arrange horizontally
+    justifyContent: "space-between", // This provides equal space between the buttons
+  },
+  articleBox: {
+    backgroundColor: "#fff",
+    marginBottom: 10,
+    padding: 10,
+    borderRadius: 5,
+    borderColor: "#ddd",
+    borderWidth: 1,
+  },
+  scrollViewArticles: {
+    flex: 1,
+    backgroundColor: "#ffffff",
+    marginBottom: 20,
+    padding: 10,
+    margin: 10,
+    borderRadius: 5,
+  },
 
-articleTitle: {
-  fontSize: 18,
-  fontWeight: 'bold',
-  marginBottom: 5,
-},
-articleDate: {
-  fontSize: 14,
-  color: '#888',
-  marginBottom: 5,
-},
-articleContent: {
-  fontSize: 16,
-},
-button: {
-  backgroundColor: '#3498db',
-  padding: 10,
-  borderRadius: 5,
-},
-buttonText: {
-  color: '#ffffff',
-  fontSize: 16,
-  textAlign: 'center',
-},
+  articleTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 5,
+  },
+  articleDate: {
+    fontSize: 14,
+    color: "#888",
+    marginBottom: 5,
+  },
+  articleContent: {
+    fontSize: 16,
+  },
+  button: {
+    backgroundColor: "#3498db",
+    padding: 10,
+    borderRadius: 5,
+  },
+  buttonText: {
+    color: "#ffffff",
+    fontSize: 16,
+    textAlign: "center",
+  },
 
-///
+  ///
   title: {
     fontSize: 24,
     fontWeight: "bold",
   },
   container: {
     flex: 1,
-    marginTop: 120,
+    marginTop: 70,
     justifyContent: "top",
     alignItems: "center",
   },
@@ -340,7 +347,7 @@ buttonText: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    marginTop: 20,
+    marginTop: 10,
     paddingHorizontal: 16,
     alignItems: "flex-end",
     position: "relative",
@@ -381,7 +388,7 @@ buttonText: {
   },
   titleSearches: {
     marginTop: 20,
-    fontSize: 24, 
+    fontSize: 24,
     fontWeight: "bold",
     textAlign: "center",
   },
@@ -389,18 +396,29 @@ buttonText: {
     color: "#fff",
   },
   searchesContainer: {
-    textAlign:"center",
+    textAlign: "center",
     marginTop: 20,
     marginLeft: 20,
     marginRight: 20,
   },
   searchName: {
-    textAlign:"center",
+    textAlign: "center",
     color: "blue",
     textDecorationLine: "underline",
   },
   scrollView: {
     flexGrow: 1,
     width: "100%",
+  },
+  searchButton1: {
+    height: 35,
+    width: 35,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#3FB4B1",
+    borderRadius: 5,
+    marginHorizontal: 10,
+    top: -4,
   },
 });

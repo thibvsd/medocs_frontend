@@ -40,7 +40,7 @@ export default function HomeScreen({ navigation }) {
     motCle: false,
   });
   const [sourceValue, setSourceValue] = useState(null);
-  const [keyword, setKeyword] = useState('');
+  const [keyword, setKeyword] = useState("");
 
   const pickerRef = useRef();
 
@@ -98,7 +98,7 @@ export default function HomeScreen({ navigation }) {
       }
     };
     fetchData().then((responseData) => {
-      if(!responseData) return;
+      if (!responseData) return;
       const filteredData = responseData
         .filter((item) =>
           item.name.toLowerCase().includes(queryToFilter.toLowerCase())
@@ -127,7 +127,6 @@ export default function HomeScreen({ navigation }) {
     fetchSources();
     fetchFamilles();
   }, []);
-
 
   const onLogin = () => {
     navigation.navigate("TabNavigator", {
@@ -205,19 +204,21 @@ export default function HomeScreen({ navigation }) {
     setSourceValue(selectedSource);
     handleCombinedFilter();
   };
-  
+
   const handleSearchKeyword = () => {
     handleCombinedFilter();
   };
 
   const handleCombinedFilter = async () => {
     try {
-      const formattedSource = encodeURIComponent(sourceValue || 'undefined');
-      const formattedKeyword = encodeURIComponent(keyword || 'undefined');
-  
-      const response = await fetch(`http://${IP_ADDRESS}:3000/articles/bySourceAndKeyword/${formattedSource}/${formattedKeyword}`);
+      const formattedSource = encodeURIComponent(sourceValue || "undefined");
+      const formattedKeyword = encodeURIComponent(keyword || "undefined");
+
+      const response = await fetch(
+        `http://${IP_ADDRESS}:3000/articles/bySourceAndKeyword/${formattedSource}/${formattedKeyword}`
+      );
       const data = await response.json();
-  
+
       setArticles(data.combinedArticles); // Mettre à jour les articles filtrés dans l'état
     } catch (error) {
       console.error(error);
@@ -307,7 +308,7 @@ export default function HomeScreen({ navigation }) {
               if (text.length > 2) {
                 setQuery(text);
               }
-              if(!text.length) setSuggestions([]);
+              if (!text.length) setSuggestions([]);
             }}
             flatListProps={{
               //définit comment chaque élément de la liste générée par Autocomplete sera affiché
@@ -321,18 +322,22 @@ export default function HomeScreen({ navigation }) {
             placeholder="Rechercher un médicament..."
             containerStyle={styles.autocompleteContainer}
           />
-          <TouchableOpacity onPress={handleSearch} style={styles.searchButton}>
-            <FontAwesome name="search" size={30} color="white" />
+          <TouchableOpacity onPress={handleSearch} style={styles.searchButton1}>
+            <FontAwesome name="search" size={20} color="white" />
           </TouchableOpacity>
         </View>
-        <Text style={styles.title}>Feed</Text>
+
         <View style={styles.filterButtonContainer}>
           <View style={styles.filterButtons}>
             <TouchableOpacity
               style={styles.filterButtonLeft}
               onPress={() => openFilterModal("boutonFiltre")}
             >
-              <FontAwesome name="filter" size={25} color="#3FB4B1" />
+              <Image
+                style={styles.filterdefault}
+                source={require("../assets/FilterNice.png")}
+              />
+              <Text style={styles.filterButtonTextLeft}>Filtres</Text>
             </TouchableOpacity>
             <Dropdown
               style={styles.dropdown}
@@ -383,7 +388,7 @@ export default function HomeScreen({ navigation }) {
 
 const styles = StyleSheet.create({
   dropdown: {
-    margin: 16,
+    // margin: 16,
     height: 50,
     borderBottomColor: "gray",
     borderBottomWidth: 0.5,
@@ -404,7 +409,7 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    marginTop: 120,
+    marginTop: 70,
     justifyContent: "top",
     alignItems: "center",
   },
@@ -412,7 +417,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    marginTop: 20,
+    marginTop: 10,
     paddingHorizontal: 16,
     alignItems: "flex-end",
     position: "relative",
@@ -428,7 +433,7 @@ const styles = StyleSheet.create({
   },
   searchInput: {
     flex: 1,
-    height: 40,
+    height: 20,
     borderColor: "gray",
     borderWidth: 1,
     paddingLeft: 10,
@@ -442,27 +447,44 @@ const styles = StyleSheet.create({
     borderBottomColor: "#ccc",
   },
   filterButtonContainer: {
+    display: "flex",
     flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "flex-start",
-    paddingHorizontal: 16,
-    marginTop: 10,
+    // alignItems: "space-between",
+    justifyContent: "space-around",
+    paddingHorizontal: 10,
+    position: "relative",
+    width: "100%",
   },
   filterButtons: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "center",
+    justifyContent: "space-between",
+    width: "100%",
   },
   filterButtonLeft: {
     marginLeft: 10,
     marginRight: 10,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    width: "30%",
+    padding: 5,
+    borderWidth: 1,
+    borderRadius: 10,
+    backgroundColor: "#E0E0E0",
+  },
+  filterButtonTextLeft: {
+    marginLeft: 10,
+    marginRight: 10,
+    flexDirection: "row",
+    alignItems: "center",
   },
   filterButton: {
     marginRight: 5,
     color: "white",
     backgroundColor: "#3FB4B1",
     borderRadius: 30,
-    paddingVertical: 10,
+    paddingVertical: 5,
     paddingHorizontal: 18,
   },
   filterButtonText: {
@@ -529,12 +551,29 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "white",
   },
-  searchButton:{
-  height: 40,
-  width: 40,
-  flexDirection: "row",
-  alignItems: "center",
-  justifyContent: "center",
-  backgroundColor: "#3FB4B1",
-  borderRadius: 5,}
+  searchButton: {
+    height: 30,
+    width: 30,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#3FB4B1",
+    borderRadius: 5,
+    marginHorizontal: 10,
+  },
+  searchButton1: {
+    height: 35,
+    width: 35,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#3FB4B1",
+    borderRadius: 5,
+    marginHorizontal: 10,
+    top: -4,
+  },
+  filterdefault: {
+    width: 32,
+    height: 24,
+  },
 });
