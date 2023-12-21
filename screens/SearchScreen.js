@@ -84,7 +84,7 @@ export default function SearchScreen({ route, navigation }) {
       setSuggestions(filteredData.map((item) => item.name)); // map pour n'avoir que les names sans clé
     });
 
-    // Fonction pour fetch les dernières recherches
+    // Fonction pour fetch les dernières fiches consultées
     const fetchLastSearch = async () => {
       // vérifier la présence de token et bloquer si pas de token (et informer le user)
       if (!token) {
@@ -209,7 +209,6 @@ export default function SearchScreen({ route, navigation }) {
     data.drug_id === null || !token ? (
       <View></View>
     ) : (
-      
       searches.map((data, i) => (
         <View key={i} style={styles.searchesContainer}>
           <TouchableOpacity onPress={() => onLastSearchClick(data.drug_id)}>
