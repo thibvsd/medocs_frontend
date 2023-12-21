@@ -78,7 +78,7 @@ export default function App() {
     checkTokenAndLaunchStatus();
   }, []);
 
-  if (isFirstLaunch === null || !fontsLoaded) {
+  if (isFirstLaunch === null) {
     return null;
   }
 

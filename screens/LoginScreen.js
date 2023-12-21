@@ -62,7 +62,6 @@ export default function LoginScreen({ route, navigation }) {
       .then((response) => {
         console.log("signup", response);
         if (!response.ok) {
-          console.log("ici");
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
         return response.json();
@@ -123,9 +122,6 @@ export default function LoginScreen({ route, navigation }) {
       });
   };
 
-  const toggleCheckBox = () => {
-    setChecked(!isChecked);
-  };
 
   const SignUp = (
     <>
@@ -171,24 +167,8 @@ export default function LoginScreen({ route, navigation }) {
         value={confirmPassword} // Utilisation de confirmPassword au lieu de signUpPassword
         onChangeText={(text) => setConfirmPassword(text)}
       />
-      {/* <View style={styles.checkboxContainer}>
-        <CheckBox value={isChecked} onValueChange={toggleCheckBox} />
-        <Text style={styles.checkboxText}>
-          J’accepte les conditions d’utilisation de l’application :
-        </Text>
-        <TouchableOpacity onPress={() => navigation.navigate("FAQ")}>
-          <Text style={styles.linkText}>FAQ</Text>
-        </TouchableOpacity>
-      </View> */}
       <TouchableOpacity style={styles.link} onPress={toggleForm}>
         <Text>Vous avez déjà un compte ?{'\n'}Connectez-vous ici !</Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        style={[styles.button, !isChecked && styles.disabledButton]}
-        onPress={handleRegister}
-        // disabled={!isChecked}
-      >
-        <Text style={styles.buttonText}>S'inscrire</Text>
       </TouchableOpacity>
     </>
   );
