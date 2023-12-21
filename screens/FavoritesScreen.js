@@ -18,8 +18,8 @@ useEffect(() => {
     });},[]);
 
     // A modifier
-    const handleDelete = (name) => {
-        fetch(`http://${IP_ADDRESS}:3000/favorites/deleteFavorite/${user.token}/${name}`)
+    const handleDelete = (drug) => {
+        fetch(`http://${IP_ADDRESS}:3000/favorites/deleteFavorite/${user.token}/${drug}`)
         .then((response) => response.json())
         .then((data) => {
             setFavoDrug(data.idAndName)
@@ -32,7 +32,7 @@ useEffect(() => {
             <TouchableOpacity>
               <Text style={styles.name}>{data.name}</Text>
             </TouchableOpacity>
-            <FontAwesome style={styles.icon} name='trash-o' onPress={() => handleDelete(data.name)} size={25} color='#ec6e5b' />
+            <FontAwesome style={styles.icon} name='trash-o' onPress={() => handleDelete(data._id)} size={25} color='#ec6e5b' />
           </View>
         );
       });
