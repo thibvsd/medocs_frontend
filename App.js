@@ -26,6 +26,7 @@ import OnboardingScreen from "./screens/OnboardingScreen";
 import InfoDrugScreen from "./screens/InfoDrugScreen";
 import CameraScreen from "./screens/CameraScreen";
 import SplashScreen from "./screens/SplashScreen.js";
+import SplashScreenOB from "./screens/SplashScreenOB.js";
 import Lgn from "./screens/Lgn.js";
 
 // AsyncStorage.clear();
@@ -35,6 +36,7 @@ const persistConfig = {
   storage: AsyncStorage,
 };
 
+const reducers = combineReducers({ user, drugs });
 // Create Redux store
 const store = configureStore({
   reducer: persistReducer(persistConfig, reducers),
@@ -263,7 +265,7 @@ export default function App() {
         <NavigationContainer>
           {isFirstLaunch ? (
             <Stack.Navigator screenOptions={{ headerShown: false }}>
-              <Stack.Screen name="SplashScreen" component={SplashScreen} />
+              <Stack.Screen name="SplashScreenOB" component={SplashScreenOB} />
               <Stack.Screen name="TabNavigator" component={TabNavigator} />
               <Stack.Screen
                 name="OnboardingScreen"
@@ -273,6 +275,7 @@ export default function App() {
             </Stack.Navigator>
           ) : (
             <Stack.Navigator screenOptions={{ headerShown: false }}>
+              <Stack.Screen name="SplashScreen" component={SplashScreen} />
               <Stack.Screen name="TabNavigator" component={TabNavigator} />
               <Stack.Screen
                 name="LoginScreen"
