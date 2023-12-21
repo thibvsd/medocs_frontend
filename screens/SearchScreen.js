@@ -84,7 +84,7 @@ export default function SearchScreen({ route, navigation }) {
       setSuggestions(filteredData.map((item) => item.name)); // map pour n'avoir que les names sans clé
     });
 
-    // Fonction pour fetch les dernières recherches
+    // Fonction pour fetch les dernières fiches consultées
     const fetchLastSearch = async () => {
       // vérifier la présence de token et bloquer si pas de token (et informer le user)
       if (!token) {

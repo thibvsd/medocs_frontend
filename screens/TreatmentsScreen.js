@@ -13,18 +13,21 @@ import Autocomplete from "react-native-autocomplete-input";
 import { IP_ADDRESS } from "../config.js";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import { removePhoto } from "../reducers/user";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 
 export default function TreatmentsScreen({ navigation }) {
-  const token = "mYZ2UayAiPjfhaQRy0FXQH-1oktu1Xi9";
+  const dispatch = useDispatch();
+  const token = useSelector((state) => state.user.value.token);
   const [suggestions, setSuggestions] = useState([]);
   const [data, setData] = useState([]);
   const [query, setQuery] = useState("");
   const [doseInput, setDoseInput] = useState("");
   const [med_reason, setMed_reason] = useState("");
   const [drugAdd, setDrugAdd] = useState([]);
+  const [validation, setValidation] = useState("");
 
   const userPhotos = useSelector((state) => state.user.value.photos);
+
   // console.log("USER photo ", userPhotos);
 
   console.log('query state', query);
@@ -74,6 +77,7 @@ export default function TreatmentsScreen({ navigation }) {
         doseInput,
       }),
     });
+    setValidation("Données enregistrées avec succès !");
   };
 
   const addDrugPress = async (drug) => {
@@ -232,18 +236,21 @@ export default function TreatmentsScreen({ navigation }) {
           <View>
             <Text style={styles.subtitle}>Mes ordonnances</Text>
             <View style={styles.ordonnanceContainer}>
+            <View style={styles.ordonnanceText}>
               <Text>Ajouter une ordonnance </Text>
               <TouchableOpacity onPress={onAddPrescriptionPress}>
                 <FontAwesome
                   name="camera"
-                  size={20}
+                  size={30}
                   color="#3FB4B1"
-                  style={styles.filterButtonCaret}
+                  style={styles.filterButtonCamera}
                 />
-              </TouchableOpacity>
-              <View>{photos}</View>
+              </TouchableOpacity></View>
+              <View style={styles.ordonnancePhotoContainer}>{photos}</View>
+              
             </View>
           </View>
+          <Text style={styles.validationText}>{validation}</Text>
           <TouchableOpacity onPress={onSave} style={styles.saveButton}>
             <Text style={styles.saveButtonText}>Save</Text>
           </TouchableOpacity>
@@ -279,7 +286,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
   },
-  filterButtonCaret: {
+  filterButtonCamera: {
+    marginLeft: 10,
     marginRight: 10,
   },
   drugList: {
@@ -341,8 +349,7 @@ const styles = StyleSheet.create({
     textAlignVertical: "top",
   },
   ordonnanceContainer: {
-    flexDirection: "row",
-  },
+alignItems: "center", },
 
   saveButton: {
     marginTop: 20,
@@ -362,4 +369,25 @@ const styles = StyleSheet.create({
     textAlign: "center",
     justifyContent: "center",
   },
+  ordonnanceText: {
+    flexDirection: "row",
+    margin :10,
+    alignItems: "center",
+  },
+  ordonnancePhotoContainer: {
+    flexWrap: 'wrap',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginBottom:10,
+  },
+  photo: {
+    margin: 10,
+    width: 150,
+    height: 150,
+  },
+  validationText: {
+    color:"green",
+    textAlign: "center",
+
+  }
 });
