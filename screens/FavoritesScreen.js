@@ -15,6 +15,7 @@ useEffect(() => {
     .then((response) => response.json())
     .then((data) => {
         setFavoDrug(data.idAndName)
+        console.log(data.idAndName);
     });},[]);
 
     // A modifier
@@ -27,6 +28,7 @@ useEffect(() => {
     }
 
     const favoDrugs = favoDrug.map((data, i) => {
+      console.log("favo",data);
         return (
           <View key={i} style={styles.card}>
             <TouchableOpacity>
