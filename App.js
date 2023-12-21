@@ -277,7 +277,7 @@ if (isFirstLaunch === null) {
           name="InfoDrugScreen"
           component={InfoDrugScreen}
           options={{
-            headerShown: false,
+            headerShown: true,
             title: "Infos médicament",
             headerStyle: {
               backgroundColor: "#199a8e",
