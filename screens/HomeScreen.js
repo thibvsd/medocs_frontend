@@ -393,6 +393,7 @@ const styles = StyleSheet.create({
   dropdown: {
     margin: 16,
     height: 50,
+    width: 100,
     borderBottomColor: "gray",
     borderBottomWidth: 0.5,
   },
