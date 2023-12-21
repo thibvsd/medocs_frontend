@@ -118,6 +118,8 @@ export default function LoginScreen({ route, navigation }) {
           setSignInEmail("");
           setSignInPassword("");
           navigation.navigate("Profile");
+        } else {
+          Alert.alert(data.error);
         }
       });
   };
