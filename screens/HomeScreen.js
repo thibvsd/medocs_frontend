@@ -10,8 +10,9 @@ import {
   FlatList,
   ScrollView,
   StyleSheet,
+  Image,
 } from "react-native";
-import { Image } from "expo-image";
+
 import Autocomplete from "react-native-autocomplete-input";
 import { useDispatch, useSelector } from "react-redux";
 import { addLastSearch } from "../reducers/drugs";
@@ -286,17 +287,10 @@ export default function HomeScreen({ navigation }) {
       );
       return (
         <View key={i} style={styles.articleContainer}>
-          <View style={styles.container}>
-            <Image
-              style={styles.image}
-              source="https://picsum.photos/seed/696/3000/2000"
-              contentFit="cover"
-              transition={1000}
-            />
-          </View>
+          <View style={styles.container}></View>
           <Image
             source={{ uri: data.illustration }}
-            style={styles.articleImage}
+            style={{ width: 50, height: 50 }}
             contentFit="contain" // Add this line to adapt the image
           />
           <View style={styles.articleTextContainer}>
