@@ -217,6 +217,9 @@ export default function HomeScreen({ navigation }) {
 
   const handleCombinedFilter = async () => {
     try {
+      if (!sourceValue && !keyword) {
+        return;
+      }
       const formattedSource = encodeURIComponent(sourceValue || 'undefined');
       const formattedKeyword = encodeURIComponent(keyword || 'undefined');
   
