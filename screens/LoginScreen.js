@@ -98,6 +98,7 @@ export default function LoginScreen({ route, navigation }) {
   };
 
   const handleConnection = () => {
+    console.log("dans la connection", signInEmail, " ",signInPassword);
     fetch(`http://${IP_ADDRESS}:3000/users/signin`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -109,6 +110,7 @@ export default function LoginScreen({ route, navigation }) {
       .then((response) => response.json())
       .then((data) => {
         if (data.result) {
+          console.log("dans le then de la connection");
           dispatch(
             login({
               email: signInEmail,
