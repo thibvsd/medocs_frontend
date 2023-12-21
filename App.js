@@ -26,6 +26,7 @@ import OnboardingScreen from "./screens/OnboardingScreen";
 import InfoDrugScreen from "./screens/InfoDrugScreen";
 import CameraScreen from "./screens/CameraScreen";
 import SplashScreen from "./screens/SplashScreen.js";
+import SplashScreenOB from "./screens/SplashScreenOB.js";
 import Lgn from "./screens/Lgn.js";
 
 // AsyncStorage.clear();
@@ -35,6 +36,7 @@ const persistConfig = {
   storage: AsyncStorage,
 };
 
+const reducers = combineReducers({ user, drugs });
 // Create Redux store
 const store = configureStore({
   reducer: persistReducer(persistConfig, reducers),
@@ -60,6 +62,25 @@ export default function App() {
     "Montserrat-Bold": require("./assets/fonts/Montserrat-Bold.ttf"),
   });
 
+  // useEffect(() => {
+  //   async function checkTokenAndLaunchStatus() {
+  //     try {
+  //       const userToken = await AsyncStorage.getItem("token");
+  //       setToken(userToken);
+
+  //       const hasLaunched = await AsyncStorage.getItem("appLaunched");
+  //       setIsFirstLaunch(hasLaunched === null);
+  //     } catch (error) {
+  //       console.error("Error checking token and launch status:", error);
+  //     }
+  //   }
+
+  //   checkTokenAndLaunchStatus();
+  // }, []);
+
+  // if (isFirstLaunch === null || !fontsLoaded) {
+  //   return null;
+  // }
   useEffect(() => {
     async function checkToken() {
       try {
@@ -91,7 +112,6 @@ export default function App() {
   if (isFirstLaunch === null) {
     return null;
   }
-
   const TabNavigator = () => {
     return (
       <Tab.Navigator
@@ -252,7 +272,7 @@ export default function App() {
           name="InfoDrugScreen"
           component={InfoDrugScreen}
           options={{
-            headerShown: false,
+            headerShown: true,
             title: "Infos médicament",
             headerStyle: {
               backgroundColor: "#199a8e",
@@ -275,7 +295,7 @@ export default function App() {
         <NavigationContainer>
           {isFirstLaunch ? (
             <Stack.Navigator screenOptions={{ headerShown: false }}>
-              <Stack.Screen name="SplashScreen" component={SplashScreen} />
+              <Stack.Screen name="SplashScreenOB" component={SplashScreenOB} />
               <Stack.Screen name="TabNavigator" component={TabNavigator} />
               <Stack.Screen
                 name="OnboardingScreen"
@@ -285,6 +305,7 @@ export default function App() {
             </Stack.Navigator>
           ) : (
             <Stack.Navigator screenOptions={{ headerShown: false }}>
+              <Stack.Screen name="SplashScreen" component={SplashScreen} />
               <Stack.Screen name="TabNavigator" component={TabNavigator} />
               <Stack.Screen
                 name="LoginScreen"

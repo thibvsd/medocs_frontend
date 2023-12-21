@@ -66,7 +66,6 @@ export default function HomeScreen({ navigation }) {
 
   const fetchFamilles = async () => {
     try {
-      console.log("ici");
       const response = await fetch(`http://${IP_ADDRESS}:3000/articles/codes`);
       const resultLabels = await response.json();
       setLoadFamille(resultLabels.codes);
@@ -79,16 +78,31 @@ export default function HomeScreen({ navigation }) {
     // AbortController pour arrêter la requête si query est modifié
     const fetchDataController = new AbortController();
     const queryToFilter = query;
+    if (queryToFilter) {
+      fetchData().then((responseData) => {
+        if (!responseData) return;
+        const filteredData = responseData
+          .filter((item) =>
+            item.name.toLowerCase().includes(queryToFilter.toLowerCase())
+          )
+          .slice(0, 10); // Limite à 10 suggestions
+        setSuggestions(filteredData.map((item) => item.name)); // map pour n'avoir que les names sans clé
+      });
+    }
     // Fonction pour fetch les noms des médicaments (pour l'autocomplétion)
-    const fetchData = async () => {
+    async function fetchData() {
       try {
         const response = await fetch(
           `http://${IP_ADDRESS}:3000/drugs/query3characters/${queryToFilter}`,
           { signal: fetchDataController.signal }
         );
-        const result = await response.json();
-        setData(result.namesAndId);
-        return result.namesAndId;
+        if (response.ok) {
+          const result = await response.json();
+          setData(result.namesAndId);
+          return result.namesAndId;
+        }
+        throw new Error(`Error: ${response.statusText}`);
+        // in prod: return an error state to display for the user
       } catch (error) {
         if (error.name === "AbortError") {
           console.log("La requête fetchData a été annulée.");
@@ -96,16 +110,7 @@ export default function HomeScreen({ navigation }) {
           console.error(error);
         }
       }
-    };
-    fetchData().then((responseData) => {
-      if (!responseData) return;
-      const filteredData = responseData
-        .filter((item) =>
-          item.name.toLowerCase().includes(queryToFilter.toLowerCase())
-        )
-        .slice(0, 10); // Limite à 10 suggestions
-      setSuggestions(filteredData.map((item) => item.name)); // map pour n'avoir que les names sans clé
-    });
+    }
 
     return () => fetchDataController.abort();
   }, [query]);
@@ -140,30 +145,32 @@ export default function HomeScreen({ navigation }) {
   const onSuggestionPress = (suggestion) => {
     // Cherche le name et extrait son _id :
     const selectedDrug = data.find((item) => item.name === suggestion)._id;
-    if(token){
-    // enregistre la recherche dans la DB
-    fetch(`http://${IP_ADDRESS}:3000/searches/addLastSearch/${token}`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        _id: selectedDrug,
-      }),
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        if (data.result) {
-          dispatch(addLastSearch(selectedDrug)); // Dispatch l'id pour pouvoir le récupérer sur la page infoDrugScreen
-          navigation.navigate("InfoDrugScreen"); // redirige vers l'info du médicament
-          setQuery("");
-          setSuggestions([]);
-        }
-      });}
-      else {dispatch(addLastSearch(selectedDrug)); // Dispatch l'id pour pouvoir le récupérer sur la page infoDrugScreen
+    if (token) {
+      // enregistre la recherche dans la DB
+      fetch(`http://${IP_ADDRESS}:3000/searches/addLastSearch/${token}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          _id: selectedDrug,
+        }),
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.result) {
+            dispatch(addLastSearch(selectedDrug)); // Dispatch l'id pour pouvoir le récupérer sur la page infoDrugScreen
+            navigation.navigate("InfoDrugScreen"); // redirige vers l'info du médicament
+            setQuery("");
+            setSuggestions([]);
+          }
+        });
+    } else {
+      dispatch(addLastSearch(selectedDrug)); // Dispatch l'id pour pouvoir le récupérer sur la page infoDrugScreen
       navigation.navigate("InfoDrugScreen");
       setQuery("");
-      setSuggestions([]);}
+      setSuggestions([]);
+    }
   };
 
   // Click sur la loupe, lance la recherche
@@ -216,6 +223,9 @@ export default function HomeScreen({ navigation }) {
 
   const handleCombinedFilter = async () => {
     try {
+      if (!sourceValue && !keyword) {
+        return;
+      }
       const formattedSource = encodeURIComponent(sourceValue || "undefined");
       const formattedKeyword = encodeURIComponent(keyword || "undefined");
 
@@ -395,6 +405,7 @@ const styles = StyleSheet.create({
   dropdown: {
     // margin: 16,
     height: 50,
+    width: 100,
     borderBottomColor: "gray",
     borderBottomWidth: 0.5,
   },
