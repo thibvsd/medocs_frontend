@@ -70,7 +70,6 @@ export default function HomeScreen({ navigation }) {
       const response = await fetch(`http://${IP_ADDRESS}:3000/articles/codes`);
       const resultLabels = await response.json();
       setLoadFamille(resultLabels.codes);
-      console.log("dans le label", resultLabels.codes);
     } catch (error) {
       console.error(error);
     }
@@ -79,18 +78,17 @@ export default function HomeScreen({ navigation }) {
   useEffect(() => {
     // AbortController pour arrêter la requête si query est modifié
     const fetchDataController = new AbortController();
-
+    const queryToFilter = query;
     // Fonction pour fetch les noms des médicaments (pour l'autocomplétion)
     const fetchData = async () => {
       try {
-        if (query.length >= 3) {
-          const response = await fetch(
-            `http://${IP_ADDRESS}:3000/drugs/query3characters/${query}`,
-            { signal: fetchDataController.signal }
-          );
-          const result = await response.json();
-          setData(result.namesAndId);
-        }
+        const response = await fetch(
+          `http://${IP_ADDRESS}:3000/drugs/query3characters/${queryToFilter}`,
+          { signal: fetchDataController.signal }
+        );
+        const result = await response.json();
+        setData(result.namesAndId);
+        return result.namesAndId;
       } catch (error) {
         if (error.name === "AbortError") {
           console.log("La requête fetchData a été annulée.");
@@ -99,7 +97,20 @@ export default function HomeScreen({ navigation }) {
         }
       }
     };
+    fetchData().then((responseData) => {
+      if(!responseData) return;
+      const filteredData = responseData
+        .filter((item) =>
+          item.name.toLowerCase().includes(queryToFilter.toLowerCase())
+        )
+        .slice(0, 10); // Limite à 10 suggestions
+      setSuggestions(filteredData.map((item) => item.name)); // map pour n'avoir que les names sans clé
+    });
 
+    return () => fetchDataController.abort();
+  }, [query]);
+
+  useEffect(() => {
     // Fetch pour récupérer les 3 derniers articles
     const fetchArticles = async () => {
       try {
@@ -112,25 +123,11 @@ export default function HomeScreen({ navigation }) {
         console.error(error);
       }
     };
-
-    fetchData();
     fetchArticles();
     fetchSources();
     fetchFamilles();
-    return () => fetchDataController.abort();
   }, []);
 
-  // Filtre les suggestions en fonction de la valeur de l'input
-  const filterData = (text) => {
-    if (text.length >= 3) {
-      const filteredData = data
-        .filter((item) => item.name.toLowerCase().includes(text.toLowerCase()))
-        .slice(0, 10);
-      setSuggestions(filteredData.map((item) => item.name));
-    } else {
-      setSuggestions([]);
-    }
-  };
 
   const onLogin = () => {
     navigation.navigate("TabNavigator", {
@@ -306,10 +303,11 @@ export default function HomeScreen({ navigation }) {
         <View style={styles.searchContainer}>
           <Autocomplete
             data={suggestions}
-            value={query}
             onChangeText={(text) => {
-              setQuery(text);
-              filterData(text);
+              if (text.length > 2) {
+                setQuery(text);
+              }
+              if(!text.length) setSuggestions([]);
             }}
             flatListProps={{
               //définit comment chaque élément de la liste générée par Autocomplete sera affiché
@@ -378,10 +376,6 @@ export default function HomeScreen({ navigation }) {
         >
           <TouchableOpacity>{feed}</TouchableOpacity>
         </ScrollView>
-
-        <TouchableOpacity onPress={onLogin}>
-          <Text style={{ color: "#000000" }}>TEST MEDOC</Text>
-        </TouchableOpacity>
       </View>
     </TouchableWithoutFeedback>
   );
@@ -535,13 +529,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "white",
   },
-  searchButton: {
-    height: 40,
-    width: 40,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "#3498db",
-    borderRadius: 5,
-  },
+  searchButton:{
+  height: 40,
+  width: 40,
+  flexDirection: "row",
+  alignItems: "center",
+  justifyContent: "center",
+  backgroundColor: "#3FB4B1",
+  borderRadius: 5,}
 });

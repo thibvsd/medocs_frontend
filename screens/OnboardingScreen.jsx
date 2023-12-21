@@ -4,13 +4,12 @@ import { useNavigation } from '@react-navigation/native';
 import {
   View,
   Text,
-  Button,
   Image,
   StyleSheet,
   TouchableOpacity,
 } from "react-native";
 
-import { Border, FontFamily, FontSize, Color } from "../assets/GlobalStyles";
+import {Color } from "../assets/GlobalStyles";
 
 const Dots = ({ selected }) => {
   let backgroundColor;
@@ -24,18 +23,27 @@ const Dots = ({ selected }) => {
         height: 6,
         marginHorizontal: 3,
         backgroundColor,
+        borderRadius: 10,
       }}
     />
   );
 };
 
 const Next = ({ ...props }) => (
-  <Button title="Next" color="#000000" {...props} />
+  <TouchableOpacity style={{ marginHorizontal: 15 }} {...props}>
+    <Text style={{ fontSize: 16 }}>Suivant</Text>
+  </TouchableOpacity>
 );
 
 const Done = ({ ...props }) => (
-  <TouchableOpacity style={{ marginHorizontal: 8 }} {...props}>
-    <Text style={{ fontSize: 16 }}>Done</Text>
+  <TouchableOpacity style={{ marginHorizontal: 15 }} {...props}>
+    <Text style={{ fontSize: 16 }}>Continuer</Text>
+  </TouchableOpacity>
+);
+
+const Skip = ({ ...props }) => (
+  <TouchableOpacity style={{ marginHorizontal: 15 }} {...props}>
+    <Text style={{ fontSize: 16 }}>Passer</Text>
   </TouchableOpacity>
 );
 
@@ -45,112 +53,62 @@ const OnboardingScreen = () => {
 
 const navigation = useNavigation();
 
-const onDone = () => {
-  navigation.replace('TabNavigator','Home'); 
-};
-const onLogin = () => {
-  navigation.navigate('TabNavigator', {
-    screen: 'Profile',
-    params: {
-      screen: 'Login',
-      params: {
-        IsSignup: false,
-      },
-    },
-  });
-}
-
-const onInscription = () => {
-  navigation.navigate('TabNavigator', {
-    screen: 'Profile',
-    params: {
-      screen: 'Login',
-      params: {
-        IsSignup: true,
-      },
-    },
-  });
-}
-const onHome = () => {
-  navigation.replace('TabNavigator','Home'); 
-};
+// const onDone = () => {
+//   navigation.replace('TabNavigator','Home'); 
+// };
 
   return (
     <Onboarding     
       DoneButtonComponent={Done}
+      NextButtonComponent={Next}
+      SkipButtonComponent={Skip}
       DotComponent={Dots}
-      onSkip={() => navigation.navigate("TabNavigator")}       
-      onDone={() => navigation.navigate("TabNavigator")}
+      bottomBarHighlight = {false}
+      skipToPage={2}
+      controlStatusBar={false}     
+      onDone={() => navigation.navigate("Lgn")}
       pages={[
         {
-          backgroundColor: "#a6e4d0",
-          image: <Image source={require("../assets/logo.png")} />,
-          title: <>
-          <View style={styles.contentFlexBox}>
-          <Text style={styles.headline}>{`Prêt ? `}</Text>
-            <TouchableOpacity onPress={onHome}>
-              <Text style={styles.connectezVousPour}>
-                Connectez vous pour profiter dès à présent des fonctionnalités de l’application
-              </Text>
-            </TouchableOpacity>
-          </View></>,
-          subtitle: <>
-          <View style={styles.frameFlexBox}>
-            <View style={styles.buttonLayout}>
-              <View style={[styles.loginButtonChild, styles.buttonChildPosition]} />
-              <TouchableOpacity onPress={onLogin}>
-                <Text style={styles.connexion}>
-                Connexion
-                </Text>
-              </TouchableOpacity>
-            </View>
-            <View style={[styles.signupButton, styles.buttonLayout]}>
-              <View
-                style={[styles.signupButtonChild, styles.buttonChildPosition]}
-              />
-              <TouchableOpacity onPress={onInscription}>
-              <Text style={[styles.inscription, styles.inscriptionTypo]}>
-                Inscription
-              </Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-          <View style={[styles.frame, styles.frameFlexBox]}>
-            <Text style={styles.ou}>ou</Text>
-            <View style={styles.buttonLayout}> 
-              <TouchableOpacity onPress={onHome}>             
-                <Text style={[styles.continuerEnTant, styles.inscriptionTypo]}>
-                  Continuer en tant qu’invité
-                </Text>
-              </TouchableOpacity>  
-            </View>
-          </View>
-        </>
-        },
-        {
           backgroundColor: "#fdeb93",
-          image: <Image source={require("../assets/logo.png")} />,
-          title: "Ecran 2",
-          subtitle: "...",
+          image: <Image style= {styles.picto} source={require("../assets/biotech.png")} />,
+          title: " Avoir accès aux dernières actualités sur les médicaments",
+          subtitle: "",
+        }, 
+        {
+          backgroundColor: "#e9bcbe",
+          image: <Image style= {styles.picto} source={require("../assets/policy.png")} />,
+          title: "Se renseigner sur un traitement en particulier",
+          subtitle: "",
         },
         {
           backgroundColor: "#e9bcbe",
-          image: <Image source={require("../assets/logo.png")} />,
-          title: "Ecran 3",
-          subtitle: "...",
+          image: <Image style= {styles.picto} source={require("../assets/insights.png")} />,
+          title: "Suivre ses traitements en cours",
+          subtitle: "",
         },
+        
       ]}
     />
   );
 };
 
 const styles = StyleSheet.create({
-  contentFlexBox: {
-    justifyContent: "center",
-    alignItems: "center",
+ pictospecial : {
+   position: "absolute",
+   bottom: 10,
+   width: 150,
+   height: 150,
+   top: -200
+   
+ },
+ 
+  picto : {
+    top: -50,
+    width: 250,
+    height: 250,
   },
   buttonChildPosition: {
-    borderRadius: 13,
+    borderRadius: 25,
     bottom: "0%",
     right: "0%",
     height: "100%",
@@ -165,49 +123,23 @@ const styles = StyleSheet.create({
   },
   inscriptionTypo: {
     fontWeight: "500",
-    lineHeight: 24,
+    // lineHeight: 24,
     textAlign: "center",
-    position: "absolute",
+    // position: "absolute",
+    color: "#A1A8B0",
   },
-  frameFlexBox: {
-    marginTop: 43,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  vectorIcon: {
-    height: "60.67%",
-    width: "56.91%",
-    right: "21.37%",
-    bottom: "39.33%",
-    left: "21.71%",
-    maxWidth: "100%",
-    maxHeight: "100%",
-    top: "0%",
-    position: "absolute",
-    overflow: "hidden",
-  },
-  medidoc: {
-    top: "71.34%",
-    fontSize: 39,
-    textAlign: "left",
-    color: Color.colorDarkcyan,
-    fontWeight: "700",
-    left: "0%",
-    position: "absolute",
-  },
-  logo: {
-    width: 175,
-    height: 164,
-  },
+  
   headline: {
-    fontSize: 22,
-    lineHeight: 30,
-    color: "#101623",
+    fontSize: 38,
+    fontFamily: "Montserrat-Bold",
+    letterSpacing: 0,
+    color: "#199A8E",
     display: "flex",
-    marginTop: 53,
+    // marginTop: 53,
     width: 311,
     textAlign: "center",
-    fontWeight: "700",
+    top: -110,
+    
     justifyContent: "center",
     alignItems: "center",
   },
@@ -215,7 +147,7 @@ const styles = StyleSheet.create({
     color: "#707784",
     letterSpacing: 1,
     lineHeight: 24,
-    marginTop: 53,
+    top: -70,
     width: 311,
     textAlign: "center",
   },
@@ -223,13 +155,14 @@ const styles = StyleSheet.create({
     backgroundColor: Color.colorDarkcyan,
   },
   connexion: {
-    left: "33.76%",
     fontWeight: "600",
     color: Color.colorWhite,
-    top: "28.57%",
-    lineHeight: 24,
+    top: "90%",
+   
     textAlign: "center",
-    position: "absolute",
+    
+    
+    
   },
   signupButtonChild: {
     borderStyle: "solid",
@@ -251,25 +184,20 @@ const styles = StyleSheet.create({
     lineHeight: 24,
     letterSpacing: 1,
     textAlign: "center",
+    top: "40%",
+    
   },
   continuerEnTant: {
-    top: "50%",
-    left: "11.33%",
-    color: "#707477",
+    top: "330%",
+    color: "#A1A8B0",
+    position: "relative",
+    
   },
-  frame: {
-    overflow: "hidden",
-  },
-  onboarding3: {
-    backgroundColor: Color.colorWhite,
-    flex: 1,
-    height: 812,
-    paddingHorizontal: 32,
-    paddingVertical: 70,
-    overflow: "hidden",
-    width: "100%",
-    alignItems: "center",
-  },
+
+  frameFlexBox: {
+    flexDirection: "column",
+  }
+ 
 });
 
 export default OnboardingScreen;
