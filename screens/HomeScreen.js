@@ -79,16 +79,31 @@ export default function HomeScreen({ navigation }) {
     // AbortController pour arrêter la requête si query est modifié
     const fetchDataController = new AbortController();
     const queryToFilter = query;
+    if(queryToFilter) {
+      fetchData().then((responseData) => {
+          if(!responseData) return;
+          const filteredData = responseData
+            .filter((item) =>
+              item.name.toLowerCase().includes(queryToFilter.toLowerCase())
+            )
+            .slice(0, 10); // Limite à 10 suggestions
+          setSuggestions(filteredData.map((item) => item.name)); // map pour n'avoir que les names sans clé
+        });
+    }
     // Fonction pour fetch les noms des médicaments (pour l'autocomplétion)
-    const fetchData = async () => {
+    async function fetchData() {
       try {
         const response = await fetch(
           `http://${IP_ADDRESS}:3000/drugs/query3characters/${queryToFilter}`,
           { signal: fetchDataController.signal }
         );
-        const result = await response.json();
-        setData(result.namesAndId);
-        return result.namesAndId;
+        if(response.ok) {
+          const result = await response.json();
+          setData(result.namesAndId);
+          return result.namesAndId;
+        }
+        throw new Error(`Error: ${response.statusText}`);
+        // in prod: return an error state to display for the user
       } catch (error) {
         if (error.name === "AbortError") {
           console.log("La requête fetchData a été annulée.");
@@ -97,15 +112,7 @@ export default function HomeScreen({ navigation }) {
         }
       }
     };
-    fetchData().then((responseData) => {
-      if(!responseData) return;
-      const filteredData = responseData
-        .filter((item) =>
-          item.name.toLowerCase().includes(queryToFilter.toLowerCase())
-        )
-        .slice(0, 10); // Limite à 10 suggestions
-      setSuggestions(filteredData.map((item) => item.name)); // map pour n'avoir que les names sans clé
-    });
+  
 
     return () => fetchDataController.abort();
   }, [query]);

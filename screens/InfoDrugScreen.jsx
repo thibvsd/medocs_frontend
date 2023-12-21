@@ -136,10 +136,10 @@ return (
 
       <Text style={[styles.title, { alignContent: 'center',textAlign: 'center', }]}>{data.drug.name.split(',')[0].trim()}{'\n'}
       <Text style={[{ textAlign: 'center', }]}>{data.drug.name.split(',')[1].trim()}</Text>      
-      {data.drug.classification.label && (
+     {/*} {data.drug.classification.label && (
         <Text style={{ alignContent: 'center',textAlign: 'center', fontStyle: 'italic', fontSize: 10  }}>Famille {data.drug.classification.label}</Text>
-      )}
-      </Text>
+      )}*/}
+     </Text>
 
       { token ? 
         <TouchableOpacity onPress={() => openUrl(data.url)} activeOpacity={0.8} style={[{ paddingTop: 20, paddingLeft: 2 }]}>
@@ -173,7 +173,13 @@ return (
             ))}
           </>
           :
-          <Text></Text>
+            <View key={index} style={styles.articleBox}>
+              <Text>Vous pouvez retrouver d'autres informations sur les sites
+                <TouchableOpacity onPress={() => openUrl(data.url)} style={[{ marginTop: 10, paddingLeft: 2 }]}>
+                  <FontAwesome name="external-link" size={20} color="#199a8e" />
+                </TouchableOpacity>
+              </Text>
+            </View>  
           }
       </ScrollView>
 
