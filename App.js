@@ -28,7 +28,7 @@ import CameraScreen from "./screens/CameraScreen";
 import SplashScreen from "./screens/SplashScreen.js";
 import Lgn from "./screens/Lgn.js";
 
-// AsyncStorage.clear();
+AsyncStorage.clear();
 const reducers = combineReducers({ user, drugs });
 
 // Configure Redux persist
