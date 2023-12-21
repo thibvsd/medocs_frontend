@@ -135,6 +135,7 @@ export default function SearchScreen({ route, navigation }) {
   const onSuggestionPress = (suggestion) => {
     // Cherche le name et extrait son _id :
     const selectedDrug = data.find((item) => item.name === suggestion)._id;
+    if(token){
     // enregistre la recherche dans la DB
     fetch(`http://${IP_ADDRESS}:3000/searches/addLastSearch/${token}`, {
       method: "POST",
@@ -153,11 +154,16 @@ export default function SearchScreen({ route, navigation }) {
           setQuery("");
           setSuggestions([]);
         }
-      });
+      });}
+      else {dispatch(addLastSearch(selectedDrug)); // Dispatch l'id pour pouvoir le récupérer sur la page infoDrugScreen
+      navigation.navigate("InfoDrugScreen");
+      setQuery("");
+      setSuggestions([]);}
   };
 
   // Quand click sur un résultat de recherche, redirige vers l'info du médicament
   const onSearchResultClick = (suggestion) => {
+    if(token){
     fetch(`http://${IP_ADDRESS}:3000/searches/addLastSearch/${token}`, {
       method: "POST",
       headers: {
@@ -177,7 +183,15 @@ export default function SearchScreen({ route, navigation }) {
           setShowSearchResults(false);
           setSuggestions([]);
         }
-      });
+      });}
+      else{
+        dispatch(addLastSearch(suggestion._id));
+        navigation.navigate("InfoDrugScreen");
+        setQuery("");
+        setQueryResults([]);
+        setShowSearchResults(false);
+        setSuggestions([]);
+      }
   };
 
   // Quand click sur une des dernières recherches, redirige vers la page info du médicament
