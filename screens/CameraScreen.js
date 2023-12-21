@@ -31,11 +31,11 @@ export default function SnapScreen() {
   }
 
   const takePicture = async () => {
-        const photo = await cameraRef.takePictureAsync({
-          quality: 0.3,
-        });
-        dispatch(addPhoto(photo.uri));
-        navigation.navigate("Traitements");
+    const photo = await cameraRef.takePictureAsync({
+      quality: 0.3,
+    });
+    dispatch(addPhoto(photo.uri));
+    navigation.navigate("Traitements");
   };
 
   const toggleFlashMode = () => {
@@ -50,34 +50,35 @@ export default function SnapScreen() {
         type={type}
         flashMode={flashMode}
       >
-        <TouchableOpacity           onPress={() =>
+        <TouchableOpacity
+          onPress={() =>
             setType(
               type === CameraType.back ? CameraType.front : CameraType.back
-            )}>
-        <FontAwesome 
-          name="rotate-right"
-          size={30}
-          color="#000000"
-          style={styles.cameraTypeButton}
-        />
+            )
+          }
+        >
+          <FontAwesome
+            name="rotate-right"
+            size={30}
+            color="#000000"
+            style={styles.cameraTypeButton}
+          />
         </TouchableOpacity>
-        <TouchableOpacity onPress={toggleFlashMode}
->
-        <FontAwesome
-          name="flash"
-          size={30}
-          color={flashMode === FlashMode.on ? "#FFFF00" : "#000000"}
-          style={styles.flashButton}
-        />
+        <TouchableOpacity onPress={toggleFlashMode}>
+          <FontAwesome
+            name="flash"
+            size={30}
+            color={flashMode === FlashMode.on ? "#FFFF00" : "#000000"}
+            style={styles.flashButton}
+          />
         </TouchableOpacity>
         <View style={styles.bottomButtonsContainer}>
           <TouchableOpacity onPress={() => cameraRef && takePicture()}>
-          <FontAwesome
-            name="circle-thin"
-            size={60}
-            style={styles.takePictureButton}
-            
-          />
+            <FontAwesome
+              name="circle-thin"
+              size={60}
+              style={styles.takePictureButton}
+            />
           </TouchableOpacity>
         </View>
       </Camera>
@@ -111,7 +112,7 @@ const styles = StyleSheet.create({
   },
   bottomButtonsContainer: {
     position: "absolute",
-    bottom: 20, 
+    bottom: 20,
     width: "100%",
     flexDirection: "row",
     justifyContent: "center",
