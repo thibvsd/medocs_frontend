@@ -30,7 +30,7 @@ export default function TreatmentsScreen({ navigation }) {
 
   // console.log("USER photo ", userPhotos);
 
-  console.log('query state', query);
+  console.log("query state", query);
 
   useEffect(() => {
     // AbortController pour arrêter la requête si query est modifié
@@ -55,7 +55,7 @@ export default function TreatmentsScreen({ navigation }) {
       }
     };
     fetchData().then((responseData) => {
-      if(!responseData) return;
+      if (!responseData) return;
       const filteredData = responseData
         .filter((item) =>
           item.name.toLowerCase().includes(queryToFilter.toLowerCase())
@@ -207,7 +207,7 @@ export default function TreatmentsScreen({ navigation }) {
                 if (text.length > 2) {
                   setQuery(text);
                 }
-                if(!text.length) setSuggestions([]);
+                if (!text.length) setSuggestions([]);
               }}
               flatListProps={{
                 keyExtractor: (_, idx) => idx.toString(),
@@ -236,18 +236,18 @@ export default function TreatmentsScreen({ navigation }) {
           <View>
             <Text style={styles.subtitle}>Mes ordonnances</Text>
             <View style={styles.ordonnanceContainer}>
-            <View style={styles.ordonnanceText}>
-              <Text>Ajouter une ordonnance </Text>
-              <TouchableOpacity onPress={onAddPrescriptionPress}>
-                <FontAwesome
-                  name="camera"
-                  size={30}
-                  color="#3FB4B1"
-                  style={styles.filterButtonCamera}
-                />
-              </TouchableOpacity></View>
+              <View style={styles.ordonnanceText}>
+                <Text>Ajouter une ordonnance </Text>
+                <TouchableOpacity onPress={onAddPrescriptionPress}>
+                  <FontAwesome
+                    name="camera"
+                    size={30}
+                    color="#3FB4B1"
+                    style={styles.filterButtonCamera}
+                  />
+                </TouchableOpacity>
+              </View>
               <View style={styles.ordonnancePhotoContainer}>{photos}</View>
-              
             </View>
           </View>
           <Text style={styles.validationText}>{validation}</Text>
@@ -349,7 +349,8 @@ const styles = StyleSheet.create({
     textAlignVertical: "top",
   },
   ordonnanceContainer: {
-alignItems: "center", },
+    alignItems: "center",
+  },
 
   saveButton: {
     marginTop: 20,
@@ -371,14 +372,14 @@ alignItems: "center", },
   },
   ordonnanceText: {
     flexDirection: "row",
-    margin :10,
+    margin: 10,
     alignItems: "center",
   },
   ordonnancePhotoContainer: {
-    flexWrap: 'wrap',
-    flexDirection: 'row',
-    justifyContent: 'center',
-    marginBottom:10,
+    flexWrap: "wrap",
+    flexDirection: "row",
+    justifyContent: "center",
+    marginBottom: 10,
   },
   photo: {
     margin: 10,
@@ -386,8 +387,7 @@ alignItems: "center", },
     height: 150,
   },
   validationText: {
-    color:"green",
+    color: "green",
     textAlign: "center",
-
-  }
+  },
 });
