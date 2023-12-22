@@ -10,7 +10,7 @@ import {
   FlatList,
   ScrollView,
   StyleSheet,
-  Image
+  Image,
 } from "react-native";
 import Autocomplete from "react-native-autocomplete-input";
 import { useDispatch, useSelector } from "react-redux";
@@ -279,7 +279,6 @@ export default function HomeScreen({ navigation }) {
 
   const generateFeed = (articles) => {
     const filterdArticles = articles.map((data, i) => {
-      // console.log(data.illustration);
       const options = { day: "2-digit", month: "2-digit", year: "numeric" };
       const formattedDate = new Date(data.date).toLocaleDateString(
         "fr-FR",
@@ -287,12 +286,6 @@ export default function HomeScreen({ navigation }) {
       );
       return (
         <View key={i} style={styles.articleContainer}>
-          <View style={styles.container}></View>
-          <Image
-            source={{ uri: data.illustration }}
-            style={{ width: 50, height: 50 }}
-            contentFit="contain" // Add this line to adapt the image
-          />
           <View style={styles.articleTextContainer}>
             <Text style={styles.articleTitle}>{data.title}</Text>
             <Text style={styles.articleDate}>{formattedDate}</Text>
@@ -378,20 +371,20 @@ export default function HomeScreen({ navigation }) {
               onChange={handleDropdownSource}
             />
 
-<View style={styles.searchKeyWordContainer}>
-  <TextInput
-    style={styles.keywordInput}
-    placeholder="mot-clé..."
-    onChangeText={(text) => setKeyword(text)}
-    value={keyword}
-  />
-  <TouchableOpacity
-    style={styles.searchButton}
-    onPress={handleSearchKeyword}
-  >
-    <Text style={styles.okText}>OK</Text>
-  </TouchableOpacity>
-</View>
+            <View style={styles.searchKeyWordContainer}>
+              <TextInput
+                style={styles.keywordInput}
+                placeholder="mot-clé..."
+                onChangeText={(text) => setKeyword(text)}
+                value={keyword}
+              />
+              <TouchableOpacity
+                style={styles.searchButton}
+                onPress={handleSearchKeyword}
+              >
+                <Text style={styles.okText}>OK</Text>
+              </TouchableOpacity>
+            </View>
           </View>
           {selectedFilter &&
             filterModals[selectedFilter] &&
@@ -445,11 +438,11 @@ const styles = StyleSheet.create({
     position: "relative",
     zIndex: 1,
   },
-  placeholderStyle:{
-color: "gray",
-textAlign:"center",
+  placeholderStyle: {
+    color: "gray",
+    textAlign: "center",
   },
-  searchKeyWordContainer:{
+  searchKeyWordContainer: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
@@ -459,12 +452,12 @@ textAlign:"center",
     position: "relative",
     zIndex: 1,
   },
-  keywordInput:{
+  keywordInput: {
     height: 40,
-    width:150,
+    width: 150,
     borderColor: "gray",
     backgroundColor: "white",
-    marginLeft:20,
+    marginLeft: 20,
   },
   autocompleteContainer: {
     flex: 1,
@@ -499,15 +492,15 @@ textAlign:"center",
     width: "100%",
   },
   filterButtons: {
-    margin:20,
+    margin: 20,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
     width: "100%",
   },
   okText: {
-    color: 'white',
-    fontWeight: 'bold',
+    color: "white",
+    fontWeight: "bold",
   },
   filterButton: {
     marginRight: 5,
@@ -518,21 +511,18 @@ textAlign:"center",
     paddingHorizontal: 18,
   },
   searchButtonText: {
-    color:"white",
-    fontSize:16,
+    color: "white",
+    fontSize: 16,
   },
-  // articleContainer: {
-  //   marginTop: 20,
-  //   flexDirection: "row",
-  //   // justifyContent: "space-around",
-  //   // alignItems: "center",
-  //   marginVertical: 10,
-  //   marginLeft: 20,
-  //   // width: "1%",
-  //   // border: 1,
-  //   // borderRadius: 10,
-  //   // backgroundColor: "white",
-  // },
+  articleContainer: {
+    marginTop: 20,
+    flexDirection: "row",
+    justifyContent: "space-around",
+    alignItems: "center",
+    marginVertical: 10,
+    marginLeft: 20,
+    width: "90%",
+  },
   scrollView: {
     flexGrow: 1,
     width: "100%",
@@ -542,14 +532,10 @@ textAlign:"center",
     height: 80,
     marginRight: 20,
     marginLeft: 10,
-    borderWidth: 1,
-    backgroundColor: "blue",
-    display: "flex",
   },
   articleTextContainer: {
     flex: 1,
     marginRight: 10,
-    backgroundColor: "yellow",
   },
   articleTitle: {
     fontSize: 16,

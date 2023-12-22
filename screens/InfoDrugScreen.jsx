@@ -190,36 +190,33 @@ return (
       <View style={styles.containerColumn}>
         <View style={[styles.containerRow,{marginTop: 10, marginBottom: 10}]}>
 
-          <View  style={[{ padding: 20 }]}>
+          <View>
             <Text style={data.drug.smr === "majeur ou important" ? [styles.baseText, {backgroundColor: '#199a8e', color: '#fff'}] : [styles.baseText,  {backgroundColor: 'red', color: '#fff'}]}>SMR</Text>
           </View>
 
-        {/*}
-        <Image
+          <Image
           style={styles.indiceSurveillanceIcon}
           contentFit="cover"
           source={data.drug.survey_indic ? require("../assets/indice-surveillance.png") : require("../assets/indice-surveillance.png")}
-        /> */}
- 
-        <FontAwesome size={25} name='eye' color={data.drug.survey_indic ? '#199a8e' : '#000'}/>
+        />
 
         <Image
-          style={styles.indiceSurveillanceIcon}
+          style={styles.indiceSurveillanceIconSpecial}
           contentFit="cover"
-          source={data.drug.pregnancy_alert ? require("../assets/grosesse_base.png") : require("../assets/grosesse_true.png")}
+          source={data.drug.pregnancy_alert ? require("../assets/grosesse.png") : require("../assets/grosesse_true.png")}
         />
         <Image
-          style={styles.indiceSurveillanceIcon}
+          style={styles.indiceSurveillanceIconSpecial2}
           contentFit="cover"
           source={data.drug.breastfeed_alert ? require("../assets/allaitement.png") : require("../assets/allaitement.png")}
         />
-        <Image
-          style={styles.indiceSurveillanceIcon}
+       <Image 
+          style={styles.indiceSurveillanceIconSpecial3}
           contentFit="cover"
           source={data.drug.driving_alert ? require("../assets/vigilance_gris.png") : require("../assets/vigilance_true.png")}
         />
         <Image
-          style={styles.indiceSurveillanceIcon}
+          style={styles.indiceSurveillanceIcon4}
           contentFit="cover"
           source={data.drug.on_prescription ? require("../assets/ordonnance.png") : require("../assets/ordonnance_true.png")}        />
       </View>
@@ -330,9 +327,9 @@ const styles = StyleSheet.create({
   },
   containerRow: {
     flexDirection: 'row',
+    width: '90%',
+    alignItems: 'flex-start',
     justifyContent: 'space-between',
-    width: '95%',
-    verticalAlign: 'flex-start',
   },
   containerColumn: {
     flexDirection: 'column',
@@ -454,219 +451,36 @@ const styles = StyleSheet.create({
     left: 23,
     flexDirection: "row",
     justifyContent: "space-between",
-    paddingHorizontal: 3,
-    paddingVertical: 0,
+    paddingHorizontal: 0,
+    paddingVertical: 5,
     height: 28,
     overflow: "hidden",
     alignItems: "center",
     position: "absolute",
-},
-
-indiceSurveillanceIcon: {
-  height: 24,
-  width: 24,
-},
-
-  /*
-  container: {
-    flexDirection: 'row', // This makes the child elements arrange horizontally
-    justifyContent: 'space-between', // This provides equal space between the buttons
-    padding: 10,
-  },
-  contentTab: {
-    flex: 1,
-    flexDirection: 'row', // This makes the child elements arrange horizontally
-    justifyContent: 'space-between', // This provides equal space between the buttons
-  },
-  articleBox: {
-    backgroundColor: '#fff',
-    marginBottom: 10,
-    padding: 10,
-    borderRadius: 5,
-    borderColor: '#ddd',
-    borderWidth: 1,
-  },
-  scrollViewArticles: {
-    flex: 1,
-    backgroundColor: '#ffffff',
-    marginBottom: 20,
-    padding: 10, 
-    margin: 10,
-    borderRadius: 5
-  },
-
-  articleTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 5,
-  },
-  articleDate: {
-    fontSize: 14,
-    color: '#888',
-    marginBottom: 5,
-  },
-  articleContent: {
-    fontSize: 16,
-  },
-  button: {
-    backgroundColor: '#3498db',
-    padding: 10,
-    borderRadius: 5,
-  },
-  buttonText: {
-    color: '#ffffff',
-    fontSize: 16,
-    textAlign: 'center',
-  },
-  */
-});
-
-
-{/*
-<SafeAreaView style={styles.container} contentContainerStyle={styles.container}>
-  { data && data.drug ?  
     
-    <View style={styles.contentFlexBox}>
-      <Text
-        style={[globalStyles.headline, {width: '100%', alignContent: 'center', justifyContent: 'center'}]}
-      >{data.drug.name}
-        <TouchableOpacity onPress={() => addToFavorites(data._id)}>              
-        { favo ?   
-          <FontAwesome  size={25} 
-            name={isIdInFavo ? 'star' : 'star'}
-            color={isIdInFavo ? '#199a8e' : '#000'}/>
-            :             
-          <FontAwesome  size={25} name='star' color='#000'/>            
-        }
-        </TouchableOpacity>
-      </Text>
-    <View style={[styles.ficheMedicamentChild, styles.fichePosition]} />
-    <View style={[styles.ficheMedicamentItem, styles.fichePosition]} />
-    <View style={[styles.ficheMedicamentInner, styles.fichePosition]} />
-    <View style={[styles.sousMenus, styles.sousMenusFlexBox]}>
-      <View style={[styles.ciPe, styles.itBorder]}>
-        <Text
-          style={[styles.contreIndicationEtPrcautio, styles.lastestNewsTypo]}
-        >
-          Contre-indication et précautions d’emploi
-        </Text>
-        <Image
-          style={styles.buttonmodalIcon}
-          contentFit="cover"
-          source={require("../assets/buttonmodal.png")}
-        />
-      </View>
-      <View style={[styles.it, styles.itBorder]}>
-        <Text
-          style={[styles.contreIndicationEtPrcautio, styles.lastestNewsTypo]}
-        >
-          Indice thérapeuthique
-        </Text>
-        <Image
-          style={styles.buttonmodalIcon}
-          contentFit="cover"
-          source={require("../assets/buttonmodal.png")}
-        />
-      </View>
-      <View style={[styles.it, styles.itBorder]}>
-        <Text
-          style={[styles.contreIndicationEtPrcautio, styles.lastestNewsTypo]}
-        >
-          Posologie
-        </Text>
-        <Image
-          style={styles.buttonmodalIcon}
-          contentFit="cover"
-          source={require("../assets/buttonmodal.png")}
-        />
-      </View>
-      <View style={[styles.it, styles.itBorder]}>
-        <Text
-          style={[styles.contreIndicationEtPrcautio, styles.lastestNewsTypo]}
-        >
-          Effets indésirables
-        </Text>
-        <Image
-          style={styles.buttonmodalIcon}
-          contentFit="cover"
-          source={require("../assets/buttonmodal.png")}
-        />
-      </View>
-      <View style={[styles.it, styles.itBorder]}>
-        <Text
-          style={[styles.contreIndicationEtPrcautio, styles.lastestNewsTypo]}
-        >
-          Mode d’administration
-        </Text>
-        <Image
-          style={styles.buttonmodalIcon}
-          contentFit="cover"
-          source={require("../assets/buttonmodal.png")}
-        />
-      </View>
-    </View>
-    <View style={styles.indiceSurveillanceParent}>
-      <Image
-        style={styles.indiceSurveillanceIcon}
-        contentFit="cover"
-        source={require("../assets/indice-surveillance.png")}
-      />
-      <Image
-        style={styles.indiceSurveillanceIcon}
-        contentFit="cover"
-        source={require("../assets/smr.png")}
-      />
-      <Image
-        style={styles.indiceSurveillanceIcon}
-        contentFit="cover"
-        source={require("../assets/grosesse.png")}
-      />
-      <Image
-        style={styles.allaitementIcon}
-        contentFit="cover"
-        source={require("../assets/allaitement.png")}
-      />
-      <Image
-        style={styles.vigilanceIcon}
-        contentFit="cover"
-        source={require("../assets/vigilance.png")}
-      />
-      <Image
-        style={styles.ordonnanceIcon}
-        contentFit="cover"
-        source={require("../assets/ordonnance.png")}
-      />
-    </View>
-    <Text
-      style={[styles.lastestNews, styles.lastestNewsTypo]}
-    >
-            { listArticles ?
-              <>
-                {listArticles.map((article, index) => (                  
-                  <ScrollView>
-                    <View key={index} style={styles.articleBox}>
-                      <Text style={styles.articleTitle}>{article.title} - {formatFrenchDate(article.date)} 
-                        <TouchableOpacity onPress={() => openUrl(data.url)}>
-                          <FontAwesome name="external-link" size={25} color="#ec6e5b" />
-                        </TouchableOpacity>
-                      </Text>
-                    </View>
-                  </ScrollView>             
-                ))}
-              </>
-              :
-              <Text></Text>
-              }
-    </Text>
-  </View>
-  :
-  <><Text>Data not available</Text>
-  </>
-  }
-
-</SafeAreaView>
-
-
-)
-*/}
-
+},
+indiceSurveillanceIconSpecial3
+: {
+  width: 38,
+  height: 30,
+},
+indiceSurveillanceIconSpecial2
+: {
+  width: 32,
+  height: 34,
+},
+indiceSurveillanceIconSpecial
+: {
+  width: 30,
+  height: 30,
+},
+indiceSurveillanceIcon4
+: {
+  width: 36,
+  height: 36,
+},
+indiceSurveillanceIcon: {
+  height: 30,
+  width: 30,
+  paddingTop: 10,
+}});
