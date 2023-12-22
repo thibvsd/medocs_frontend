@@ -12,6 +12,7 @@ import {
   StyleSheet,
   Image,
 } from "react-native";
+
 import Autocomplete from "react-native-autocomplete-input";
 import { useDispatch, useSelector } from "react-redux";
 import { addLastSearch } from "../reducers/drugs";
@@ -286,6 +287,12 @@ export default function HomeScreen({ navigation }) {
       );
       return (
         <View key={i} style={styles.articleContainer}>
+          <View style={styles.container}></View>
+          <Image
+            source={{ uri: data.illustration }}
+            style={{ width: 50, height: 50 }}
+            contentFit="contain" // Add this line to adapt the image
+          />
           <View style={styles.articleTextContainer}>
             <Text style={styles.articleTitle}>{data.title}</Text>
             <Text style={styles.articleDate}>{formattedDate}</Text>
@@ -507,15 +514,18 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "white",
   },
-  articleContainer: {
-    marginTop: 20,
-    flexDirection: "row",
-    justifyContent: "space-around",
-    alignItems: "center",
-    marginVertical: 10,
-    marginLeft: 20,
-    width: "90%",
-  },
+  // articleContainer: {
+  //   marginTop: 20,
+  //   flexDirection: "row",
+  //   // justifyContent: "space-around",
+  //   // alignItems: "center",
+  //   marginVertical: 10,
+  //   marginLeft: 20,
+  //   // width: "1%",
+  //   // border: 1,
+  //   // borderRadius: 10,
+  //   // backgroundColor: "white",
+  // },
   scrollView: {
     flexGrow: 1,
     width: "100%",
@@ -525,10 +535,14 @@ const styles = StyleSheet.create({
     height: 80,
     marginRight: 20,
     marginLeft: 10,
+    borderWidth: 1,
+    backgroundColor: "blue",
+    display: "flex",
   },
   articleTextContainer: {
     flex: 1,
     marginRight: 10,
+    backgroundColor: "yellow",
   },
   articleTitle: {
     fontSize: 16,
