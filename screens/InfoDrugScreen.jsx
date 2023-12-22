@@ -209,7 +209,7 @@ return (
         <Image
           style={styles.indiceSurveillanceIcon}
           contentFit="cover"
-          source={data.drug.pregnancy_alert ? require("../assets/grosesse.png") : require("../assets/grosesse.png")}
+          source={data.drug.pregnancy_alert ? require("../assets/grosesse_base.png") : require("../assets/grosesse_true.png")}
         />
         <Image
           style={styles.indiceSurveillanceIcon}
@@ -219,12 +219,12 @@ return (
         <Image
           style={styles.indiceSurveillanceIcon}
           contentFit="cover"
-          source={data.drug.driving_alert ? require("../assets/vigilance.png") : require("../assets/vigilance.png")}
+          source={data.drug.driving_alert ? require("../assets/vigilance_gris.png") : require("../assets/vigilance_true.png")}
         />
         <Image
           style={styles.indiceSurveillanceIcon}
           contentFit="cover"
-          source={data.drug.on_prescription ? require("../assets/ordonnance.png") : require("../assets/ordonnance.png")}        />
+          source={data.drug.on_prescription ? require("../assets/ordonnance.png") : require("../assets/ordonnance_true.png")}        />
       </View>
       
       <View style={styles.containerColumn}>
@@ -322,8 +322,8 @@ const styles = StyleSheet.create({
   containerRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    width: '95%',
-    verticalAlign: 'flex-start',
+    width: '90%',
+    
   },
   containerColumn: {
     flexDirection: 'column',
@@ -436,6 +436,8 @@ const styles = StyleSheet.create({
 indiceSurveillanceIcon: {
   height: 24,
   width: 24,
+  overflow: "hidden",
+  resizeMode: "contain",
 },
 
   /*
