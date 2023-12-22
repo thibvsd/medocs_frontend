@@ -26,17 +26,17 @@ import OnboardingScreen from "./screens/OnboardingScreen";
 import InfoDrugScreen from "./screens/InfoDrugScreen";
 import CameraScreen from "./screens/CameraScreen";
 import SplashScreen from "./screens/SplashScreen.js";
+import SplashScreenOB from "./screens/SplashScreenOB.js";
 import Lgn from "./screens/Lgn.js";
 
 // AsyncStorage.clear();
-const reducers = combineReducers({ user, drugs });
-
 // Configure Redux persist
 const persistConfig = {
   key: "medidoc",
   storage: AsyncStorage,
 };
 
+const reducers = combineReducers({ user, drugs });
 // Create Redux store
 const store = configureStore({
   reducer: persistReducer(persistConfig, reducers),
@@ -62,61 +62,56 @@ export default function App() {
     "Montserrat-Bold": require("./assets/fonts/Montserrat-Bold.ttf"),
   });
 
-  /*
+  // useEffect(() => {
+  //   async function checkTokenAndLaunchStatus() {
+  //     try {
+  //       const userToken = await AsyncStorage.getItem("token");
+  //       setToken(userToken);
+
+  //       const hasLaunched = await AsyncStorage.getItem("appLaunched");
+  //       setIsFirstLaunch(hasLaunched === null);
+  //     } catch (error) {
+  //       console.error("Error checking token and launch status:", error);
+  //     }
+  //   }
+
+  //   checkTokenAndLaunchStatus();
+  // }, []);
+
+  // if (isFirstLaunch === null || !fontsLoaded) {
+  //   return null;
+  // }
   useEffect(() => {
-    async function checkTokenAndLaunchStatus() {
+    async function checkToken() {
       try {
         const userToken = await AsyncStorage.getItem("token");
-        setToken(userToken);
-
-        const hasLaunched = await AsyncStorage.getItem("appLaunched");
-        setIsFirstLaunch(hasLaunched === null);
-
+        if (userToken) {
+          setToken(userToken);
+          // dispatch(addAsyncStoragetoken(token));
+        }
       } catch (error) {
-        console.error("Error checking token and launch status:", error);
+        console.error("Erreur lors de la vérification du token:", error);
       }
     }
-
-    checkTokenAndLaunchStatus();
+    checkToken();
+    async function checkIfFirstLaunch() {
+      try {
+        const hasLaunched = await AsyncStorage.getItem("appLaunched");
+        if (hasLaunched === null) {
+          setIsFirstLaunch(true);
+          await AsyncStorage.setItem("appLaunched", "true");
+        } else {
+          setIsFirstLaunch(false);
+        }
+      } catch (error) {
+        console.error("Error checking app launch status:", error);
+      }
+    }
+    checkIfFirstLaunch();
   }, []);
-
   if (isFirstLaunch === null) {
     return null;
-  }*/
-
-// Réduire en 1 seul useEffect
-useEffect(() => {
-  async function checkToken() {
-    try {
-      const userToken = await AsyncStorage.getItem("token");
-      if (userToken) {
-        setToken(userToken);
-        // dispatch(addAsyncStoragetoken(token));
-      }
-    } catch (error) {
-      console.error("Erreur lors de la vérification du token:", error);
-    }
   }
-  checkToken();
-  async function checkIfFirstLaunch() {
-    try {
-      const hasLaunched = await AsyncStorage.getItem("appLaunched");
-      if (hasLaunched === null) {
-        setIsFirstLaunch(true);
-        await AsyncStorage.setItem("appLaunched", "true");
-      } else {
-        setIsFirstLaunch(false);
-      }
-    } catch (error) {
-      console.error("Error checking app launch status:", error);
-    }
-  }
-  checkIfFirstLaunch();
-}, []);
-if (isFirstLaunch === null) {
-  return null;
-}
-
   const TabNavigator = () => {
     return (
       <Tab.Navigator
@@ -300,7 +295,7 @@ if (isFirstLaunch === null) {
         <NavigationContainer>
           {isFirstLaunch ? (
             <Stack.Navigator screenOptions={{ headerShown: false }}>
-              <Stack.Screen name="SplashScreen" component={SplashScreen} />
+              <Stack.Screen name="SplashScreenOB" component={SplashScreenOB} />
               <Stack.Screen name="TabNavigator" component={TabNavigator} />
               <Stack.Screen
                 name="OnboardingScreen"
@@ -310,6 +305,7 @@ if (isFirstLaunch === null) {
             </Stack.Navigator>
           ) : (
             <Stack.Navigator screenOptions={{ headerShown: false }}>
+              <Stack.Screen name="SplashScreen" component={SplashScreen} />
               <Stack.Screen name="TabNavigator" component={TabNavigator} />
               <Stack.Screen
                 name="LoginScreen"

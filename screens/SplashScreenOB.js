@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Animated, Image, StyleSheet, Text } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 
-const SplashScreen = () => {
+const SplashScreenOB = () => {
   const [fadeAnim] = useState(new Animated.Value(1));
   const navigation = useNavigation();
 
@@ -13,7 +13,7 @@ const SplashScreen = () => {
         duration: 1000,
         useNativeDriver: true,
       }).start(() => {
-        navigation.replace("TabNavigator");
+        navigation.replace("OnboardingScreen");
       });
     }, 2000);
 
@@ -23,7 +23,7 @@ const SplashScreen = () => {
   return (
     <Animated.View style={[styles.container, { opacity: fadeAnim }]}>
       <Image style={styles.logo} source={require("../assets/Logo2.png")} />
-      <Text>Yolo</Text>
+      <Text>Chargement</Text>
     </Animated.View>
   );
 };
@@ -40,4 +40,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default SplashScreen;
+export default SplashScreenOB;
