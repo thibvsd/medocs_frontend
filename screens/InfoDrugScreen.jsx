@@ -29,8 +29,10 @@ export default function InfoDrugScreen({ navigation }) {
         
     const token = useSelector((state) => state.user.value.token);
     const currentDrug = useSelector((state) => state.drugs.value.search);
+
     const favo = useSelector((state) => state.drugs.value.favo);
-    const isIdInFavo = favo && favo.includes(currentDrug);
+
+    //const isIdInFavo = favo && favo.includes(currentDrug);
 
     useEffect(() => {
       const fetchData = async () => {
@@ -59,25 +61,31 @@ export default function InfoDrugScreen({ navigation }) {
     }, []);
 
 
-    const addToFavorites = (select) => {
-      console.log("select",select);
-      const fetchQuery = async () => {
-        try {
-          const response = await fetch(
-            `http://${IP_ADDRESS}:3000/drugs/addFavorites/${select}`
-          );
-          const result = await response.json();
+    const addToFavorites = async (select) => {
+      console.log("drug", select);
+      console.log("token", token);
+      try {
+        const response = await fetch(
+          `http://${IP_ADDRESS}:3000/favorites/addFavorites/${token}`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              favo: select,
+            }),
+          })
+        const result = await response.json();
+        console.log("result",result);
+        if (result) {
+
           console.log("res favo",result);
-          setFavo(result); // enregistre les résultats de la recherche
-        } catch (error) {
-          console.error(error);
+          //setFavo(result); 
+
         }
-      };
+      } catch (error) {
+        console.error("Erreur addfavorites :", error);
+      }
     };
 
-    console.log("drug",currentDrug);
-    console.log("isIdInFavo",isIdInFavo);
-    console.log("favo",favo);
 
     const openUrl = (url) => {
       Linking.openURL(url)
@@ -143,15 +151,18 @@ return (
           {'\n'}Famille {data.drug.classification.label}</Text>
       )}
     </Text>
-      { token ? 
-        <TouchableOpacity onPress={addToFavorites(data.drug._id)} activeOpacity={0.8}>
-          <FontAwesome size={25} name="star" color={isIdInFavo ? '#199a8e' : '#000'}/>
-        </TouchableOpacity>
-      :
-        <TouchableOpacity>             
-          <FontAwesome  size={25} name='star' color='#f0f0f0'/> 
-        </TouchableOpacity>      
+
+
+    <TouchableOpacity onPress={() => addToFavorites(data.drug._id)} style={[{ paddingTop: 20, paddingLeft: 2 }]}>
+      { favo ?   
+        <FontAwesome size={25} 
+          name='star'
+          color={isIdInFavo ? '#199a8e' : '#000'}/>
+          :
+        <FontAwesome size={25} name='star' color='#000'/>
       }
+    </TouchableOpacity>
+
     </View>
       <ScrollView contentContainerStyle={[styles.scrollView]}>
         { listArticles && listArticles.length > 0 ?
