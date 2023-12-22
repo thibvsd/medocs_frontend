@@ -2,16 +2,13 @@ import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
-  TextInput,
   TouchableOpacity,
-  TouchableWithoutFeedback,
-  Keyboard,
-  FlatList,
   ScrollView,
   StyleSheet,
   Image,
   SafeAreaView,
-  Modal
+  Modal,
+  Linking
 } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
@@ -29,15 +26,12 @@ export default function InfoDrugScreen({ navigation }) {
 
     const [showUsePrecaution, setShowUsePrecaution] = useState(false);
     const [showIndesirableEff, setShowIndesirableEff] = useState(false);
-    
-    
+        
     const token = useSelector((state) => state.user.value.token);
     const currentDrug = useSelector((state) => state.drugs.value.search);
-    console.log('currentDrug', currentDrug);
     const favo = useSelector((state) => state.drugs.value.favo);
     const isIdInFavo = favo && favo.includes(currentDrug);
-    //const isIdInFavo = vafo && vafo.filter((drug) => drug._id === currentDrug).length > 0;
-//65796586925493df6fa6ec2a
+
     useEffect(() => {
       const fetchData = async () => {
         try {
@@ -51,12 +45,12 @@ export default function InfoDrugScreen({ navigation }) {
               `http://${IP_ADDRESS}:3000/articles/byId/${result.drug._id}`
             );
             const result_articles = await response_articles.json();
-            if(result_articles) setListArticles(result_articles.drugArticles);
+            if(result_articles) setListArticles(result_articles.drugArticles)
+            else setListArticles([]);
           }
           else {
             setData(null);
           }
-          //console.log('result', result);
         } catch (error) {
           console.error(error);
         }
@@ -64,31 +58,32 @@ export default function InfoDrugScreen({ navigation }) {
       fetchData();
     }, []);
 
+
     const addToFavorites = (select) => {
+      console.log("select",select);
       const fetchQuery = async () => {
         try {
           const response = await fetch(
             `http://${IP_ADDRESS}:3000/drugs/addFavorites/${select}`
           );
           const result = await response.json();
+          console.log("res favo",result);
           setFavo(result); // enregistre les résultats de la recherche
         } catch (error) {
           console.error(error);
         }
       };
-      fetchQuery();
-      setQuery("");
-      setSuggestions([]);
-      setShowSearchResults(true);  
     };
+
+    console.log("drug",currentDrug);
+    console.log("isIdInFavo",isIdInFavo);
+    console.log("favo",favo);
 
     const openUrl = (url) => {
       Linking.openURL(url)
         .then((supported) => {
           if (!supported) {
             console.error("Opening URL is not supported");
-          } else {
-            console.log("URL opened:", url);
           }
         })
         .catch((err) => console.error("Error opening URL:", err));
@@ -100,69 +95,67 @@ export default function InfoDrugScreen({ navigation }) {
     return frenchDate;
   };
 
-  const [isModalVisible, setModalVisible] = useState(false);
+  const [isModalEffVisible, setModalEffVisible] = useState(false);
+  const [isModalPosoVisible, setModalPosoVisible] = useState(false);
+  const [isModalIndVisible, setModalIndVisible] = useState(false);
+  const [isModalPrecVisible, setModalPrecVisible] = useState(false);
 
   const openEff = () => {
-    setModalVisible(true);
+    setModalEffVisible(true);
   };
-
   const closeEff = () => {
-    setModalVisible(false);
+    setModalEffVisible(false);
   };
 
+  const openPoso = () => {
+    setModalPosoVisible(true);
+  };
+  const closePoso = () => {
+    setModalPosoVisible(false);
+  };
+
+  const openInd = () => {
+    setModalIndVisible(true);
+  };
+  const closeInd = () => {
+    setModalIndVisible(false);
+  };
+
+  const openPrec = () => {
+    setModalPrecVisible(true);
+  };
+  const closePrec = () => {
+    setModalPrecVisible(false);
+  };
+
+  
 return (
 
   <SafeAreaView style={styles.container}>
     { data && data.drug ? 
       <>
       
-    <View style={styles.containerRow}>
-
-    { token ? 
-        <TouchableOpacity onPress={() => openUrl(data.url)} style={[{ paddingTop: 20, paddingLeft: 2 }]}>             
-        { favo ?   
-          <FontAwesome  size={25} 
-            name={isIdInFavo ? 'plus' : 'plus'}
-            color={isIdInFavo ? '#199a8e' : '#000'}/>
-            :             
-          <FontAwesome  size={25} name='plus' color='#000'/>            
-        }
-        </TouchableOpacity>
-      :
-        <TouchableOpacity style={[{ paddingTop: 20, paddingLeft: 2 }]}>             
-          <FontAwesome  size={25} name='plus' color='#f0f0f0'/> 
-        </TouchableOpacity>      
-      }
-
-      <Text style={[styles.title, { alignContent: 'center',textAlign: 'center', }]}>{data.drug.name.split(',')[0].trim()}{'\n'}
-      <Text style={[{ textAlign: 'center', }]}>{data.drug.name.split(',')[1].trim()}</Text>      
+    <View style={[styles.containerTop]}>
+      <Text style={[styles.title]}>{data.drug.name.split(',')[0].trim()}{'\n'}
+      <Text style={[{ textAlign: 'center',  fontSize: 12 }]}>{data.drug.name.split(',')[1].trim()}</Text>
       {data.drug.classification && (
         <Text style={{ alignContent: 'center',textAlign: 'center', fontStyle: 'italic', fontSize: 12  }}>
           {'\n'}Famille {data.drug.classification.label}</Text>
       )}
-     </Text>
-
+    </Text>
       { token ? 
-        <TouchableOpacity onPress={() => openUrl(data.url)} activeOpacity={0.8} style={[{ paddingTop: 20, paddingLeft: 2 }]}>
-          { favo ?   
-            <FontAwesome size={25} 
-              name={isIdInFavo ? 'star' : 'star'}
-              color={isIdInFavo ? '#199a8e' : '#000'}/>
-              :             
-            <FontAwesome size={25} name='star' color='#000'/>            
-          }
+        <TouchableOpacity onPress={addToFavorites(data.drug._id)} activeOpacity={0.8}>
+          <FontAwesome size={25} name="star" color={isIdInFavo ? '#199a8e' : '#000'}/>
         </TouchableOpacity>
       :
-        <TouchableOpacity style={[{ paddingTop: 20, paddingLeft: 2 }]}>             
+        <TouchableOpacity>             
           <FontAwesome  size={25} name='star' color='#f0f0f0'/> 
         </TouchableOpacity>      
       }
-
-      </View>
-
+    </View>
       <ScrollView contentContainerStyle={[styles.scrollView]}>
-        { listArticles ?
-        <>
+        { listArticles && listArticles.length > 0 ?
+        (<>
             {listArticles.map((article, index) => (                  
               <View key={index} style={styles.articleBox}>
                 <Text>{formatFrenchDate(article.date)} - {article.title} {article.source}
@@ -172,40 +165,44 @@ return (
                 </Text>
               </View>                  
             ))}
-          </>
-          :
-            <View key={index} style={styles.articleBox}>
-              <Text>Vous pouvez retrouver des informations sur les sites suivants :{'\n'}
-              Sources officielles :{'\n'}
-              Ministère de la santé et de la prévention http://sante.gouv.fr/{'\n'}
-              Agence Nationale de Sécurité des médicaments ANSM https://ansm.sante.fr/
-              Sources indépendantes :{'\n'}
-              Site du Collège National de Pharmacologie {'\n'}
-              Haute autorité de santé Autorité publique indépendante à caractère scientifique{'\n'}
-              UFC que choisir{'\n'}
-              Prescrire.org et sa liste des médicaments à écarter{'\n'}
-              https://www.prescrire.org/Fr/CAB420E670595F025E19F60B1D364181/Download.aspx
-                <TouchableOpacity onPress={() => openUrl(data.url)} style={[{ marginTop: 10, paddingLeft: 2 }]}>
-                  <FontAwesome name="external-link" size={20} color="#199a8e" />
-                </TouchableOpacity>
-              </Text>
-            </View>  
+          </>)
+          :(
+            <View>
+              <Text>Aucune informations spécifiques, autres sources d'informations :</Text>
+              <Text style={{ fontWeight: 'bold' }}>Sources officielles :</Text>
+              <TouchableOpacity onPress={() => openUrl('http://sante.gouv.fr/')}>
+              <Text>Ministère de la santé et de la prévention</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => openUrl('https://ansm.sante.fr/')}>
+              <Text>Agence Nationale de Sécurité des médicaments ANSM</Text>
+              </TouchableOpacity>
+              <Text style={{ fontWeight: 'bold' }}>Sources indépendantes :</Text>
+              <Text>Site du Collège National de Pharmacologie{'\n'}
+              Haute autorité de santé Autorité publique</Text>
+              <TouchableOpacity onPress={() => openUrl('https://www.quechoisir.org/')}>
+              <Text>UFC que choisir</Text></TouchableOpacity>
+              <TouchableOpacity onPress={() => openUrl('https://www.prescrire.org')}>
+              <Text>Prescrire.org</Text></TouchableOpacity>
+            </View>  )
           }
       </ScrollView>
 
       <View style={styles.containerColumn}>
         <View style={[styles.containerRow,{marginTop: 10, marginBottom: 10}]}>
 
-        <Image
-          style={styles.indiceSurveillanceIcon}
-          contentFit="cover"
-          source={data.drug.smr ? require("../assets/smr.png") : require("../assets/smr.png")}
-        />
+          <View  style={[{ padding: 20 }]}>
+            <Text style={data.drug.smr === "majeur ou important" ? [styles.baseText, {backgroundColor: '#199a8e', color: '#fff'}] : [styles.baseText,  {backgroundColor: 'red', color: '#fff'}]}>SMR</Text>
+          </View>
+
+        {/*}
         <Image
           style={styles.indiceSurveillanceIcon}
           contentFit="cover"
           source={data.drug.survey_indic ? require("../assets/indice-surveillance.png") : require("../assets/indice-surveillance.png")}
-        />
+        /> */}
+ 
+        <FontAwesome size={25} name='eye' color={data.drug.survey_indic ? '#199a8e' : '#000'}/>
+
         <Image
           style={styles.indiceSurveillanceIcon}
           contentFit="cover"
@@ -228,12 +225,12 @@ return (
       </View>
       
       <View style={styles.containerColumn}>
-        {/*}
-        <TouchableOpacity style={[styles.button ]}>
+        <TouchableOpacity style={[styles.button ]} onPress={openInd}>
           <Text style= {[styles.buttonText ]}>Indications thérapeutiques
           </Text>
-        </TouchableOpacity>*/}
-        <TouchableOpacity style={[styles.button ]}>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={[styles.button ]} onPress={openPoso}>
           <Text style= {[styles.buttonText ]}>Posolgie
           </Text>
         </TouchableOpacity>
@@ -243,64 +240,60 @@ return (
             Effets indésirables
           </Text>
         </TouchableOpacity>
-        <TouchableOpacity style={[styles.button ]}>
+        <TouchableOpacity style={[styles.button ]} onPress={openPrec}>
           <Text style= {[styles.buttonText ]}>
             Contre indications précautions d'emploi
           </Text>
         </TouchableOpacity>
-
-        <TouchableOpacity style={[styles.button ]}>
-          <Text style= {[styles.buttonText ]}>
-          Liste noire des médicaments - pdf
-          </Text>
+        
+        <TouchableOpacity style={[styles.button, {backgroundColor: 'orange', marginBottom: 30} ]} onPress={() => openUrl(' https://www.prescrire.org/Fr/CAB420E670595F025E19F60B1D364181/Download.aspx')}>
+          <Text style= {[styles.buttonText ]}>Liste des médicaments à écarter (prescrire.org)</Text>
         </TouchableOpacity>
 
       </View>
     </View>
 
-    <ScrollView contentContainerStyle={[styles.scrollView, { marginTop: 10 }]}>
-      <View>
-        <Text style={[styles.text, { textAlign: 'justify', lineHeight: 17 }]}>{data.drug.therap_indic}</Text>
+    <Modal visible={isModalIndVisible} animationType="slide" transparent={true} onRequestClose={closeInd} style={styles.modal} >         
+       <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <TouchableOpacity onPress={closeInd}>
+              <Text style={{ fontWeight: 'bold', color: '#222', paddingBottom: 15 }}>fermer X</Text>
+            </TouchableOpacity>
+            <Text style={{ textAlign: 'justify' }}>{data.drug.therap_indic}</Text>
+          </View>
       </View>
-    </ScrollView>
-      
+    </Modal>
+    <Modal visible={isModalEffVisible} animationType="slide" transparent={true} onRequestClose={closeEff}  style={styles.modal} >        
+       <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <TouchableOpacity onPress={closeEff}>
+              <Text style={{ fontWeight: 'bold', color: '#222', paddingBottom: 15 }}>fermer X</Text>
+            </TouchableOpacity>
+            <Text style={{ textAlign: 'justify' }}>{data.drug.indesirable_eff}</Text>
+          </View>
+      </View>
+    </Modal>
+    <Modal visible={isModalPrecVisible} animationType="slide" transparent={true} onRequestClose={closePrec}  style={styles.modal} >        
+       <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <TouchableOpacity onPress={closePrec}>
+              <Text style={{ fontWeight: 'bold', color: '#222', paddingBottom: 15 }}>fermer X</Text>
+            </TouchableOpacity>
+            <Text style={{ textAlign: 'justify' }}>{data.drug.use_precaution}</Text>
+          </View>
+      </View>
+    </Modal>
 
-    <Modal
-        visible={isModalVisible}
-        animationType="slide"
-        transparent={false}
-        onRequestClose={closeEff}
-      >
-        {/* Your modal content goes here */}
-        
-        <ScrollView contentContainerStyle={[styles.scrollView]}>
-            <View style={styles.modalContainer}>
-              <Text>{data.drug.indesirable_eff}</Text>
-              <TouchableOpacity onPress={closeEff}>
-                <Text>fermer</Text>
-              </TouchableOpacity>
-            </View>
-        </ScrollView>
-      </Modal>
-
-      
-      {/*}
-      <ScrollView contentContainerStyle={[styles.scrollView]}>
-        <View style={styles.box}>
-          <Text>{data.drug.indesirable_eff}</Text>
-        </View>
-      </ScrollView>
-      <ScrollView contentContainerStyle={[styles.scrollView]}>
-        <View style={styles.box}>
-          <Text>{data.drug.use_precaution}</Text>
-        </View>
-      </ScrollView>
-      <ScrollView contentContainerStyle={[styles.scrollView]}>
-        <View style={styles.box}>
-          <Text>{data.drug.dosage}</Text>
-        </View>
-        </ScrollView>*/}
-
+    <Modal visible={isModalPosoVisible} animationType="slide" transparent={true} onRequestClose={closePoso}  style={styles.modal} >        
+     <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <TouchableOpacity onPress={closePoso}>
+              <Text style={{ fontWeight: 'bold', color: '#222', paddingBottom: 15 }}>fermer X</Text>
+            </TouchableOpacity>
+            <Text style={{ textAlign: 'justify' }}>{data.drug.dosage}</Text>
+          </View>
+      </View>
+    </Modal>
 
       </>
         :
@@ -315,40 +308,60 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#f2f2f2',
     alignItems: 'center',
-    verticalAlign: 'flex-start',
     alignContent: 'center',
-    width: '100%',
+    justifyContent: 'center',
   },
-  containerRow: {
+  containerTop: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    width: '90%',
-    
-  },
-  containerColumn: {
-    flexDirection: 'column',
     alignContent: 'center',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    width: '95%',
-    verticalAlign: 'flex-start',
-  },
-  containerInfosDrugs: {
-    alignContent: 'center',
-    alignItems: 'center',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
     width: '90%',
+    justifyContent: 'center',
+    alignItems: 'center'
   },
   title: {
     fontSize: 16,
     fontWeight: '600',
     marginTop: 10,
     marginBottom: 30,
+    paddingLeft: 10,
+    paddingRight: 10,
+    textAlign: 'center',
+    width: '85%',
+  },
+  containerRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '95%',
+    verticalAlign: 'flex-start',
+  },
+  containerColumn: {
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    width: '95%',
+    verticalAlign: 'flex-start',
+  },
+  containerInfosDrugs: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    width: '90%',
+    paddingBottom: 20,
+    marginTop: 0,
+    paddingTop: 0,
+    marginBottom: 0
   },
   text: {
     flex: 1,
     marginLeft: 10, 
+  },
+  baseText: {
+    borderRadius: 5,
+    padding: 5,
+    textAlign: 'center',
+    color: '#000',
+    width: '25',
+    height: '25',
   },
   scrollView: {
     backgroundColor: '#ffffff',
@@ -357,12 +370,28 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     width: '90%',
   },
+
   modalContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0)',
-    zIndex: 100,
+    marginTop: 22,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalContent: {
+    margin: 20,
+    backgroundColor: 'white',
+    borderRadius: 20,
+    padding: 35,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
   },
   box: {
     margin: 10,
@@ -436,8 +465,6 @@ const styles = StyleSheet.create({
 indiceSurveillanceIcon: {
   height: 24,
   width: 24,
-  overflow: "hidden",
-  resizeMode: "contain",
 },
 
   /*

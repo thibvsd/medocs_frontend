@@ -20,7 +20,11 @@ export const userSlice = createSlice({
       state.value.username = null;
     },
     addPhoto: (state, action) => {
+<<<<<<< HEAD
       console.log("reducer payload", action.payload);
+=======
+console.log('reducer payload', action.payload);
+>>>>>>> d54a7df0329345cce6215f4e754911db394ea475
       state.value.photos.push(action.payload);
     },
     removePhoto: (state, action) => {
