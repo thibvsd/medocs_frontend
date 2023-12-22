@@ -101,6 +101,30 @@ export default function InfoDrugScreen({ navigation }) {
       }
     };
 
+    const addDrugPress = async (drug) => {
+      console.log("addDrugPress", currentDrug);
+      if (currentDrug) {
+        console.log("currentDrug", currentDrug);
+        try {
+          const response = await fetch(
+            `http://${IP_ADDRESS}:3000/treatments/addDrugTreatment/${token}`,
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ _id: currentDrug }),
+            }
+          );
+          const result = await response.json();
+          if (result.result) {
+            Alert.alert("Sauvegardé avec succès dans votre traitement.");
+          }
+        } catch (error) {
+          // Gérer les erreurs réseau
+          console.error("Erreur réseau :", error);
+        }
+      }
+    };
+
     const openUrl = (url) => {
       Linking.openURL(url)
         .then((supported) => {
@@ -248,7 +272,15 @@ return (
           source={data.drug.on_prescription ? require("../assets/ordonnance.png") : require("../assets/ordonnance_true.png")}        />
       </View>
       
+
       <View style={styles.containerColumn}>
+
+      <TouchableOpacity  style={[styles.button, {backgroundColor: '#199a8e', color: '#fff'} ]}  onPress={() => addDrugPress(data.drug._id)}>
+        <Text style= {[styles.buttonText, {color: '#fff'}  ]}>Ajouter à mon traitement
+        </Text>
+      </TouchableOpacity>
+
+
         <TouchableOpacity style={[styles.button ]} onPress={openInd}>
           <Text style= {[styles.buttonText ]}>Indications thérapeutiques
           </Text>
