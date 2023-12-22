@@ -60,13 +60,13 @@ const navigation = useNavigation();
       NextButtonComponent={Next}
       SkipButtonComponent={Skip}
       DotComponent={Dots}
-      bottomBarHighlight = {false}
+      bottomBarHighlight = {true}
       controlStatusBar={false}     
       onDone={() => navigation.navigate("Lgn")}
       onSkip={() => navigation.navigate("Lgn")}
       pages={[
         {
-          backgroundColor: "#fdeb93",
+          backgroundColor: "#9dd0f2",
           image: <Image style= {styles.picto} source={require("../assets/biotech.png")} />,
           title: " Avoir accès aux dernières actualités sur les médicaments",
           subtitle: "",
@@ -78,7 +78,7 @@ const navigation = useNavigation();
           subtitle: "",
         },
         {
-          backgroundColor: "#e9bcbe",
+          backgroundColor: "#acb5e5",
           image: <Image style= {styles.picto} source={require("../assets/insights.png")} />,
           title: "Suivre ses traitements en cours",
           subtitle: "",

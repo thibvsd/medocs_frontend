@@ -135,63 +135,65 @@ export default function SearchScreen({ route, navigation }) {
   const onSuggestionPress = (suggestion) => {
     // Cherche le name et extrait son _id :
     const selectedDrug = data.find((item) => item.name === suggestion)._id;
-    if(token){
-    // enregistre la recherche dans la DB
-    fetch(`http://${IP_ADDRESS}:3000/searches/addLastSearch/${token}`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        _id: selectedDrug,
-      }),
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        if (data.result) {
-          dispatch(addLastSearch(selectedDrug)); // Dispatch l'id pour pouvoir le récupérer sur la page infoDrugScreen
-          navigation.navigate("InfoDrugScreen");
-          setQuery("");
-          setSuggestions([]);
-        }
-      });}
-      else {dispatch(addLastSearch(selectedDrug)); // Dispatch l'id pour pouvoir le récupérer sur la page infoDrugScreen
+    if (token) {
+      // enregistre la recherche dans la DB
+      fetch(`http://${IP_ADDRESS}:3000/searches/addLastSearch/${token}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          _id: selectedDrug,
+        }),
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.result) {
+            dispatch(addLastSearch(selectedDrug)); // Dispatch l'id pour pouvoir le récupérer sur la page infoDrugScreen
+            navigation.navigate("InfoDrugScreen");
+            setQuery("");
+            setSuggestions([]);
+          }
+        });
+    } else {
+      dispatch(addLastSearch(selectedDrug)); // Dispatch l'id pour pouvoir le récupérer sur la page infoDrugScreen
       navigation.navigate("InfoDrugScreen");
       setQuery("");
-      setSuggestions([]);}
+      setSuggestions([]);
+    }
   };
 
   // Quand click sur un résultat de recherche, redirige vers l'info du médicament
   const onSearchResultClick = (suggestion) => {
-    if(token){
-    fetch(`http://${IP_ADDRESS}:3000/searches/addLastSearch/${token}`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        _id: suggestion._id,
-      }),
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        if (data.result) {
-          dispatch(addLastSearch(data._id));
-          navigation.navigate("InfoDrugScreen");
-          setQuery("");
-          setQueryResults([]);
-          setShowSearchResults(false);
-          setSuggestions([]);
-        }
-      });}
-      else{
-        dispatch(addLastSearch(suggestion._id));
-        navigation.navigate("InfoDrugScreen");
-        setQuery("");
-        setQueryResults([]);
-        setShowSearchResults(false);
-        setSuggestions([]);
-      }
+    if (token) {
+      fetch(`http://${IP_ADDRESS}:3000/searches/addLastSearch/${token}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          _id: suggestion._id,
+        }),
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.result) {
+            dispatch(addLastSearch(data._id));
+            navigation.navigate("InfoDrugScreen");
+            setQuery("");
+            setQueryResults([]);
+            setShowSearchResults(false);
+            setSuggestions([]);
+          }
+        });
+    } else {
+      dispatch(addLastSearch(suggestion._id));
+      navigation.navigate("InfoDrugScreen");
+      setQuery("");
+      setQueryResults([]);
+      setShowSearchResults(false);
+      setSuggestions([]);
+    }
   };
 
   // Quand click sur une des dernières recherches, redirige vers la page info du médicament

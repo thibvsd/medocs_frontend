@@ -1,4 +1,4 @@
-import React, { useState, useEffect  } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -6,7 +6,7 @@ import {
   TextInput,
   Alert,
   StyleSheet,
-  Image
+  Image,
 } from "react-native";
 import { useDispatch } from "react-redux";
 import { login } from "../reducers/user";
@@ -32,17 +32,16 @@ export default function LoginScreen({ route, navigation }) {
   const [signInPassword, setSignInPassword] = useState("");
   const [isChecked, setChecked] = useState(false);
 
-
   const toggleForm = () => {
     setIsSignIn(!isSignIn);
   };
-    
+
   useEffect(() => {
     if (route.params && route.params.IsSignup) {
-    setIsSignIn(!isSignIn);
+      setIsSignIn(!isSignIn);
     }
-  }, [route.params]); 
-  
+  }, [route.params]);
+
   const handleRegister = () => {
     if (signUpPassword !== confirmPassword) {
       Alert.alert("Attention", "Les mots de passe ne correspondent pas.");
@@ -124,7 +123,6 @@ export default function LoginScreen({ route, navigation }) {
       });
   };
 
-
   const SignUp = (
     <>
       <Text style={styles.title}>Medidoc</Text>
@@ -179,7 +177,7 @@ export default function LoginScreen({ route, navigation }) {
         </TouchableOpacity>
       </View> */}
       <TouchableOpacity style={styles.link} onPress={toggleForm}>
-        <Text>Vous avez déjà un compte ?{'\n'}Connectez-vous ici !</Text>
+        <Text>Vous avez déjà un compte ?{"\n"}Connectez-vous ici !</Text>
       </TouchableOpacity>
       <TouchableOpacity style={styles.button} onPress={handleRegister}>
         <Text style={styles.buttonText}>S'inscrire</Text>
@@ -204,7 +202,9 @@ export default function LoginScreen({ route, navigation }) {
         onChangeText={(text) => setSignInPassword(text)}
       />
       <TouchableOpacity style={styles.link} onPress={toggleForm}>
-        <Text style={{ textAlign: 'center'}}>Vous n'avez pas de compte ?{'\n'}Inscrivez-vous ici !</Text>
+        <Text style={{ textAlign: "center" }}>
+          Vous n'avez pas de compte ?{"\n"}Inscrivez-vous ici !
+        </Text>
       </TouchableOpacity>
       <TouchableOpacity style={styles.button} onPress={handleConnection}>
         <Text style={styles.buttonText}>Se connecter</Text>
@@ -214,8 +214,12 @@ export default function LoginScreen({ route, navigation }) {
 
   return (
     <View style={styles.container}>
-      <Image style={styles.logo} source={require('../assets/logo.png')} resizeMode="contain" />
+      <Image
+        style={styles.logo}
+        source={require("../assets/Logo2.png")}
+        resizeMode="contain"
+      />
       {isSignIn ? SignIn : SignUp}
     </View>
-  )
+  );
 }

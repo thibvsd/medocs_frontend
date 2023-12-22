@@ -29,7 +29,6 @@ import SplashScreen from "./screens/SplashScreen.js";
 import SplashScreenOB from "./screens/SplashScreenOB.js";
 import Lgn from "./screens/Lgn.js";
 
-// AsyncStorage.clear();
 // Configure Redux persist
 const persistConfig = {
   key: "medidoc",

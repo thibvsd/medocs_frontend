@@ -201,32 +201,35 @@ return (
       <View style={styles.containerColumn}>
         <View style={[styles.containerRow,{marginTop: 10, marginBottom: 10}]}>
 
-          <View  style={[{ padding: 20 }]}>
+          <View>
             <Text style={data.drug.smr === "majeur ou important" ? [styles.baseText, {backgroundColor: '#199a8e', color: '#fff'}] : [styles.baseText,  {backgroundColor: 'red', color: '#fff'}]}>SMR</Text>
           </View>
 
-        {/*}
-        <Image
+          <Image
           style={styles.indiceSurveillanceIcon}
           contentFit="cover"
           source={data.drug.survey_indic ? require("../assets/indice-surveillance.png") : require("../assets/indice-surveillance.png")}
-        /> */}
- 
-        <FontAwesome size={25} name='eye' color={data.drug.survey_indic ? '#199a8e' : '#000'}/>
+        />
 
         <Image
-          style={styles.indiceSurveillanceIcon}
+          style={styles.indiceSurveillanceIconSpecial}
           contentFit="cover"
-          source={data.drug.pregnancy_alert ? require("../assets/grosesse.png") : require("../assets/grosesse.png")}
+          source={data.drug.pregnancy_alert ? require("../assets/grosesse.png") : require("../assets/grosesse_true.png")}
         />
         <Image
-          style={styles.indiceSurveillanceIcon}
+          style={styles.indiceSurveillanceIconSpecial2}
           contentFit="cover"
           source={data.drug.breastfeed_alert ? require("../assets/allaitement.png") : require("../assets/allaitement.png")}
         />
-        <FontAwesome size={25} name='car' color={data.drug.driving_alert ? '#199a8e' : '#000'}/>
-  
-        <FontAwesome size={25} name='edit' color={data.drug.on_prescription ? '#199a8e' : '#000'}/>
+       <Image 
+          style={styles.indiceSurveillanceIconSpecial3}
+          contentFit="cover"
+          source={data.drug.driving_alert ? require("../assets/vigilance_gris.png") : require("../assets/vigilance_true.png")}
+        />
+        <Image
+          style={styles.indiceSurveillanceIcon4}
+          contentFit="cover"
+          source={data.drug.on_prescription ? require("../assets/ordonnance.png") : require("../assets/ordonnance_true.png")}        />
       </View>
       
       <View style={styles.containerColumn}>
@@ -335,15 +338,9 @@ const styles = StyleSheet.create({
   },
   containerRow: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     width: '90%',
-    verticalAlign: 'flex-start',
-
-
+    alignItems: 'flex-start',
     justifyContent: 'space-between',
-    alignItems: 'center'
-
-
   },
   containerColumn: {
     flexDirection: 'column',
@@ -465,15 +462,36 @@ const styles = StyleSheet.create({
     left: 23,
     flexDirection: "row",
     justifyContent: "space-between",
-    paddingHorizontal: 3,
-    paddingVertical: 0,
+    paddingHorizontal: 0,
+    paddingVertical: 5,
     height: 28,
     overflow: "hidden",
     alignItems: "center",
     position: "absolute",
+    
 },
-
+indiceSurveillanceIconSpecial3
+: {
+  width: 38,
+  height: 30,
+},
+indiceSurveillanceIconSpecial2
+: {
+  width: 32,
+  height: 34,
+},
+indiceSurveillanceIconSpecial
+: {
+  width: 30,
+  height: 30,
+},
+indiceSurveillanceIcon4
+: {
+  width: 36,
+  height: 36,
+},
 indiceSurveillanceIcon: {
-  height: 24,
-  width: 24,
+  height: 30,
+  width: 30,
+  paddingTop: 10,
 }});
