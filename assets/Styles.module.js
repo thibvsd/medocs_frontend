@@ -1,4 +1,4 @@
-import { StyleSheet } from 'react-native';
+import { StyleSheet } from "react-native";
 import { Border, FontFamily, FontSize, Color } from "./GlobalStyles";
 
 const styles = StyleSheet.create({
@@ -12,79 +12,89 @@ const styles = StyleSheet.create({
   contentContainer: {
     flex: 1,
     fontFamily: FontFamily.interRegular,
-    paddingBottom:20
+    paddingBottom: 20,
   },
   scrollView: {
     flex: 1,
-    backgroundColor: '#ffffff',
+    backgroundColor: "#ffffff",
     marginBottom: 10,
-    padding: 10, 
+    padding: 10,
     margin: 10,
-    borderRadius: 5
+    borderRadius: 5,
   },
   box: {
-    width: '80%',
+    width: "80%",
     padding: 20,
     margin: 10,
-    backgroundColor: 'lightblue',
-    alignItems: 'center',
+    backgroundColor: "lightblue",
+    alignItems: "center",
   },
   containerInfosDrugs: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
   },
   button: {
-    backgroundColor: "#199a8e",
+    backgroundColor: "#199b8e",
     padding: 10,
-    borderRadius: 5,
+    borderRadius: 15,
     width: "100%",
     alignItems: "center",
+    paddingTop: 85,
   },
   buttonText: {
     color: "white",
     fontSize: 16,
+    fontWeight: "bold",
+    textAlign: "center",
+    fontFamily: FontFamily.interRegular,
+    padding: 5,
+    // width: "100%",
+    // position: "absolute",
+    // // top: "10%",
   },
   link: {
-    marginBottom: 20,
+    // marginBottom: 20,
+    marginTop: 20,
   },
   logo: {
-    width: 120
+    width: 120,
+    height: 120,
   },
   title: {
     fontSize: 28,
-    fontWeight: '600',
-    color: '#199a8e',
+    fontWeight: "600",
+    color: "#199a8e",
   },
   logoContainer: {
-    alignItems: 'center',
-    justifyContent: 'flex-start',
-    paddingTop: 0, 
+    alignItems: "center",
+    justifyContent: "flex-start",
+    paddingTop: 0,
     flex: 1,
   },
   input: {
-    width: '80%',
+    width: "80%",
     marginTop: 5,
-    borderColor: '#cccccc',
+    borderColor: "#cccccc",
     borderWidth: 1,
     borderRadius: 10,
     padding: 10,
     fontSize: 15,
-    backgroundColor:'#f0f0f0',
+    backgroundColor: "#f0f0f0",
   },
   button: {
-    alignItems: 'center',
+    alignItems: "center",
     padding: 10,
     paddingTop: 8,
-    width: '80%',
+    width: "80%",
     marginTop: 30,
-    backgroundColor: '#199a8e',
+    backgroundColor: "#199a8e",
     borderRadius: 10,
     marginBottom: 80,
   },
   textButton: {
-    color: '#ffffff',
+    color: "#ffffff",
     height: 30,
-    fontWeight: '600',
+    fontWeight: "600",
     fontSize: 16,
   },
   contentFlexBox: {
@@ -208,7 +218,6 @@ const styles = StyleSheet.create({
     overflow: "hidden",
     width: "100%",
     alignItems: "center",
-  }
-
+  },
 });
-export default styles;  
+export default styles;
