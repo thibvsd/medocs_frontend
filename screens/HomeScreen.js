@@ -10,8 +10,9 @@ import {
   FlatList,
   ScrollView,
   StyleSheet,
-  Image,
+  Image
 } from "react-native";
+// import {Image} from "react-native-elements";
 import Autocomplete from "react-native-autocomplete-input";
 import { useDispatch, useSelector } from "react-redux";
 import { addLastSearch } from "../reducers/drugs";
@@ -279,6 +280,7 @@ export default function HomeScreen({ navigation }) {
 
   const generateFeed = (articles) => {
     const filterdArticles = articles.map((data, i) => {
+      // console.log(data.illustration);
       const options = { day: "2-digit", month: "2-digit", year: "numeric" };
       const formattedDate = new Date(data.date).toLocaleDateString(
         "fr-FR",
