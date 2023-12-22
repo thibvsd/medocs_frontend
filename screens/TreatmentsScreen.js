@@ -25,7 +25,6 @@ export default function TreatmentsScreen({ navigation }) {
   const [med_reason, setMed_reason] = useState("");
   const [drugAdd, setDrugAdd] = useState([]);
   const [validation, setValidation] = useState("");
-  const [validation, setValidation] = useState("");
 
   const userPhotos = useSelector((state) => state.user.value.photos);
 
@@ -78,7 +77,6 @@ export default function TreatmentsScreen({ navigation }) {
         doseInput,
       }),
     });
-    setValidation("Données enregistrées avec succès !");
     setValidation("Données enregistrées avec succès !");
   };
 
@@ -239,25 +237,19 @@ export default function TreatmentsScreen({ navigation }) {
             <Text style={styles.subtitle}>Mes ordonnances</Text>
             <View style={styles.ordonnanceContainer}>
             <View style={styles.ordonnanceText}>
-            <View style={styles.ordonnanceText}>
               <Text>Ajouter une ordonnance </Text>
               <TouchableOpacity onPress={onAddPrescriptionPress}>
                 <FontAwesome
                   name="camera"
                   size={30}
-                  size={30}
                   color="#3FB4B1"
-                  style={styles.filterButtonCamera}
                   style={styles.filterButtonCamera}
                 />
               </TouchableOpacity></View>
-              </TouchableOpacity></View>
               <View style={styles.ordonnancePhotoContainer}>{photos}</View>
-              
               
             </View>
           </View>
-          <Text style={styles.validationText}>{validation}</Text>
           <Text style={styles.validationText}>{validation}</Text>
           <TouchableOpacity onPress={onSave} style={styles.saveButton}>
             <Text style={styles.saveButtonText}>Save</Text>
@@ -294,8 +286,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
   },
-  filterButtonCamera: {
-    marginLeft: 10,
   filterButtonCamera: {
     marginLeft: 10,
     marginRight: 10,
@@ -384,16 +374,10 @@ alignItems: "center", },
     margin :10,
     alignItems: "center",
   },
-  ordonnanceText: {
-    flexDirection: "row",
-    margin :10,
-    alignItems: "center",
-  },
   ordonnancePhotoContainer: {
     flexWrap: 'wrap',
     flexDirection: 'row',
     justifyContent: 'center',
-    marginBottom:10,
     marginBottom:10,
   },
   photo: {
@@ -401,11 +385,6 @@ alignItems: "center", },
     width: 150,
     height: 150,
   },
-  validationText: {
-    color:"green",
-    textAlign: "center",
-
-  }
   validationText: {
     color:"green",
     textAlign: "center",

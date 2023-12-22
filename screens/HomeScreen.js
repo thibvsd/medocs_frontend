@@ -344,7 +344,7 @@ export default function HomeScreen({ navigation }) {
 
         <View style={styles.filterButtonContainer}>
           <View style={styles.filterButtons}>
-            <TouchableOpacity
+            {/* <TouchableOpacity
               style={styles.filterButtonLeft}
               onPress={() => openFilterModal("boutonFiltre")}
             >
@@ -353,7 +353,7 @@ export default function HomeScreen({ navigation }) {
                 source={require("../assets/FilterNice.png")}
               />
               <Text style={styles.filterButtonTextLeft}>Filtres</Text>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
             <Dropdown
               style={styles.dropdown}
               placeholderStyle={styles.placeholderStyle}
@@ -371,20 +371,20 @@ export default function HomeScreen({ navigation }) {
               onChange={handleDropdownSource}
             />
 
-            <View style={styles.searchContainer}>
-              <TextInput
-                style={styles.input}
-                placeholder="Rechercher..."
-                onChangeText={(text) => setKeyword(text)}
-                value={keyword}
-              />
-              <TouchableOpacity
-                style={styles.searchButton}
-                onPress={handleSearchKeyword}
-              >
-                {/* Insérez ici votre icône de recherche ou un composant Text "Search" */}
-              </TouchableOpacity>
-            </View>
+<View style={styles.searchKeyWordContainer}>
+  <TextInput
+    style={styles.keywordInput}
+    placeholder="mot-clé..."
+    onChangeText={(text) => setKeyword(text)}
+    value={keyword}
+  />
+  <TouchableOpacity
+    style={styles.searchButton}
+    onPress={handleSearchKeyword}
+  >
+    <Text style={styles.okText}>OK</Text>
+  </TouchableOpacity>
+</View>
           </View>
           {selectedFilter &&
             filterModals[selectedFilter] &&
@@ -403,7 +403,7 @@ export default function HomeScreen({ navigation }) {
 
 const styles = StyleSheet.create({
   dropdown: {
-    // margin: 16,
+    marginLeft: 16,
     height: 50,
     width: 100,
     borderBottomColor: "gray",
@@ -435,9 +435,29 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     marginTop: 10,
     paddingHorizontal: 16,
+    position: "relative",
+    zIndex: 1,
+  },
+  placeholderStyle:{
+color: "gray",
+textAlign:"center",
+  },
+  searchKeyWordContainer:{
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginTop: 10,
+    paddingHorizontal: 16,
     alignItems: "flex-end",
     position: "relative",
     zIndex: 1,
+  },
+  keywordInput:{
+    height: 40,
+    width:150,
+    borderColor: "gray",
+    backgroundColor: "white",
+    marginLeft:20,
   },
   autocompleteContainer: {
     flex: 1,
@@ -472,28 +492,15 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   filterButtons: {
+    margin:20,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
     width: "100%",
   },
-  filterButtonLeft: {
-    marginLeft: 10,
-    marginRight: 10,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    width: "30%",
-    padding: 5,
-    borderWidth: 1,
-    borderRadius: 10,
-    backgroundColor: "#E0E0E0",
-  },
-  filterButtonTextLeft: {
-    marginLeft: 10,
-    marginRight: 10,
-    flexDirection: "row",
-    alignItems: "center",
+  okText: {
+    color: 'white',
+    fontWeight: 'bold',
   },
   filterButton: {
     marginRight: 5,
@@ -503,9 +510,9 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
     paddingHorizontal: 18,
   },
-  filterButtonText: {
-    fontSize: 16,
-    color: "white",
+  searchButtonText: {
+    color:"white",
+    fontSize:16,
   },
   articleContainer: {
     marginTop: 20,
@@ -568,25 +575,22 @@ const styles = StyleSheet.create({
     color: "white",
   },
   searchButton: {
-    height: 30,
-    width: 30,
+    height: 40,
+    width: 40,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: "#3FB4B1",
     borderRadius: 5,
-    marginHorizontal: 10,
   },
   searchButton1: {
-    height: 35,
-    width: 35,
+    height: 42,
+    width: 42,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: "#3FB4B1",
     borderRadius: 5,
-    marginHorizontal: 10,
-    top: -4,
   },
   filterdefault: {
     width: 32,
