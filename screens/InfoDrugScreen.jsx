@@ -2,16 +2,13 @@ import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
-  TextInput,
   TouchableOpacity,
-  TouchableWithoutFeedback,
-  Keyboard,
-  FlatList,
   ScrollView,
   StyleSheet,
   Image,
   SafeAreaView,
-  Modal
+  Modal,
+  Linking
 } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
@@ -63,30 +60,30 @@ export default function InfoDrugScreen({ navigation }) {
 
 
     const addToFavorites = (select) => {
+      console.log("select",select);
       const fetchQuery = async () => {
         try {
           const response = await fetch(
             `http://${IP_ADDRESS}:3000/drugs/addFavorites/${select}`
           );
           const result = await response.json();
+          console.log("res favo",result);
           setFavo(result); // enregistre les résultats de la recherche
         } catch (error) {
           console.error(error);
         }
       };
-      fetchQuery();
-      setQuery("");
-      setSuggestions([]);
-      setShowSearchResults(true);  
     };
+
+    console.log("drug",currentDrug);
+    console.log("isIdInFavo",isIdInFavo);
+    console.log("favo",favo);
 
     const openUrl = (url) => {
       Linking.openURL(url)
         .then((supported) => {
           if (!supported) {
             console.error("Opening URL is not supported");
-          } else {
-            console.log("URL opened:", url);
           }
         })
         .catch((err) => console.error("Error opening URL:", err));
@@ -139,27 +136,16 @@ return (
       <>
       
     <View style={[styles.containerTop]}>
-
-
       <Text style={[styles.title]}>{data.drug.name.split(',')[0].trim()}{'\n'}
-
       <Text style={[{ textAlign: 'center',  fontSize: 12 }]}>{data.drug.name.split(',')[1].trim()}</Text>
-
       {data.drug.classification && (
         <Text style={{ alignContent: 'center',textAlign: 'center', fontStyle: 'italic', fontSize: 12  }}>
           {'\n'}Famille {data.drug.classification.label}</Text>
       )}
-     </Text>
-
+    </Text>
       { token ? 
-        <TouchableOpacity onPress={() => openUrl(data.url)} activeOpacity={0.8}>
-          { favo ?   
-            <FontAwesome size={25} 
-              name={isIdInFavo ? 'star' : 'star'}
-              color={isIdInFavo ? '#199a8e' : '#000'}/>
-              :             
-            <FontAwesome size={25} name='star' color='#000'/>            
-          }
+        <TouchableOpacity onPress={addToFavorites(data.drug._id)} activeOpacity={0.8}>
+          <FontAwesome size={25} name="star" color={isIdInFavo ? '#199a8e' : '#000'}/>
         </TouchableOpacity>
       :
         <TouchableOpacity>             
@@ -479,208 +465,4 @@ const styles = StyleSheet.create({
 indiceSurveillanceIcon: {
   height: 24,
   width: 24,
-},
-
-  /*
-  container: {
-    flexDirection: 'row', // This makes the child elements arrange horizontally
-    justifyContent: 'space-between', // This provides equal space between the buttons
-    padding: 10,
-  },
-  contentTab: {
-    flex: 1,
-    flexDirection: 'row', // This makes the child elements arrange horizontally
-    justifyContent: 'space-between', // This provides equal space between the buttons
-  },
-  articleBox: {
-    backgroundColor: '#fff',
-    marginBottom: 10,
-    padding: 10,
-    borderRadius: 5,
-    borderColor: '#ddd',
-    borderWidth: 1,
-  },
-  scrollViewArticles: {
-    flex: 1,
-    backgroundColor: '#ffffff',
-    marginBottom: 20,
-    padding: 10, 
-    margin: 10,
-    borderRadius: 5
-  },
-
-  articleTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 5,
-  },
-  articleDate: {
-    fontSize: 14,
-    color: '#888',
-    marginBottom: 5,
-  },
-  articleContent: {
-    fontSize: 16,
-  },
-  button: {
-    backgroundColor: '#3498db',
-    padding: 10,
-    borderRadius: 5,
-  },
-  buttonText: {
-    color: '#ffffff',
-    fontSize: 16,
-    textAlign: 'center',
-  },
-  */
-});
-
-
-{/*
-<SafeAreaView style={styles.container} contentContainerStyle={styles.container}>
-  { data && data.drug ?  
-    
-    <View style={styles.contentFlexBox}>
-      <Text
-        style={[globalStyles.headline, {width: '100%', alignContent: 'center', justifyContent: 'center'}]}
-      >{data.drug.name}
-        <TouchableOpacity onPress={() => addToFavorites(data._id)}>              
-        { favo ?   
-          <FontAwesome  size={25} 
-            name={isIdInFavo ? 'star' : 'star'}
-            color={isIdInFavo ? '#199a8e' : '#000'}/>
-            :             
-          <FontAwesome  size={25} name='star' color='#000'/>            
-        }
-        </TouchableOpacity>
-      </Text>
-    <View style={[styles.ficheMedicamentChild, styles.fichePosition]} />
-    <View style={[styles.ficheMedicamentItem, styles.fichePosition]} />
-    <View style={[styles.ficheMedicamentInner, styles.fichePosition]} />
-    <View style={[styles.sousMenus, styles.sousMenusFlexBox]}>
-      <View style={[styles.ciPe, styles.itBorder]}>
-        <Text
-          style={[styles.contreIndicationEtPrcautio, styles.lastestNewsTypo]}
-        >
-          Contre-indication et précautions d’emploi
-        </Text>
-        <Image
-          style={styles.buttonmodalIcon}
-          contentFit="cover"
-          source={require("../assets/buttonmodal.png")}
-        />
-      </View>
-      <View style={[styles.it, styles.itBorder]}>
-        <Text
-          style={[styles.contreIndicationEtPrcautio, styles.lastestNewsTypo]}
-        >
-          Indice thérapeuthique
-        </Text>
-        <Image
-          style={styles.buttonmodalIcon}
-          contentFit="cover"
-          source={require("../assets/buttonmodal.png")}
-        />
-      </View>
-      <View style={[styles.it, styles.itBorder]}>
-        <Text
-          style={[styles.contreIndicationEtPrcautio, styles.lastestNewsTypo]}
-        >
-          Posologie
-        </Text>
-        <Image
-          style={styles.buttonmodalIcon}
-          contentFit="cover"
-          source={require("../assets/buttonmodal.png")}
-        />
-      </View>
-      <View style={[styles.it, styles.itBorder]}>
-        <Text
-          style={[styles.contreIndicationEtPrcautio, styles.lastestNewsTypo]}
-        >
-          Effets indésirables
-        </Text>
-        <Image
-          style={styles.buttonmodalIcon}
-          contentFit="cover"
-          source={require("../assets/buttonmodal.png")}
-        />
-      </View>
-      <View style={[styles.it, styles.itBorder]}>
-        <Text
-          style={[styles.contreIndicationEtPrcautio, styles.lastestNewsTypo]}
-        >
-          Mode d’administration
-        </Text>
-        <Image
-          style={styles.buttonmodalIcon}
-          contentFit="cover"
-          source={require("../assets/buttonmodal.png")}
-        />
-      </View>
-    </View>
-    <View style={styles.indiceSurveillanceParent}>
-      <Image
-        style={styles.indiceSurveillanceIcon}
-        contentFit="cover"
-        source={require("../assets/indice-surveillance.png")}
-      />
-      <Image
-        style={styles.indiceSurveillanceIcon}
-        contentFit="cover"
-        source={require("../assets/smr.png")}
-      />
-      <Image
-        style={styles.indiceSurveillanceIcon}
-        contentFit="cover"
-        source={require("../assets/grosesse.png")}
-      />
-      <Image
-        style={styles.allaitementIcon}
-        contentFit="cover"
-        source={require("../assets/allaitement.png")}
-      />
-      <Image
-        style={styles.vigilanceIcon}
-        contentFit="cover"
-        source={require("../assets/vigilance.png")}
-      />
-      <Image
-        style={styles.ordonnanceIcon}
-        contentFit="cover"
-        source={require("../assets/ordonnance.png")}
-      />
-    </View>
-    <Text
-      style={[styles.lastestNews, styles.lastestNewsTypo]}
-    >
-            { listArticles ?
-              <>
-                {listArticles.map((article, index) => (                  
-                  <ScrollView>
-                    <View key={index} style={styles.articleBox}>
-                      <Text style={styles.articleTitle}>{article.title} - {formatFrenchDate(article.date)} 
-                        <TouchableOpacity onPress={() => openUrl(data.url)}>
-                          <FontAwesome name="external-link" size={25} color="#ec6e5b" />
-                        </TouchableOpacity>
-                      </Text>
-                    </View>
-                  </ScrollView>             
-                ))}
-              </>
-              :
-              <Text></Text>
-              }
-    </Text>
-  </View>
-  :
-  <><Text>Data not available</Text>
-  </>
-  }
-
-</SafeAreaView>
-
-
-)
-*/}
-
+}});
