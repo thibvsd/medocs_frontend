@@ -12,10 +12,6 @@ import {
   StyleSheet,
   Image,
 } from "react-native";
-<<<<<<< HEAD
-
-=======
->>>>>>> b4676ccb9a7c4b8f3770b589ff25d907fa46975e
 import Autocomplete from "react-native-autocomplete-input";
 import { useDispatch, useSelector } from "react-redux";
 import { addLastSearch } from "../reducers/drugs";
