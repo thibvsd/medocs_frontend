@@ -12,10 +12,6 @@ import {
   StyleSheet,
   Image,
 } from "react-native";
-<<<<<<< HEAD
-
-=======
->>>>>>> b4676ccb9a7c4b8f3770b589ff25d907fa46975e
 import Autocomplete from "react-native-autocomplete-input";
 import { useDispatch, useSelector } from "react-redux";
 import { addLastSearch } from "../reducers/drugs";
@@ -283,7 +279,6 @@ export default function HomeScreen({ navigation }) {
 
   const generateFeed = (articles) => {
     const filterdArticles = articles.map((data, i) => {
-      // console.log(data.illustration);
       const options = { day: "2-digit", month: "2-digit", year: "numeric" };
       const formattedDate = new Date(data.date).toLocaleDateString(
         "fr-FR",
@@ -291,12 +286,6 @@ export default function HomeScreen({ navigation }) {
       );
       return (
         <View key={i} style={styles.articleContainer}>
-          <View style={styles.container}></View>
-          <Image
-            source={{ uri: data.illustration }}
-            style={{ width: 50, height: 50 }}
-            contentFit="contain" // Add this line to adapt the image
-          />
           <View style={styles.articleTextContainer}>
             <Text style={styles.articleTitle}>{data.title}</Text>
             <Text style={styles.articleDate}>{formattedDate}</Text>
@@ -525,18 +514,15 @@ const styles = StyleSheet.create({
     color: "white",
     fontSize: 16,
   },
-  // articleContainer: {
-  //   marginTop: 20,
-  //   flexDirection: "row",
-  //   // justifyContent: "space-around",
-  //   // alignItems: "center",
-  //   marginVertical: 10,
-  //   marginLeft: 20,
-  //   // width: "1%",
-  //   // border: 1,
-  //   // borderRadius: 10,
-  //   // backgroundColor: "white",
-  // },
+  articleContainer: {
+    marginTop: 20,
+    flexDirection: "row",
+    justifyContent: "space-around",
+    alignItems: "center",
+    marginVertical: 10,
+    marginLeft: 20,
+    width: "90%",
+  },
   scrollView: {
     flexGrow: 1,
     width: "100%",
@@ -546,14 +532,10 @@ const styles = StyleSheet.create({
     height: 80,
     marginRight: 20,
     marginLeft: 10,
-    borderWidth: 1,
-    backgroundColor: "blue",
-    display: "flex",
   },
   articleTextContainer: {
     flex: 1,
     marginRight: 10,
-    backgroundColor: "yellow",
   },
   articleTitle: {
     fontSize: 16,
