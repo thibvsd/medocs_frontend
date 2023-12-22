@@ -360,6 +360,7 @@ alignItems: "center", },
 
   saveButton: {
     marginTop: 20,
+    marginBottom:20,
     width: 100,
     height: 50,
     backgroundColor: "#3FB4B1",
