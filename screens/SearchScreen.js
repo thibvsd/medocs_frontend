@@ -425,14 +425,12 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   searchButton1: {
-    height: 35,
-    width: 35,
+    height: 42,
+    width: 42,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: "#3FB4B1",
     borderRadius: 5,
-    marginHorizontal: 10,
-    top: -4,
   },
 });

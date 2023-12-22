@@ -23,7 +23,7 @@ const SplashScreen = () => {
   return (
     <Animated.View style={[styles.container, { opacity: fadeAnim }]}>
       <Image style={styles.logo} source={require("../assets/Logo2.png")} />
-      <Text>Yolo</Text>
+      <Text></Text>
     </Animated.View>
   );
 };

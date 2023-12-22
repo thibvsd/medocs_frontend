@@ -49,8 +49,8 @@ const ProfileScreen = ({ navigation }) => {
           navigation.navigate("Traitements")
         }
       >
-                <FontAwesome
-          name="pills"
+        <FontAwesome
+          name="list"
           size={20}
           color="white"
           style={styles.filterButtonCaret}
