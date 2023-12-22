@@ -1,9 +1,8 @@
 import React from "react";
 import { View, Text, TouchableOpacity, StyleSheet, Image } from "react-native";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
-import { useDispatch, useSelector } from 'react-redux';
-import { logout } from '../reducers/user';
-
+import { useDispatch, useSelector } from "react-redux";
+import { logout } from "../reducers/user";
 
 const ProfileScreen = ({ navigation }) => {
   const dispatch = useDispatch();
@@ -22,7 +21,7 @@ const ProfileScreen = ({ navigation }) => {
         color="#3FB4B1"
         style={styles.userImage}
       />
-      <Text style={styles.username}>{username}</Text>
+      <Text style={styles.username}>Bonjour, {username} !</Text>
 
       <TouchableOpacity
         style={styles.button}
@@ -45,16 +44,9 @@ const ProfileScreen = ({ navigation }) => {
 
       <TouchableOpacity
         style={styles.button}
-        onPress={() =>
-          navigation.navigate("Traitements")
-        }
+        onPress={() => navigation.navigate("Traitements")}
       >
-        <FontAwesome
-          name="list"
-          size={20}
-          color="white"
-          style={styles.filterButtonCaret}
-        />
+        <Image source={require("../assets/pills.png")} style={styles.pills} />
         <Text style={styles.buttonText}>Traitements en cours</Text>
         <FontAwesome
           name="caret-right"
@@ -118,6 +110,7 @@ const styles = StyleSheet.create({
   },
   userImage: {
     paddingBottom: 50,
+    top: -30,
   },
   username: {
     fontSize: 18,
@@ -126,11 +119,11 @@ const styles = StyleSheet.create({
   },
   button: {
     backgroundColor: "#3FB4B1",
-    width: "100%",
+    width: "90%",
     height: 60,
-    padding: 10,
+    padding: 15,
     borderRadius: 5,
-    marginVertical: 3,
+    marginVertical: 10,
     textAlign: "center",
     flexDirection: "row",
     alignItems: "center",
@@ -150,13 +143,18 @@ const styles = StyleSheet.create({
     height: 15,
   },
   logout: {
-    marginTop: 20,
+    marginTop: 10,
+    top: 60,
     textAlign: "center",
   },
   logoutText: {
     color: "#3FB4B1",
     fontWeight: "bold",
     fontSize: 16,
+  },
+  pills: {
+    width: 20,
+    height: 16,
   },
 });
 
