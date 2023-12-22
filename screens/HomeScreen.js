@@ -10,13 +10,9 @@ import {
   FlatList,
   ScrollView,
   StyleSheet,
-  Image
+  Image,
 } from "react-native";
-<<<<<<< HEAD
 
-=======
-// import {Image} from "react-native-elements";
->>>>>>> d54a7df0329345cce6215f4e754911db394ea475
 import Autocomplete from "react-native-autocomplete-input";
 import { useDispatch, useSelector } from "react-redux";
 import { addLastSearch } from "../reducers/drugs";
@@ -383,20 +379,20 @@ export default function HomeScreen({ navigation }) {
               onChange={handleDropdownSource}
             />
 
-<View style={styles.searchKeyWordContainer}>
-  <TextInput
-    style={styles.keywordInput}
-    placeholder="mot-clé..."
-    onChangeText={(text) => setKeyword(text)}
-    value={keyword}
-  />
-  <TouchableOpacity
-    style={styles.searchButton}
-    onPress={handleSearchKeyword}
-  >
-    <Text style={styles.okText}>OK</Text>
-  </TouchableOpacity>
-</View>
+            <View style={styles.searchKeyWordContainer}>
+              <TextInput
+                style={styles.keywordInput}
+                placeholder="mot-clé..."
+                onChangeText={(text) => setKeyword(text)}
+                value={keyword}
+              />
+              <TouchableOpacity
+                style={styles.searchButton}
+                onPress={handleSearchKeyword}
+              >
+                <Text style={styles.okText}>OK</Text>
+              </TouchableOpacity>
+            </View>
           </View>
           {selectedFilter &&
             filterModals[selectedFilter] &&
@@ -450,11 +446,11 @@ const styles = StyleSheet.create({
     position: "relative",
     zIndex: 1,
   },
-  placeholderStyle:{
-color: "gray",
-textAlign:"center",
+  placeholderStyle: {
+    color: "gray",
+    textAlign: "center",
   },
-  searchKeyWordContainer:{
+  searchKeyWordContainer: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
@@ -464,12 +460,12 @@ textAlign:"center",
     position: "relative",
     zIndex: 1,
   },
-  keywordInput:{
+  keywordInput: {
     height: 40,
-    width:150,
+    width: 150,
     borderColor: "gray",
     backgroundColor: "white",
-    marginLeft:20,
+    marginLeft: 20,
   },
   autocompleteContainer: {
     flex: 1,
@@ -504,15 +500,15 @@ textAlign:"center",
     width: "100%",
   },
   filterButtons: {
-    margin:20,
+    margin: 20,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
     width: "100%",
   },
   okText: {
-    color: 'white',
-    fontWeight: 'bold',
+    color: "white",
+    fontWeight: "bold",
   },
   filterButton: {
     marginRight: 5,
@@ -523,8 +519,8 @@ textAlign:"center",
     paddingHorizontal: 18,
   },
   searchButtonText: {
-    color:"white",
-    fontSize:16,
+    color: "white",
+    fontSize: 16,
   },
   // articleContainer: {
   //   marginTop: 20,
