@@ -406,8 +406,6 @@ const styles = StyleSheet.create({
     marginLeft: 16,
     height: 50,
     width: 100,
-    borderBottomColor: "gray",
-    borderBottomWidth: 0.5,
   },
   selectedTextStyle: {
     fontSize: 16,
@@ -415,6 +413,7 @@ const styles = StyleSheet.create({
   inputSearchStyle: {
     height: 40,
     fontSize: 16,
+    padding: 10,
   },
   title: {
     fontSize: 24,
@@ -590,7 +589,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: "#3FB4B1",
-    borderRadius: 5,
+    borderRadius: 15,
+    marginLeft: 5,
   },
   filterdefault: {
     width: 32,
