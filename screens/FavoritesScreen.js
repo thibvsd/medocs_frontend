@@ -7,7 +7,7 @@ import { IP_ADDRESS } from "../config.js";
 
 export default function FavoritesScreen({ navigation }) {
     const user = useSelector((state) => state.user.value);
-
+const [token, setToken] = useState(null);
     const [favoDrug, setFavoDrug] = useState([]);
 
 useEffect(() => {
@@ -26,8 +26,11 @@ useEffect(() => {
             setFavoDrug(data.idAndName)
         });
     }
-
-    const favoDrugs = favoDrug.map((data, i) => {
+    const favoDrugs =
+    favoDrug._id === null || !token ? (
+      <View></View>
+    ) : (
+    favoDrug.map((data, i) => {
       console.log("favo",data);
         return (
           <View key={i} style={styles.card}>
@@ -37,7 +40,7 @@ useEffect(() => {
             <FontAwesome style={styles.icon} name='trash-o' onPress={() => handleDelete(data._id)} size={25} color='#ec6e5b' />
           </View>
         );
-      });
+      }));
 
   return (
     <View>
