@@ -590,7 +590,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: "#3FB4B1",
-    borderRadius: 5,
+    borderRadius: 15,
+    marginLeft: 5,
   },
   filterdefault: {
     width: 32,
