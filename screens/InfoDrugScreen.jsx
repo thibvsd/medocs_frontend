@@ -14,6 +14,8 @@ import { useDispatch, useSelector } from "react-redux";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import { IP_ADDRESS } from "../config.js";
 
+import { addFavorite } from "../reducers/drugs";
+
 import { Button } from "react-native-paper";
 
 import stylesMed from '../assets/DrugInfos.module.js';
@@ -27,13 +29,12 @@ export default function InfoDrugScreen({ navigation }) {
     const [showUsePrecaution, setShowUsePrecaution] = useState(false);
     const [showIndesirableEff, setShowIndesirableEff] = useState(false);
         
+
+    const [favo, setFavo] = useState(false);
+
     const token = useSelector((state) => state.user.value.token);
     const currentDrug = useSelector((state) => state.drugs.value.search);
-
-    const favo = useSelector((state) => state.drugs.value.favo);
-
-    //const isIdInFavo = favo && favo.includes(currentDrug);
-
+    
     useEffect(() => {
       const fetchData = async () => {
         try {
@@ -58,12 +59,32 @@ export default function InfoDrugScreen({ navigation }) {
         }
       };
       fetchData();
+
+      fetch(`http://${IP_ADDRESS}:3000/favorites/isFavorite/${token}/${currentDrug}`)
+      .then((response) => response.json())
+      .then((data) => {
+        setFavo(data.isFavorite);
+      });
+      
     }, []);
 
+    const [iconColor, setIconColor] = useState('black');
+
+    useEffect(() => {
+      // Set the initial color based on the 'favo' state
+      setIconColor(favo ? 'gold' : 'black');
+    }, [favo]);
+  
+    const handleIconClick = () => {
+      // Toggle the 'favo' state
+      setFavo(!favo);
+      // Update the color based on the new 'favo' state
+      setIconColor(!favo ? 'gold' : 'black');
+      // Perform other actions as needed
+      addToFavorites(!favo);
+    };
 
     const addToFavorites = async (select) => {
-      console.log("drug", select);
-      console.log("token", token);
       try {
         const response = await fetch(
           `http://${IP_ADDRESS}:3000/favorites/addFavorites/${token}`, {
@@ -74,18 +95,11 @@ export default function InfoDrugScreen({ navigation }) {
             }),
           })
         const result = await response.json();
-        console.log("result",result);
-        if (result) {
 
-          console.log("res favo",result);
-          //setFavo(result); 
-
-        }
       } catch (error) {
         console.error("Erreur addfavorites :", error);
       }
     };
-
 
     const openUrl = (url) => {
       Linking.openURL(url)
@@ -151,19 +165,21 @@ return (
           {'\n'}Famille {data.drug.classification.label}</Text>
       )}
     </Text>
-
-
-    <TouchableOpacity onPress={() => addToFavorites(data.drug._id)} style={[{ paddingTop: 20, paddingLeft: 2 }]}>
-      { favo ?   
-        <FontAwesome size={25} 
-          name='star'
-          color={isIdInFavo ? '#199a8e' : '#000'}/>
-          :
-        <FontAwesome size={25} name='star' color='#000'/>
-      }
+    { token ?   
+      <TouchableOpacity onPress={() => handleIconClick() && addToFavorites(data.drug._id)} style={[{ paddingTop: 20, paddingLeft: 2 }]}>
+      <FontAwesome size={25} 
+        name='star'
+        color={iconColor} />
+      </TouchableOpacity>
+      :
+    <TouchableOpacity style={[{ paddingTop: 20, paddingLeft: 2 }]}>
+      <FontAwesome size={25} name='star' color='#000'/>
     </TouchableOpacity>
-
+    }
     </View>
+    
+    <View style={[{ marginTop: 20  }]}>
+      </View>
       <ScrollView contentContainerStyle={[styles.scrollView]}>
         { listArticles && listArticles.length > 0 ?
         (<>
@@ -254,55 +270,62 @@ return (
           </Text>
         </TouchableOpacity>
         
-        <TouchableOpacity style={[styles.button, {backgroundColor: 'orange', marginBottom: 30} ]} onPress={() => openUrl(' https://www.prescrire.org/Fr/CAB420E670595F025E19F60B1D364181/Download.aspx')}>
+        <TouchableOpacity style={[styles.button, {backgroundColor: 'orange', marginBottom: 30} ]} onPress={() => openUrl('https://www.prescrire.org/Fr/CAB420E670595F025E19F60B1D364181/Download.aspx')}>
           <Text style= {[styles.buttonText ]}>Liste des médicaments à écarter (prescrire.org)</Text>
         </TouchableOpacity>
 
       </View>
     </View>
 
-    <Modal visible={isModalIndVisible} animationType="slide" transparent={true} onRequestClose={closeInd} style={styles.modal} >         
-       <View style={styles.modalContainer}>
+    <Modal visible={isModalIndVisible} animationType="slide" transparent={true} onRequestClose={closeInd} style={styles.modal} >            
+      <View style={styles.modalContainer}>
+        <ScrollView>
           <View style={styles.modalContent}>
             <TouchableOpacity onPress={closeInd}>
               <Text style={{ fontWeight: 'bold', color: '#222', paddingBottom: 15 }}>fermer X</Text>
             </TouchableOpacity>
             <Text style={{ textAlign: 'justify' }}>{data.drug.therap_indic}</Text>
           </View>
+        </ScrollView>
       </View>
     </Modal>
     <Modal visible={isModalEffVisible} animationType="slide" transparent={true} onRequestClose={closeEff}  style={styles.modal} >        
-       <View style={styles.modalContainer}>
+      <View style={styles.modalContainer}>
+        <ScrollView>
           <View style={styles.modalContent}>
             <TouchableOpacity onPress={closeEff}>
               <Text style={{ fontWeight: 'bold', color: '#222', paddingBottom: 15 }}>fermer X</Text>
             </TouchableOpacity>
             <Text style={{ textAlign: 'justify' }}>{data.drug.indesirable_eff}</Text>
           </View>
+        </ScrollView>
       </View>
     </Modal>
     <Modal visible={isModalPrecVisible} animationType="slide" transparent={true} onRequestClose={closePrec}  style={styles.modal} >        
-       <View style={styles.modalContainer}>
+      <View style={styles.modalContainer}>
+        <ScrollView>
           <View style={styles.modalContent}>
             <TouchableOpacity onPress={closePrec}>
               <Text style={{ fontWeight: 'bold', color: '#222', paddingBottom: 15 }}>fermer X</Text>
             </TouchableOpacity>
             <Text style={{ textAlign: 'justify' }}>{data.drug.use_precaution}</Text>
           </View>
+        </ScrollView>
       </View>
     </Modal>
 
     <Modal visible={isModalPosoVisible} animationType="slide" transparent={true} onRequestClose={closePoso}  style={styles.modal} >        
-     <View style={styles.modalContainer}>
+      <View style={styles.modalContainer}>
+        <ScrollView>
           <View style={styles.modalContent}>
             <TouchableOpacity onPress={closePoso}>
               <Text style={{ fontWeight: 'bold', color: '#222', paddingBottom: 15 }}>fermer X</Text>
             </TouchableOpacity>
             <Text style={{ textAlign: 'justify' }}>{data.drug.dosage}</Text>
           </View>
+        </ScrollView>
       </View>
     </Modal>
-
       </>
         :
         <></>
@@ -321,7 +344,6 @@ const styles = StyleSheet.create({
   },
   containerTop: {
     flexDirection: 'row',
-    alignContent: 'center',
     width: '90%',
     justifyContent: 'center',
     alignItems: 'center'
@@ -330,7 +352,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     marginTop: 10,
-    marginBottom: 30,
+    marginBottom: 0,
     paddingLeft: 10,
     paddingRight: 10,
     textAlign: 'center',

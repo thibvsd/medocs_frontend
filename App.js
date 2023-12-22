@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { StyleSheet } from "react-native";
+import { StyleSheet, LogBox } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
@@ -12,6 +12,8 @@ import { Provider, useSelector, useDispatch } from "react-redux";
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import user from "./reducers/user";
 import drugs from "./reducers/drugs";
+
+LogBox.ignoreAllLogs();
 
 // Import your screens
 import HomeScreen from "./screens/HomeScreen";
