@@ -24,6 +24,7 @@ export default function TreatmentsScreen({ navigation }) {
   const [doseInput, setDoseInput] = useState("");
   const [med_reason, setMed_reason] = useState("");
   const [drugAdd, setDrugAdd] = useState([]);
+  const [validation, setValidation] = useState("");
 
   const userPhotos = useSelector((state) => state.user.value.photos);
 
@@ -76,6 +77,7 @@ export default function TreatmentsScreen({ navigation }) {
         doseInput,
       }),
     });
+    setValidation("Données enregistrées avec succès !");
   };
 
   const addDrugPress = async (drug) => {
@@ -234,20 +236,21 @@ export default function TreatmentsScreen({ navigation }) {
           <View>
             <Text style={styles.subtitle}>Mes ordonnances</Text>
             <View style={styles.ordonnanceContainer}>
+            <View style={styles.ordonnanceText}>
               <Text>Ajouter une ordonnance </Text>
-              <View style={styles}>
               <TouchableOpacity onPress={onAddPrescriptionPress}>
                 <FontAwesome
                   name="camera"
-                  size={20}
+                  size={30}
                   color="#3FB4B1"
-                  style={styles.filterButtonCaret}
+                  style={styles.filterButtonCamera}
                 />
-              </TouchableOpacity>
+              </TouchableOpacity></View>
               <View style={styles.ordonnancePhotoContainer}>{photos}</View>
-              </View>
+              
             </View>
           </View>
+          <Text style={styles.validationText}>{validation}</Text>
           <TouchableOpacity onPress={onSave} style={styles.saveButton}>
             <Text style={styles.saveButtonText}>Save</Text>
           </TouchableOpacity>
@@ -283,7 +286,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
   },
-  filterButtonCaret: {
+  filterButtonCamera: {
+    marginLeft: 10,
     marginRight: 10,
   },
   drugList: {
@@ -365,14 +369,25 @@ alignItems: "center", },
     textAlign: "center",
     justifyContent: "center",
   },
+  ordonnanceText: {
+    flexDirection: "row",
+    margin :10,
+    alignItems: "center",
+  },
   ordonnancePhotoContainer: {
     flexWrap: 'wrap',
     flexDirection: 'row',
     justifyContent: 'center',
+    marginBottom:10,
   },
   photo: {
     margin: 10,
     width: 150,
     height: 150,
   },
+  validationText: {
+    color:"green",
+    textAlign: "center",
+
+  }
 });
