@@ -49,6 +49,7 @@ export default function InfoDrugScreen({ navigation }) {
               `http://${IP_ADDRESS}:3000/articles/byId/${result.drug._id}`
             );
             const result_articles = await response_articles.json();
+            console.log("result_articles", result_articles.drugArticles);
             if(result_articles) setListArticles(result_articles.drugArticles)
             else setListArticles([]);
           }
@@ -76,17 +77,9 @@ export default function InfoDrugScreen({ navigation }) {
       setIconColor(favo ? 'gold' : 'black');
     }, [favo]);
   
-    const handleIconClick = () => {
-      // Toggle the 'favo' state
-      setFavo(!favo);
-      // Update the color based on the new 'favo' state
-      setIconColor(!favo ? 'gold' : 'black');
-      // Perform other actions as needed
-      addToFavorites(!favo);
-    };
-  
     const addToFavorites = async (currentDrug) => {
       console.log("cur", currentDrug);
+      setFavo(!favo);
       try {
         if (favo) {
           // Si 'favo' est vrai, supprimer de la DB
@@ -104,7 +97,6 @@ export default function InfoDrugScreen({ navigation }) {
             }
           );
           const result = await response.json();
-          setFavo(!favo);
         }
       } catch (error) {
         console.error("Erreur addfavorites :", error);
@@ -112,6 +104,7 @@ export default function InfoDrugScreen({ navigation }) {
     };
   
     const removeFromFavorites = async (currentDrug) => {
+      setFavo(!favo);
       try {
         const response = await fetch(
           `http://${IP_ADDRESS}:3000/favorites/deleteFavorite/${token}/${currentDrug}`,
@@ -124,9 +117,6 @@ export default function InfoDrugScreen({ navigation }) {
           }
         );
         const result = await response.json();
-        setFavo(!favo);
-        // // Mettre à jour la couleur de l'icône à 'black' après la suppression
-        // setIconColor('black');
       } catch (error) {
         console.error("Erreur removeFavorites :", error);
       }
