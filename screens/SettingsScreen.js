@@ -125,7 +125,7 @@ const styles = StyleSheet.create({
     marginBottom: 40,
   },
   inputTitle: {
-    marginLeft: 20,
+    marginLeft: 25,
     fontSize:16,
     fontWeight: "bold",
 
@@ -136,12 +136,14 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
   input: {
-    margin: 20,
+    marginVertical: 10,
+    marginHorizontal:20,
     height: 40,
-    borderColor: "gray",
+    borderColor: "#CBCECD",
     borderWidth: 1,
     marginBottom: 30,
     paddingHorizontal: 10,
+    borderRadius:10,
   },
   saveButton: {
     backgroundColor: "#3FB4B1",

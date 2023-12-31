@@ -174,7 +174,7 @@ const styles = StyleSheet.create({
     height: 100,
   },
   medidoc: {
-    fontSize: 39,
+    fontSize: 35,
     fontFamily: FontFamily.montserratBold,
     textAlign: "left",
     marginTop: 17,

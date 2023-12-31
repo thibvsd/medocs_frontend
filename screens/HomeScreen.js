@@ -133,15 +133,6 @@ export default function HomeScreen({ navigation }) {
     fetchFamilles();
   }, []);
 
-  const onLogin = () => {
-    navigation.navigate("TabNavigator", {
-      screen: "Search",
-      params: {
-        screen: "InfoDrugScreen",
-      },
-    });
-  };
-
   const onSuggestionPress = (suggestion) => {
     // Cherche le name et extrait son _id :
     const selectedDrug = data.find((item) => item.name === suggestion)._id;
@@ -175,11 +166,13 @@ export default function HomeScreen({ navigation }) {
 
   // Click sur la loupe, lance la recherche
   const handleSearch = () => {
+    console.log(query);
     navigation.navigate("TabNavigator", {
       screen: "Search",
       params: {
         screen: "SearchScreen",
         params: {
+          queryinput:"",
           query: query,
         },
       },
@@ -251,32 +244,6 @@ export default function HomeScreen({ navigation }) {
     value: source.label,
   }));
 
-  // Affichage des articles récupérés via le fetch
-  // const feed = articles.map((data, i) => {
-  //   const options = { day: "2-digit", month: "2-digit", year: "numeric" };
-  //   const formattedDate = new Date(data.date).toLocaleDateString(
-  //     "fr-FR",
-  //     options
-  //   );
-  //   return (
-  //     <View key={i} style={styles.articleContainer}>
-  //       <View style={styles.articleTextContainer}>
-  //         <Text style={styles.articleTitle}>{data.title}</Text>
-  //         <Text style={styles.articleDate}>{formattedDate}</Text>
-
-  //         <Text style={styles.articleContent}>{data.content}</Text>
-  //       </View>
-  //       <TouchableOpacity onPress={() => openUrl(data.url)}>
-  //         <FontAwesome name="external-link" size={25} color="#3FB4B1" />
-  //       </TouchableOpacity>
-  //       <Image
-  //         source={{ uri: data.illustration }}
-  //         style={styles.articleImage}
-  //       />
-  //     </View>
-  //   );
-  // });
-
   const generateFeed = (articles) => {
     const filterdArticles = articles.map((data, i) => {
       const options = { day: "2-digit", month: "2-digit", year: "numeric" };
@@ -344,16 +311,6 @@ export default function HomeScreen({ navigation }) {
 
         <View style={styles.filterButtonContainer}>
           <View style={styles.filterButtons}>
-            {/* <TouchableOpacity
-              style={styles.filterButtonLeft}
-              onPress={() => openFilterModal("boutonFiltre")}
-            >
-              <Image
-                style={styles.filterdefault}
-                source={require("../assets/FilterNice.png")}
-              />
-              <Text style={styles.filterButtonTextLeft}>Filtres</Text>
-            </TouchableOpacity> */}
             <Dropdown
               style={styles.dropdown}
               placeholderStyle={styles.placeholderStyle}
@@ -404,8 +361,11 @@ export default function HomeScreen({ navigation }) {
 const styles = StyleSheet.create({
   dropdown: {
     marginLeft: 16,
-    height: 50,
-    width: 100,
+    paddingRight:10,
+    height: 40,
+    width: 120,
+    backgroundColor:"#BFE9DB",
+    borderRadius:"10",
   },
   selectedTextStyle: {
     fontSize: 16,
@@ -414,6 +374,7 @@ const styles = StyleSheet.create({
     height: 40,
     fontSize: 16,
     padding: 10,
+    borderRadius: 10,
   },
   title: {
     fontSize: 24,
@@ -438,14 +399,13 @@ const styles = StyleSheet.create({
     zIndex: 1,
   },
   placeholderStyle: {
-    color: "gray",
+    color: "grey",
     textAlign: "center",
   },
   searchKeyWordContainer: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    marginTop: 10,
     paddingHorizontal: 16,
     alignItems: "flex-end",
     position: "relative",
@@ -457,6 +417,9 @@ const styles = StyleSheet.create({
     borderColor: "gray",
     backgroundColor: "white",
     marginLeft: 20,
+    paddingLeft:10,
+    borderRadius: 5,
+
   },
   autocompleteContainer: {
     flex: 1,
@@ -497,6 +460,9 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     width: "100%",
   },
+  iconStyle:{
+color:"white",
+  },
   okText: {
     color: "white",
     fontWeight: "bold",
@@ -504,8 +470,8 @@ const styles = StyleSheet.create({
   filterButton: {
     marginRight: 5,
     color: "white",
-    backgroundColor: "#3FB4B1",
-    borderRadius: 30,
+    backgroundColor: "#E1F6F4",
+    borderRadius: 10,
     paddingVertical: 5,
     paddingHorizontal: 18,
   },
@@ -589,7 +555,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: "#3FB4B1",
-    borderRadius: 15,
+    borderRadius: 10,
     marginLeft: 5,
   },
   filterdefault: {

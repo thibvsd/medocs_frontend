@@ -8,7 +8,8 @@ import {
   Image,
   SafeAreaView,
   Modal,
-  Linking
+  Linking, 
+  Alert,
 } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
@@ -84,14 +85,15 @@ export default function InfoDrugScreen({ navigation }) {
       addToFavorites(!favo);
     };
 
-    const addToFavorites = async (select) => {
+    const addToFavorites = async (currentDrug) => {
+      console.log("cur",currentDrug)
       try {
         const response = await fetch(
           `http://${IP_ADDRESS}:3000/favorites/addFavorites/${token}`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-              favo: select,
+              favo: currentDrug,
             }),
           })
         const result = await response.json();
@@ -99,6 +101,7 @@ export default function InfoDrugScreen({ navigation }) {
       } catch (error) {
         console.error("Erreur addfavorites :", error);
       }
+      // handleIconClick()
     };
 
     const addDrugPress = async (drug) => {
@@ -190,7 +193,7 @@ return (
       )}
     </Text>
     { token ?   
-      <TouchableOpacity onPress={() => handleIconClick() && addToFavorites(data.drug._id)} style={[{ paddingTop: 20, paddingLeft: 2 }]}>
+      <TouchableOpacity onPress={() =>  addToFavorites(data.drug._id)} style={[{ paddingTop: 20, paddingLeft: 2 }]}>
       <FontAwesome size={25} 
         name='star'
         color={iconColor} />

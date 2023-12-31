@@ -30,7 +30,12 @@ export default function TreatmentsScreen({ navigation }) {
 
   // console.log("USER photo ", userPhotos);
 
-  console.log('query state', query);
+  console.log("query state", query);
+  console.log("drugAdd", drugAdd);
+
+  useEffect(() => {
+    loadDrugs();
+  }, []);
 
   useEffect(() => {
     // AbortController pour arrêter la requête si query est modifié
@@ -55,7 +60,7 @@ export default function TreatmentsScreen({ navigation }) {
       }
     };
     fetchData().then((responseData) => {
-      if(!responseData) return;
+      if (!responseData) return;
       const filteredData = responseData
         .filter((item) =>
           item.name.toLowerCase().includes(queryToFilter.toLowerCase())
@@ -105,16 +110,13 @@ export default function TreatmentsScreen({ navigation }) {
     setQuery("");
   };
 
-  useEffect(() => {
-    loadDrugs();
-  }, []);
-
   const loadDrugs = async () => {
     try {
       const response = await fetch(
         `http://${IP_ADDRESS}:3000/treatments/${token}`
       );
       const data = await response.json();
+      console.log("load ttt", data);
       // Récupère les noms des médicaments et les met à jour dans setDrugAdd
       const nameAndId = data.treatment.drugs.map((drug) => {
         const match = drug.drug_id.name.match(/^([^,]+),/);
@@ -162,19 +164,19 @@ export default function TreatmentsScreen({ navigation }) {
   const drugTreatment = drugAdd.map((drug, index) => (
     <View key={index} style={styles.drugContainer}>
       <View style={styles.drugLine}>
-      <TouchableOpacity onPress={() => onDeleteDrugPress(drug._id)}>
-        <FontAwesome
-          name="trash"
-          size={20}
-          color="#3FB4B1"
-          style={styles.deleteButton}
-        />
-      </TouchableOpacity>
-      <Text style={styles.drugList}>{drug.name}</Text>
+        <TouchableOpacity onPress={() => onDeleteDrugPress(drug._id)}>
+          <FontAwesome
+            name="trash"
+            size={20}
+            color="#3FB4B1"
+            style={styles.deleteButton}
+          />
+        </TouchableOpacity>
+        <Text style={styles.drugList}>{drug.name}</Text>
+      </View>
       <View style={styles.doseContainer}>
         <Text style={styles.doseText}>Dose :</Text>
-        <TextInput style={styles.doseInput} placeholder="0" />
-      </View>
+        <TextInput style={styles.doseInput} placeholder="A compléter..." />
       </View>
     </View>
   ));
@@ -209,7 +211,7 @@ export default function TreatmentsScreen({ navigation }) {
                 if (text.length > 2) {
                   setQuery(text);
                 }
-                if(!text.length) setSuggestions([]);
+                if (!text.length) setSuggestions([]);
               }}
               flatListProps={{
                 keyExtractor: (_, idx) => idx.toString(),
@@ -238,18 +240,18 @@ export default function TreatmentsScreen({ navigation }) {
           <View>
             <Text style={styles.subtitle}>Mes ordonnances</Text>
             <View style={styles.ordonnanceContainer}>
-            <View style={styles.ordonnanceText}>
-              <Text>Ajouter une ordonnance </Text>
-              <TouchableOpacity onPress={onAddPrescriptionPress}>
-                <FontAwesome
-                  name="camera"
-                  size={30}
-                  color="#3FB4B1"
-                  style={styles.filterButtonCamera}
-                />
-              </TouchableOpacity></View>
+              <View style={styles.ordonnanceText}>
+                <Text>Ajouter une ordonnance :</Text>
+                <TouchableOpacity onPress={onAddPrescriptionPress}>
+                  <FontAwesome
+                    name="camera"
+                    size={30}
+                    color="#3FB4B1"
+                    style={styles.filterButtonCamera}
+                  />
+                </TouchableOpacity>
+              </View>
               <View style={styles.ordonnancePhotoContainer}>{photos}</View>
-              
             </View>
           </View>
           <Text style={styles.validationText}>{validation}</Text>
@@ -279,9 +281,9 @@ const styles = StyleSheet.create({
     justifyContent: "flex-start",
     alignItems: "center",
   },
-  
+
   drugContainer: {
-    width: "80%",
+    width: "90%",
     marginBottom: 10,
   },
   medoc: {
@@ -296,13 +298,22 @@ const styles = StyleSheet.create({
   drugList: {
     marginVertical: 5,
     fontSize: 16,
+    flex: 1,
   },
-  doseContainer:{
-flexDirection:"row",
-alignItems:"center",
+  drugLine: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  deleteButton: {
+    marginRight: 15,
+  },
+  doseContainer: {
+    flexDirection: "row",
+    alignItems: "center",
   },
   doseText: {
     flex: 1,
+    fontStyle:"italic",
     flexDirection: "row",
     alignItems: "center",
     marginHorizontal: 10,
@@ -310,12 +321,13 @@ alignItems:"center",
   },
   doseInput: {
     height: 30,
-    width: 180,
-    borderColor: "gray",
+    width: "70%",
+    borderColor: "#CBCECD",
     borderWidth: 1,
     marginVertical: 10,
     paddingLeft: 10,
     backgroundColor: "white",
+    borderRadius: "5",
   },
   reasonContainer: {
     width: "90%",
@@ -327,7 +339,7 @@ alignItems:"center",
     right: 0,
     top: 0,
     zIndex: 1,
-    marginBottom: 10,
+    marginBottom: 20,
   },
   suggestionItem: {
     backgroundColor: "#fff", // Utilisez une couleur solide
@@ -340,7 +352,7 @@ alignItems:"center",
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    marginTop: 20,
+    marginTop: 10,
     paddingHorizontal: 16,
     alignItems: "flex-end",
     position: "relative",
@@ -348,19 +360,22 @@ alignItems:"center",
   },
   reasonInput: {
     height: 80,
-    borderColor: "gray",
+    borderColor: "#CBCECD",
     borderWidth: 1,
+    marginTop:10,
     marginBottom: 10,
     paddingLeft: 10,
     backgroundColor: "white",
     textAlignVertical: "top",
+    borderRadius: "5",
   },
   ordonnanceContainer: {
-alignItems: "center", },
+    alignItems: "center",
+  },
 
   saveButton: {
     marginTop: 20,
-    marginBottom:20,
+    marginBottom: 20,
     width: 100,
     height: 50,
     backgroundColor: "#3FB4B1",
@@ -379,14 +394,14 @@ alignItems: "center", },
   },
   ordonnanceText: {
     flexDirection: "row",
-    margin :10,
+    margin: 10,
     alignItems: "center",
   },
   ordonnancePhotoContainer: {
-    flexWrap: 'wrap',
-    flexDirection: 'row',
-    justifyContent: 'center',
-    marginBottom:10,
+    flexWrap: "wrap",
+    flexDirection: "row",
+    justifyContent: "center",
+    marginBottom: 10,
   },
   photo: {
     margin: 10,
@@ -394,8 +409,7 @@ alignItems: "center", },
     height: 150,
   },
   validationText: {
-    color:"green",
+    color: "green",
     textAlign: "center",
-
-  }
+  },
 });
