@@ -84,24 +84,52 @@ export default function InfoDrugScreen({ navigation }) {
       // Perform other actions as needed
       addToFavorites(!favo);
     };
-
+  
     const addToFavorites = async (currentDrug) => {
-      console.log("cur",currentDrug)
+      console.log("cur", currentDrug);
+      try {
+        if (favo) {
+          // Si 'favo' est vrai, supprimer de la DB
+          await removeFromFavorites(currentDrug);
+        } else {
+          // Sinon, ajouter à la DB
+          const response = await fetch(
+            `http://${IP_ADDRESS}:3000/favorites/addFavorites/${token}`,
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                favo: currentDrug,
+              }),
+            }
+          );
+          const result = await response.json();
+          setFavo(!favo);
+        }
+      } catch (error) {
+        console.error("Erreur addfavorites :", error);
+      }
+    };
+  
+    const removeFromFavorites = async (currentDrug) => {
       try {
         const response = await fetch(
-          `http://${IP_ADDRESS}:3000/favorites/addFavorites/${token}`, {
-            method: "POST",
+          `http://${IP_ADDRESS}:3000/favorites/deleteFavorite/${token}/${currentDrug}`,
+          {
+            method: "DELETE",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
               favo: currentDrug,
             }),
-          })
+          }
+        );
         const result = await response.json();
-
+        setFavo(!favo);
+        // // Mettre à jour la couleur de l'icône à 'black' après la suppression
+        // setIconColor('black');
       } catch (error) {
-        console.error("Erreur addfavorites :", error);
+        console.error("Erreur removeFavorites :", error);
       }
-      // handleIconClick()
     };
 
     const addDrugPress = async (drug) => {

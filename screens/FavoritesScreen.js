@@ -95,7 +95,8 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   favoriteElement:{
-width : "85%"
+width : "85%",
+marginLeft:10,
   },
   icon: {
     margin: 10,
