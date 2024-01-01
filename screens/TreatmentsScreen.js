@@ -327,7 +327,7 @@ const styles = StyleSheet.create({
     marginVertical: 10,
     paddingLeft: 10,
     backgroundColor: "white",
-    borderRadius: "5",
+    borderRadius: 5,
   },
   reasonContainer: {
     width: "90%",
@@ -367,7 +367,7 @@ const styles = StyleSheet.create({
     paddingLeft: 10,
     backgroundColor: "white",
     textAlignVertical: "top",
-    borderRadius: "5",
+    borderRadius: 5,
   },
   ordonnanceContainer: {
     alignItems: "center",
