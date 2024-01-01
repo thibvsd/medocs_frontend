@@ -34,6 +34,7 @@ export default function InfoDrugScreen({ navigation }) {
 
     const token = useSelector((state) => state.user.value.token);
     const currentDrug = useSelector((state) => state.drugs.value.search);
+    console.log("currentDrug", currentDrug);
     
     useEffect(() => {
       const fetchData = async () => {
@@ -84,14 +85,14 @@ export default function InfoDrugScreen({ navigation }) {
       addToFavorites(!favo);
     };
 
-    const addToFavorites = async (select) => {
+    const addToFavorites = async () => {
       try {
         const response = await fetch(
           `http://${IP_ADDRESS}:3000/favorites/addFavorites/${token}`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-              favo: select,
+              favo: currentDrug,
             }),
           })
         const result = await response.json();
@@ -190,7 +191,7 @@ return (
       )}
     </Text>
     { token ?   
-      <TouchableOpacity onPress={() => handleIconClick() && addToFavorites(data.drug._id)} style={[{ paddingTop: 20, paddingLeft: 2 }]}>
+      <TouchableOpacity onPress={() =>addToFavorites(data.drug._id) && handleIconClick()} style={[{ paddingTop: 20, paddingLeft: 2 }]}>
       <FontAwesome size={25} 
         name='star'
         color={iconColor} />

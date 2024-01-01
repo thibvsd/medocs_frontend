@@ -42,7 +42,7 @@ export default function FavoritesScreen({ navigation }) {
       });
   };
   const favoDrugs =
-    favoDrug.length > 0 || !token ? (
+    favoDrug && favoDrug.length > 0 || !token ? (
       favoDrug.map((data, i) => {
         console.log("data in map", data);
         return (
