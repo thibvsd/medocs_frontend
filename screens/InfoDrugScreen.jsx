@@ -43,13 +43,16 @@ export default function InfoDrugScreen({ navigation }) {
             `http://${IP_ADDRESS}:3000/drugs/byId/${currentDrug}`
           );
           const result = await response.json();
+          console.log("result", result.drug.smr);
+          console.log("result", result.drug.driving_alert);
+
+
           if (result) {
             setData(result);
             const response_articles = await fetch(
               `http://${IP_ADDRESS}:3000/articles/byId/${result.drug._id}`
             );
             const result_articles = await response_articles.json();
-            console.log("result_articles", result_articles.drugArticles);
             if(result_articles) setListArticles(result_articles.drugArticles)
             else setListArticles([]);
           }
@@ -275,7 +278,7 @@ return (
         <Image
           style={styles.indiceSurveillanceIconSpecial}
           contentFit="cover"
-          source={data.drug.pregnancy_alert ? require("../assets/grosesse.png") : require("../assets/grosesse_true.png")}
+          source={data.drug.pregnancy_alert ? require("../assets/grosesse_true.png") : require("../assets/grosesse.png")}
         />
         <Image
           style={styles.indiceSurveillanceIconSpecial2}
@@ -285,7 +288,7 @@ return (
        <Image 
           style={styles.indiceSurveillanceIconSpecial3}
           contentFit="cover"
-          source={data.drug.driving_alert ? require("../assets/vigilance_gris.png") : require("../assets/vigilance_true.png")}
+          source={data.drug.driving_alert ? require("../assets/vigilance_true.png") : require("../assets/vigilance_gris.png")}
         />
         <Image
           style={styles.indiceSurveillanceIcon4}

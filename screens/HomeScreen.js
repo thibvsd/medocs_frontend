@@ -406,7 +406,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    paddingHorizontal: 16,
+    paddingHorizontal: 18,
     alignItems: "flex-end",
     position: "relative",
     zIndex: 1,
@@ -436,6 +436,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     paddingLeft: 10,
     color: "#333",
+    
   },
 
   suggestionItem: {
