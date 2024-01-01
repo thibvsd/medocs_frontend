@@ -13,7 +13,7 @@ export default function FavoritesScreen({ navigation }) {
     fetch(`http://${IP_ADDRESS}:3000/favorites/loadFavorite/${user.token}`)
       .then((response) => response.json())
       .then((data) => {
-        // console.log("favo recu ", data.idAndName);
+        console.log("favo recu ", data.idAndName);
         setFavoDrug(data.idAndName);
       });
   }, []);
@@ -34,7 +34,7 @@ export default function FavoritesScreen({ navigation }) {
           // console.log("dans le then ", data.favorites);
           setFavoDrug(data.favorites);
         } else {
-          console.log(data.result);
+          console.log("data.result",data.result);
         }
       })
       .catch((error) => {
@@ -47,7 +47,7 @@ export default function FavoritesScreen({ navigation }) {
         console.log("data in map", data);
         return (
           <View key={i} style={styles.card}>
-            <TouchableOpacity>
+            <TouchableOpacity style={styles.favoriteElement}>
               <Text style={styles.name}>{data.name}</Text>
             </TouchableOpacity>
             <FontAwesome
@@ -55,7 +55,7 @@ export default function FavoritesScreen({ navigation }) {
               name="trash-o"
               onPress={() => handleDelete(data._id)}
               size={25}
-              color="#ec6e5b"
+              color="#3FB4B1"
             />
           </View>
         );
@@ -88,11 +88,15 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "flex-start",
     backgroundColor: "#f0f0f0",
-    width: "80%",
+    width: "100%",
     padding: 10,
     marginVertical: 10,
     borderRadius: 5,
     elevation: 3,
+  },
+  favoriteElement:{
+width : "85%",
+marginLeft:10,
   },
   icon: {
     margin: 10,

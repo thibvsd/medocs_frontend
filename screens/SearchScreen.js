@@ -9,6 +9,7 @@ import {
   ScrollView,
   FlatList,
   StyleSheet,
+  ActivityIndicator
 } from "react-native";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import Autocomplete from "react-native-autocomplete-input";
@@ -29,6 +30,8 @@ export default function SearchScreen({ route, navigation }) {
   const [queryResults, setQueryResults] = useState([]);
   const [showSearchResults, setShowSearchResults] = useState(false);
   const token = useSelector((state) => state.user.value.token);
+  const [isLoading, setIsLoading] = useState(false);
+
 
   useEffect(() => {
     if (route.params && route.params.query) {
@@ -39,15 +42,16 @@ export default function SearchScreen({ route, navigation }) {
             `http://${IP_ADDRESS}:3000/drugs/byName/${route.params.query}`
           );
           const result = await response.json();
-          console.log("result", result);
           setQueryResults(result); // enregistre les résultats de la recherche
-          console.log("queryResults", queryResults);
+          setQuery("");
         } catch (error) {
           console.error(error);
         }
       };
       fetchQuery();
+      console.log("1er useffect", query);
       setQuery("");
+      console.log("after", query);
       setSuggestions([]);
     }
   }, [route.params]);
@@ -68,7 +72,7 @@ export default function SearchScreen({ route, navigation }) {
         return result.namesAndId;
       } catch (error) {
         if (error.name === "AbortError") {
-          console.log("La requête fetchData a été annulée.");
+          console.log("La requête fetchData de la recherche a été annulée.");
         } else {
           console.error(error);
         }
@@ -88,7 +92,6 @@ export default function SearchScreen({ route, navigation }) {
     const fetchLastSearch = async () => {
       // vérifier la présence de token et bloquer si pas de token (et informer le user)
       if (!token) {
-        console.log("Pas de token");
         return;
       }
       try {
@@ -114,19 +117,19 @@ export default function SearchScreen({ route, navigation }) {
   }, [query]); // le useEffect se relance si query change
 
   // Lancer la recherche en cliquant sur le bouton loupe
-  const handleSearch = () => {
-    const fetchQuery = async () => {
-      try {
-        const response = await fetch(
-          `http://${IP_ADDRESS}:3000/drugs/byName/${query}`
-        );
-        const result = await response.json();
-        setQueryResults(result); // enregistre les résultats de la recherche
-      } catch (error) {
-        console.error(error);
-      }
-    };
-    fetchQuery();
+  const handleSearch = async () => {
+    setIsLoading(true);
+    try {
+      const response = await fetch(
+        `http://${IP_ADDRESS}:3000/drugs/byName/${query}`
+      );
+      const result = await response.json();
+      setQueryResults(result); // enregistre les résultats de la recherche
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsLoading(false);
+    }
     setQuery("");
     setSuggestions([]);
     setShowSearchResults(true);
@@ -260,8 +263,16 @@ export default function SearchScreen({ route, navigation }) {
             placeholder="Rechercher un médicament..."
             containerStyle={styles.autocompleteContainer}
           />
-          <TouchableOpacity onPress={handleSearch} style={styles.searchButton1}>
-            <FontAwesome name="search" size={20} color="white" />
+          <TouchableOpacity
+            onPress={handleSearch}
+            style={styles.searchButton1}
+            disabled={isLoading} // Désactive le bouton pendant le chargement
+          >
+            {isLoading ? (
+              <ActivityIndicator size="small" color="white" />
+            ) : (
+              <FontAwesome name="search" size={20} color="white" />
+            )}
           </TouchableOpacity>
         </View>
         {showSearchResults ? (
@@ -396,7 +407,7 @@ const styles = StyleSheet.create({
   },
 
   suggestionItem: {
-    backgroundColor: "#fff", // Utilisez une couleur solide
+    backgroundColor: "#fff", 
     padding: 10,
     borderBottomWidth: 1,
     borderBottomColor: "#ccc",
@@ -419,7 +430,7 @@ const styles = StyleSheet.create({
   },
   searchName: {
     textAlign: "center",
-    color: "blue",
+    color: "#2E9693",
     textDecorationLine: "underline",
   },
   scrollView: {
@@ -433,7 +444,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: "#3FB4B1",
-    borderRadius: 15,
+    borderRadius: 10,
     marginLeft: 5,
   },
 });

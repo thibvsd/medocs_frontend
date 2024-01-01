@@ -8,7 +8,8 @@ import {
   Image,
   SafeAreaView,
   Modal,
-  Linking
+  Linking, 
+  Alert,
 } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
@@ -34,7 +35,6 @@ export default function InfoDrugScreen({ navigation }) {
 
     const token = useSelector((state) => state.user.value.token);
     const currentDrug = useSelector((state) => state.drugs.value.search);
-    console.log("currentDrug", currentDrug);
     
     useEffect(() => {
       const fetchData = async () => {
@@ -43,6 +43,10 @@ export default function InfoDrugScreen({ navigation }) {
             `http://${IP_ADDRESS}:3000/drugs/byId/${currentDrug}`
           );
           const result = await response.json();
+          console.log("result", result.drug.smr);
+          console.log("result", result.drug.driving_alert);
+
+
           if (result) {
             setData(result);
             const response_articles = await fetch(
@@ -76,29 +80,48 @@ export default function InfoDrugScreen({ navigation }) {
       setIconColor(favo ? 'gold' : 'black');
     }, [favo]);
   
-    const handleIconClick = () => {
-      // Toggle the 'favo' state
+    const addToFavorites = async (currentDrug) => {
+      console.log("cur", currentDrug);
       setFavo(!favo);
-      // Update the color based on the new 'favo' state
-      setIconColor(!favo ? 'gold' : 'black');
-      // Perform other actions as needed
-      addToFavorites(!favo);
+      try {
+        if (favo) {
+          // Si 'favo' est vrai, supprimer de la DB
+          await removeFromFavorites(currentDrug);
+        } else {
+          // Sinon, ajouter à la DB
+          const response = await fetch(
+            `http://${IP_ADDRESS}:3000/favorites/addFavorites/${token}`,
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                favo: currentDrug,
+              }),
+            }
+          );
+          const result = await response.json();
+        }
+      } catch (error) {
+        console.error("Erreur addfavorites :", error);
+      }
     };
-
-    const addToFavorites = async () => {
+  
+    const removeFromFavorites = async (currentDrug) => {
+      setFavo(!favo);
       try {
         const response = await fetch(
-          `http://${IP_ADDRESS}:3000/favorites/addFavorites/${token}`, {
-            method: "POST",
+          `http://${IP_ADDRESS}:3000/favorites/deleteFavorite/${token}/${currentDrug}`,
+          {
+            method: "DELETE",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
               favo: currentDrug,
             }),
-          })
+          }
+        );
         const result = await response.json();
-
       } catch (error) {
-        console.error("Erreur addfavorites :", error);
+        console.error("Erreur removeFavorites :", error);
       }
     };
 
@@ -191,7 +214,7 @@ return (
       )}
     </Text>
     { token ?   
-      <TouchableOpacity onPress={() =>addToFavorites(data.drug._id) && handleIconClick()} style={[{ paddingTop: 20, paddingLeft: 2 }]}>
+      <TouchableOpacity onPress={() =>  addToFavorites(data.drug._id)} style={[{ paddingTop: 20, paddingLeft: 2 }]}>
       <FontAwesome size={25} 
         name='star'
         color={iconColor} />
@@ -255,7 +278,7 @@ return (
         <Image
           style={styles.indiceSurveillanceIconSpecial}
           contentFit="cover"
-          source={data.drug.pregnancy_alert ? require("../assets/grosesse.png") : require("../assets/grosesse_true.png")}
+          source={data.drug.pregnancy_alert ? require("../assets/grosesse_true.png") : require("../assets/grosesse.png")}
         />
         <Image
           style={styles.indiceSurveillanceIconSpecial2}
@@ -265,7 +288,7 @@ return (
        <Image 
           style={styles.indiceSurveillanceIconSpecial3}
           contentFit="cover"
-          source={data.drug.driving_alert ? require("../assets/vigilance_gris.png") : require("../assets/vigilance_true.png")}
+          source={data.drug.driving_alert ? require("../assets/vigilance_true.png") : require("../assets/vigilance_gris.png")}
         />
         <Image
           style={styles.indiceSurveillanceIcon4}
