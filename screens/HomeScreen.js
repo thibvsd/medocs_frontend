@@ -365,7 +365,7 @@ const styles = StyleSheet.create({
     height: 40,
     width: 120,
     backgroundColor:"#BFE9DB",
-    borderRadius:"10",
+    borderRadius:10,
   },
   selectedTextStyle: {
     fontSize: 16,
