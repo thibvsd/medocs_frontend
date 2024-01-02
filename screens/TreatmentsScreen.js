@@ -116,24 +116,44 @@ export default function TreatmentsScreen({ navigation }) {
         `http://${IP_ADDRESS}:3000/treatments/${token}`
       );
       const data = await response.json();
-      console.log("load ttt", data);
+      console.log("load ttt front", data);
       // Récupère les noms des médicaments et les met à jour dans setDrugAdd
       const nameAndId = data.treatment.drugs.map((drug) => {
         const match = drug.drug_id.name.match(/^([^,]+),/);
         const cleanedName = match ? match[1].trim() : drug.drug_id.name;
         const drugId = drug.drug_id._id;
+        const drugDailyPresc= drug.daily_presc;
 
-        // Créer un objet avec les propriétés name et id
-        return { name: cleanedName, _id: drugId };
+        // Créer un objet avec les propriétés name, id et daily_presc
+        return { name: cleanedName, _id: drugId, daily_presc:drugDailyPresc };
       });
       setDrugAdd(nameAndId);
     } catch (error) {
-      // Gérer les erreurs réseau
       console.error("Erreur réseau :", error);
     }
     setQuery("");
     setSuggestions([]);
   };
+
+  //  sauvegarder le dosage dans la base de données
+const saveDose = async (drugId, dose) => {
+  try {
+    const response = await fetch(
+      `http://${IP_ADDRESS}:3000/treatments/saveDose/${token}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ drugId, dose }),
+      }
+    );
+    const result = await response.json();
+    if (result.result) {
+      console.log("Dose enregistrée avec succès !");
+    }
+  } catch (error) {
+    console.error("Erreur réseau :", error);
+  }
+};
 
   const onDeleteDrugPress = async (drug) => {
     console.log("ondelete drug", drug);
@@ -176,7 +196,12 @@ export default function TreatmentsScreen({ navigation }) {
       </View>
       <View style={styles.doseContainer}>
         <Text style={styles.doseText}>Dose :</Text>
-        <TextInput style={styles.doseInput} placeholder="A compléter..." />
+        <TextInput style={styles.doseInput} placeholder={drug.daily_presc} 
+        onBlur={() => {
+          // Enregistre le texte de l'input dans la base de données
+          saveDose(drug._id, doseInput);
+        }}
+        onChangeText={(text) => setDoseInput(text)}/>
       </View>
     </View>
   ));
@@ -320,6 +345,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   doseInput: {
+    color:"balck",
     height: 30,
     width: "70%",
     borderColor: "#CBCECD",
