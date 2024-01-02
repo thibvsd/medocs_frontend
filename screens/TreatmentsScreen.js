@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import {
+  ActivityIndicator,
   Image,
   StyleSheet,
   Text,
@@ -25,6 +26,7 @@ export default function TreatmentsScreen({ navigation }) {
   const [med_reason, setMed_reason] = useState("");
   const [drugAdd, setDrugAdd] = useState([]);
   const [validation, setValidation] = useState("");
+  const [loading, setLoading] = useState(true); // État de chargement
 
   const userPhotos = useSelector((state) => state.user.value.photos);
 
@@ -35,6 +37,7 @@ export default function TreatmentsScreen({ navigation }) {
 
   useEffect(() => {
     loadDrugs();
+    setLoading(false); // Met fin au chargement
   }, []);
 
   useEffect(() => {
@@ -228,6 +231,10 @@ const saveDose = async (drugId, dose) => {
     <TouchableWithoutFeedback>
       <ScrollView>
         <View style={styles.mainContainer}>
+        {loading ? (
+            <ActivityIndicator size="large" color="#3FB4B1" />
+          ) : (
+            <>
           <Text style={styles.subtitle}>Ajouter un médicament</Text>
           <View style={styles.searchContainer}>
             <Autocomplete
@@ -283,6 +290,8 @@ const saveDose = async (drugId, dose) => {
           <TouchableOpacity onPress={onSave} style={styles.saveButton}>
             <Text style={styles.saveButtonText}>Save</Text>
           </TouchableOpacity>
+          </>
+          )}
         </View>
       </ScrollView>
     </TouchableWithoutFeedback>
