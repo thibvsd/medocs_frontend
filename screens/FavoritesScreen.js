@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Image, StyleSheet, Text, View, TouchableOpacity } from "react-native";
+import { ActivityIndicator, Image, StyleSheet, Text, View, TouchableOpacity } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import { IP_ADDRESS } from "../config.js";
@@ -8,6 +8,8 @@ export default function FavoritesScreen({ navigation }) {
   const user = useSelector((state) => state.user.value);
   const [token, setToken] = useState(null);
   const [favoDrug, setFavoDrug] = useState([]);
+  const [loading, setLoading] = useState(true); // État de chargement
+
 
   useEffect(() => {
     fetch(`http://${IP_ADDRESS}:3000/favorites/loadFavorite/${user.token}`)
@@ -15,13 +17,15 @@ export default function FavoritesScreen({ navigation }) {
       .then((data) => {
         console.log("favo recu ", data.idAndName);
         setFavoDrug(data.idAndName);
+        setLoading(false); // Met fin au chargement
+      })
+      .catch((error) => {
+        console.error("Fetch error:", error);
+        setLoading(false); // En cas d'erreur, met fin au chargement
       });
   }, []);
 
-  // A modifier
   const handleDelete = (drug) => {
-    // console.log("dans le delete ", drug);
-    // console.log("le token ", user.token);
     fetch(
       `http://${IP_ADDRESS}:3000/favorites/deleteFavorite/${user.token}/${drug}`,
       {
@@ -31,16 +35,16 @@ export default function FavoritesScreen({ navigation }) {
       .then((response) => response.json())
       .then((data) => {
         if (data.result) {
-          // console.log("dans le then ", data.favorites);
           setFavoDrug(data.favorites);
         } else {
-          console.log("data.result",data.result);
+          console.log("data.result", data.result);
         }
       })
       .catch((error) => {
         console.error("Fetch error:", error);
       });
   };
+
   const favoDrugs =
     favoDrug && favoDrug.length > 0 || !token ? (
       favoDrug.map((data, i) => {
@@ -62,13 +66,21 @@ export default function FavoritesScreen({ navigation }) {
       })
     ) : (
       <View>
-        {/* Votre contenu pour la vue vide, par exemple un message */}
         <Text>Aucun médicament favori</Text>
       </View>
     );
 
-  return <View>{favoDrugs}</View>;
+  return (
+    <View style={styles.container}>
+      {loading ? ( // Utilisation de l'ActivityIndicator pendant le chargement
+        <ActivityIndicator size="large" color="#3FB4B1" />
+      ) : (
+        favoDrugs
+      )}
+    </View>
+  );
 }
+
 
 const styles = StyleSheet.create({
   container: {
