@@ -26,7 +26,7 @@ export default function TreatmentsScreen({ navigation }) {
   const [med_reason, setMed_reason] = useState("");
   const [drugAdd, setDrugAdd] = useState([]);
   const [validation, setValidation] = useState("");
-  const [loading, setLoading] = useState(true); // État de chargement
+  const [loading, setLoading] = useState(true); // État de chargement pour afficher le loader (roue qui tourne)
 
   const userPhotos = useSelector((state) => state.user.value.photos);
 
@@ -77,15 +77,15 @@ export default function TreatmentsScreen({ navigation }) {
 
   // Sauvegarde les dosages et la raison médicale
   const onSave = () => {
-    fetch(`http://${IP_ADDRESS}:3000/treatments/saveTreatment/${token}`, {
+    fetch(`http://${IP_ADDRESS}:3000/treatments/updateDrugTreatment/${token}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        med_reason,
-        doseInput,
+        med_reason:med_reason,
       }),
-    });
-    setValidation("Données enregistrées avec succès !");
+    }).then((response) => response.json())
+    .then((data) => {
+    setValidation(data.validation)});
   };
 
   const addDrugPress = async (drug) => {
@@ -199,9 +199,9 @@ const saveDose = async (drugId, dose) => {
       </View>
       <View style={styles.doseContainer}>
         <Text style={styles.doseText}>Dose :</Text>
-        <TextInput style={styles.doseInput} placeholder={drug.daily_presc} 
+        <TextInput style={styles.doseInput} placeholder={drug.daily_presc} placeholderTextColor="black"
         onBlur={() => {
-          // Enregistre le texte de l'input dans la base de données
+          // Enregistre le texte de l'input dans la base de données quand clique en dehors de la zone d'input
           saveDose(drug._id, doseInput);
         }}
         onChangeText={(text) => setDoseInput(text)}/>
@@ -354,7 +354,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   doseInput: {
-    color:"balck",
+    color:"black",
     height: 30,
     width: "70%",
     borderColor: "#CBCECD",

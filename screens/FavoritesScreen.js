@@ -98,7 +98,7 @@ const styles = StyleSheet.create({
   card: {
     flexDirection: "row",
     justifyContent: "space-between",
-    alignItems: "flex-start",
+    alignItems: "center",
     backgroundColor: "#f0f0f0",
     width: "100%",
     padding: 10,

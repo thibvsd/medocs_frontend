@@ -228,6 +228,22 @@ export default function App() {
                 },
               }}
             />
+                        <Stack.Screen
+              name="FAQ"
+              component={FAQScreen}
+              options={{
+                title: "FAQ",
+                headerStyle: {
+                  backgroundColor: "#199a8e",
+                  shadowColor: "#199a8e",
+                },
+                headerTitleAlign: "center",
+                headerTintColor: "#fff",
+                headerTitleStyle: {
+                  fontWeight: "bold",
+                },
+              }}
+            />
             <Stack.Screen name="Se déconnecter" component={HomeScreen} />
           </>
         )}
