@@ -3,9 +3,11 @@ import { ActivityIndicator, Image, StyleSheet, Text, View, TouchableOpacity } fr
 import { useDispatch, useSelector } from "react-redux";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import { IP_ADDRESS } from "../config.js";
+import { addLastSearch } from "../reducers/drugs";
 
 export default function FavoritesScreen({ navigation }) {
   const user = useSelector((state) => state.user.value);
+  const dispatch = useDispatch();
   const [token, setToken] = useState(null);
   const [favoDrug, setFavoDrug] = useState([]);
   const [loading, setLoading] = useState(true); // État de chargement
@@ -45,13 +47,18 @@ export default function FavoritesScreen({ navigation }) {
       });
   };
 
+  const onDrugPress = (data) => () => {
+  dispatch(addLastSearch(data));
+  navigation.navigate("InfoDrugScreen");
+}
+
   const favoDrugs =
     favoDrug && favoDrug.length > 0 || !token ? (
       favoDrug.map((data, i) => {
         console.log("data in map", data);
         return (
           <View key={i} style={styles.card}>
-            <TouchableOpacity style={styles.favoriteElement}>
+            <TouchableOpacity style={styles.favoriteElement} onPress={onDrugPress(data._id)}>
               <Text style={styles.name}>{data.name}</Text>
             </TouchableOpacity>
             <FontAwesome
