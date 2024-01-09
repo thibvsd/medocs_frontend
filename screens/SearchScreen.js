@@ -51,67 +51,6 @@ export default function SearchScreen({ route, navigation }) {
     }
   }, [route.params]);
 
-  /*
-  useEffect(() => {
-    // AbortController pour arrêter la requête si query est modifié
-    const fetchDataController = new AbortController();
-    const queryToFilter = query;
-    // Fonction pour fetch les noms des médicaments (pour l'autocomplétion)
-    const fetchData = async () => {
-      try {
-        const response = await fetch(
-          `http://${IP_ADDRESS}:3000/drugs/query3characters/${queryToFilter}`,
-          { signal: fetchDataController.signal }
-        );
-        const result = await response.json();
-        setData(result.namesAndId);
-        return result.namesAndId;
-      } catch (error) {
-        if (error.name === "AbortError") {
-          console.log("La requête fetchData de la recherche a été annulée.");
-        } else {
-          console.error(error);
-        }
-      }
-    };
-    fetchData().then((responseData) => {
-      if (!responseData) return;
-      const filteredData = responseData
-        .filter((item) =>
-          item.name.toLowerCase().includes(queryToFilter.toLowerCase())
-        )
-      setSuggestions(filteredData.map((item) => item.name)); // map pour n'avoir que les names sans clé
-    });
-
-    // Fonction pour fetch les dernières fiches consultées
-    const fetchLastSearch = async () => {
-      // vérifier la présence de token et bloquer si pas de token (et informer le user)
-      if (!token) {
-        return;
-      }
-      try {
-        const response = await fetch(
-          `http://${IP_ADDRESS}:3000/searches/last5Searches/${token}`
-        );
-        const result = await response.json();
-        setSearches(result.search);
-      } catch (error) {
-        if (error.name === "AbortError") {
-          console.log("La requête fetchLastSearch a été annulée.");
-        } else {
-          console.error(error);
-        }
-      }
-    };
-
-    fetchData();
-    fetchLastSearch();
-
-    // Annuler la requête fetchData à chaque modification de query
-    return () => fetchDataController.abort();
-  }, [query]); // le useEffect se relance si query change
-*/
-
 useEffect(() => {
   // AbortController pour arrêter la requête si query est modifié
   const fetchDataController = new AbortController();
@@ -176,7 +115,7 @@ useEffect(() => {
       }
     };
 
-    fetchData();
+    //fetchData();
     fetchLastSearch();
 
   return () => fetchDataController.abort(); //return => permet de stopper la requete a la destruction du composant
@@ -185,6 +124,7 @@ useEffect(() => {
 
   // Lancer la recherche en cliquant sur le bouton loupe
   const handleSearch = async () => {
+    console.log('query', query);
     setIsLoading(true);
     try {
       const response = await fetch(
@@ -319,6 +259,7 @@ useEffect(() => {
               }
               if (!text.length) setSuggestions([]);
             }}
+            defaultValue={query}
             // Affiche les suggestions :
             flatListProps={{
               keyExtractor: (_, idx) => idx.toString(),
@@ -327,6 +268,7 @@ useEffect(() => {
                   <Text style={styles.suggestionItem}>{item}</Text>
                 </TouchableOpacity>
               ),
+              keyboardShouldPersistTaps: 'always'          
             }}
             placeholder="Rechercher un médicament..."
             containerStyle={styles.autocompleteContainer}

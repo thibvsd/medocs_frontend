@@ -258,6 +258,7 @@ export default function HomeScreen({ navigation }) {
               }
               if (!text.length) setSuggestions([]);
             }}
+            defaultValue={query}
             flatListProps={{
               //définit comment chaque élément de la liste générée par Autocomplete sera affiché
               keyExtractor: (_, idx) => idx.toString(),
@@ -266,6 +267,7 @@ export default function HomeScreen({ navigation }) {
                   <Text style={styles.suggestionItem}>{item}</Text>
                 </TouchableOpacity>
               ),
+              keyboardShouldPersistTaps: 'always' 
             }}
             placeholder="Rechercher un médicament..."
             containerStyle={styles.autocompleteContainer}
