@@ -2,12 +2,10 @@ import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
-  TextInput,
   TouchableOpacity,
   TouchableWithoutFeedback,
   Keyboard,
   ScrollView,
-  FlatList,
   StyleSheet,
   ActivityIndicator
 } from "react-native";
@@ -20,9 +18,6 @@ import { IP_ADDRESS } from "../config.js";
 // ECRAN DE RECHERCHE
 export default function SearchScreen({ route, navigation }) {
   const dispatch = useDispatch();
-  // const token = "kTe-BIKeY40kJaYz6JMm9sEcJFtpxVpD"; // Token avec des lastSearches pour tester
-  //  const token = "XkXnvWcBQXW4ortC2mvsTyeX7_XU5xLb"; // Token sans  lastSearches pour tester
-
   const [query, setQuery] = useState("");
   const [data, setData] = useState([]);
   const [suggestions, setSuggestions] = useState([]);
@@ -32,7 +27,7 @@ export default function SearchScreen({ route, navigation }) {
   const token = useSelector((state) => state.user.value.token);
   const [isLoading, setIsLoading] = useState(false);
 
-
+   //mis à jour à chaque changement du route.params.query
   useEffect(() => {
     if (route.params && route.params.query) {
       setShowSearchResults(true);
@@ -48,14 +43,15 @@ export default function SearchScreen({ route, navigation }) {
           console.error(error);
         }
       };
+      //Appel de fetchQuery pour afficher les résultats pour le mot recherche = route.params.query
       fetchQuery();
-      console.log("1er useffect", query);
+      //after query
       setQuery("");
-      console.log("after", query);
       setSuggestions([]);
     }
   }, [route.params]);
 
+  /*
   useEffect(() => {
     // AbortController pour arrêter la requête si query est modifié
     const fetchDataController = new AbortController();
@@ -84,7 +80,6 @@ export default function SearchScreen({ route, navigation }) {
         .filter((item) =>
           item.name.toLowerCase().includes(queryToFilter.toLowerCase())
         )
-        .slice(0, 10); // Limite à 10 suggestions
       setSuggestions(filteredData.map((item) => item.name)); // map pour n'avoir que les names sans clé
     });
 
@@ -115,6 +110,78 @@ export default function SearchScreen({ route, navigation }) {
     // Annuler la requête fetchData à chaque modification de query
     return () => fetchDataController.abort();
   }, [query]); // le useEffect se relance si query change
+*/
+
+useEffect(() => {
+  // AbortController pour arrêter la requête si query est modifié
+  const fetchDataController = new AbortController();
+  //query => valeur du text sélectionné dans l'autocomplete
+  const queryToFilter = query;
+  if (queryToFilter) {
+    //function fetchdata appelée à chaque nouvelle valeur de l'état query
+    fetchData().then((responseData) => {
+      if (!responseData) return;
+      //trie de responseData : Filter an item in array if it includes query drug name (contains)
+      const filteredData = responseData
+        .filter((item) =>
+          item.name.toLowerCase().includes(queryToFilter.toLowerCase())
+        );
+      //set suggestions avec le nouveau tableau de 10 résultats incluant le texte saisi dans l'autocomplete
+      setSuggestions(filteredData.map((item) => item.name)); // map pour n'avoir que les names sans _id
+    });
+  }
+  // Fonction pour fetch les noms des médicaments (pour l'autocomplétion)
+  async function fetchData() {
+    try {
+      ///drugs/query3characters/${queryToFilter} => limité à 10 résultats
+      const response = await fetch(
+        `http://${IP_ADDRESS}:3000/drugs/query3characters/${queryToFilter}`,
+        { signal: fetchDataController.signal }
+      );
+      if (response.ok) {
+        const result = await response.json();
+        //namesAndId contient l'_id et le name du medicament
+        setData(result.namesAndId);
+        return result.namesAndId;
+      }
+      throw new Error(`Error: ${response.statusText}`);
+      // in prod: return an error state to display for the user
+    } catch (error) {
+      if (error.name === "AbortError") {
+        console.log("La requête fetchData a été annulée.");
+      } else {
+        console.error(error);
+      }
+    }
+  }
+
+    // Fonction pour fetch les dernières fiches consultées
+    const fetchLastSearch = async () => {
+      // vérifier la présence de token et bloquer si pas de token (et informer le user)
+      if (!token) {
+        return;
+      }
+      try {
+        const response = await fetch(
+          `http://${IP_ADDRESS}:3000/searches/last5Searches/${token}`
+        );
+        const result = await response.json();
+        setSearches(result.search);
+      } catch (error) {
+        if (error.name === "AbortError") {
+          console.log("La requête fetchLastSearch a été annulée.");
+        } else {
+          console.error(error);
+        }
+      }
+    };
+
+    fetchData();
+    fetchLastSearch();
+
+  return () => fetchDataController.abort(); //return => permet de stopper la requete a la destruction du composant
+}, [query]);
+
 
   // Lancer la recherche en cliquant sur le bouton loupe
   const handleSearch = async () => {
@@ -181,7 +248,7 @@ export default function SearchScreen({ route, navigation }) {
         .then((response) => response.json())
         .then((data) => {
           if (data.result) {
-            dispatch(addLastSearch(data._id));
+            dispatch(addLastSearch(suggestion._id));
             navigation.navigate("InfoDrugScreen");
             setQuery("");
             setQueryResults([]);
@@ -190,6 +257,7 @@ export default function SearchScreen({ route, navigation }) {
           }
         });
     } else {
+      
       dispatch(addLastSearch(suggestion._id));
       navigation.navigate("InfoDrugScreen");
       setQuery("");
