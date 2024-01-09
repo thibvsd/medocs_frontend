@@ -9,7 +9,6 @@ export const userSlice = createSlice({
   initialState,
   reducers: {
     login: (state, action) => {
-      console.log("reducer payload", action.payload);
       state.value.token = action.payload.token;
       state.value.username = action.payload.username;
       state.value.email = action.payload.email;
@@ -20,7 +19,6 @@ export const userSlice = createSlice({
       state.value.username = null;
     },
     addPhoto: (state, action) => {
-      console.log("reducer payload", action.payload);
       state.value.photos.push(action.payload);
     },
     removePhoto: (state, action) => {

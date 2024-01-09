@@ -9,7 +9,6 @@ import {
   TextInput,
 } from "react-native";
 import { useSelector } from "react-redux";
-import FontAwesome from "react-native-vector-icons/FontAwesome";
 import { IP_ADDRESS } from "../config.js";
 
 export default function ProfileSettingScreen() {
@@ -17,6 +16,7 @@ export default function ProfileSettingScreen() {
   const [dataUserEmailSetting, setDataUserEmailSetting] = useState("");
   const [dataUserAgeSetting, setDataUserAgeSetting] = useState("");
   const [dataUserWeightSetting, setDataUserWeightSetting] = useState("");
+  
   const [usernameSetting, setUsernameSetting] = useState("");
   const [userEmailSetting, setUserEmailSetting] = useState("");
   const [userAgeSetting, setUserAgeSetting] = useState("");

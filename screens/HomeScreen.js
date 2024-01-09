@@ -6,17 +6,15 @@ import {
   TouchableOpacity,
   TouchableWithoutFeedback,
   Keyboard,
-  Modal,
-  FlatList,
   ScrollView,
   StyleSheet,
   Image,
+  Linking
 } from "react-native";
 import Autocomplete from "react-native-autocomplete-input";
 import { useDispatch, useSelector } from "react-redux";
 import { addLastSearch } from "../reducers/drugs";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
-import { Linking } from "react-native";
 import { IP_ADDRESS } from "../config.js";
 import { Dropdown } from "react-native-element-dropdown";
 
@@ -29,9 +27,10 @@ export default function HomeScreen({ navigation }) {
   const [data, setData] = useState([]);
   const [suggestions, setSuggestions] = useState([]);
   const [articles, setArticles] = useState([]);
-  const [selectedSource, setSelectedSource] = useState(null);
   const [loadSource, setLoadSource] = useState([]);
-  const [loadFamille, setLoadFamille] = useState([]);
+  const [sourceValue, setSourceValue] = useState(null);
+  const [keyword, setKeyword] = useState("");
+
   const [selectedFilter, setSelectedFilter] = useState(null);
   const [filterModals, setFilterModals] = useState({
     boutonFiltre: false,
@@ -39,19 +38,8 @@ export default function HomeScreen({ navigation }) {
     famille: false,
     motCle: false,
   });
-  const [sourceValue, setSourceValue] = useState(null);
-  const [keyword, setKeyword] = useState("");
-
-  const pickerRef = useRef();
-
-  function open() {
-    pickerRef.current.focus();
-  }
-
-  function close() {
-    pickerRef.current.blur();
-  }
-
+  
+  //fetch pour alimenter le select input "sources des articles"
   const fetchSources = async () => {
     try {
       const response = await fetch(
@@ -64,40 +52,35 @@ export default function HomeScreen({ navigation }) {
     }
   };
 
-  const fetchFamilles = async () => {
-    try {
-      const response = await fetch(`http://${IP_ADDRESS}:3000/articles/codes`);
-      const resultLabels = await response.json();
-      setLoadFamille(resultLabels.codes);
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
   useEffect(() => {
     // AbortController pour arrêter la requête si query est modifié
     const fetchDataController = new AbortController();
+    //query => valeur du text sélectionné dans l'autocomplete
     const queryToFilter = query;
     if (queryToFilter) {
+      //function fetchdata appelée à chaque nouvelle valeur de l'état query
       fetchData().then((responseData) => {
         if (!responseData) return;
+        //trie de responseData : Filter an item in array if it includes query drug name (contains)
         const filteredData = responseData
           .filter((item) =>
             item.name.toLowerCase().includes(queryToFilter.toLowerCase())
-          )
-          .slice(0, 10); // Limite à 10 suggestions
-        setSuggestions(filteredData.map((item) => item.name)); // map pour n'avoir que les names sans clé
+          );
+        //set suggestions avec le nouveau tableau de 10 résultats incluant le texte saisi dans l'autocomplete
+        setSuggestions(filteredData.map((item) => item.name)); // map pour n'avoir que les names sans _id
       });
     }
     // Fonction pour fetch les noms des médicaments (pour l'autocomplétion)
     async function fetchData() {
       try {
+        ///drugs/query3characters/${queryToFilter} => limité à 10 résultats
         const response = await fetch(
           `http://${IP_ADDRESS}:3000/drugs/query3characters/${queryToFilter}`,
           { signal: fetchDataController.signal }
         );
         if (response.ok) {
           const result = await response.json();
+          //namesAndId contient l'_id et le name du medicament
           setData(result.namesAndId);
           return result.namesAndId;
         }
@@ -111,8 +94,7 @@ export default function HomeScreen({ navigation }) {
         }
       }
     }
-
-    return () => fetchDataController.abort();
+    return () => fetchDataController.abort(); //return => permet de stopper la requete a la destruction du composant
   }, [query]);
 
   useEffect(() => {
@@ -130,7 +112,6 @@ export default function HomeScreen({ navigation }) {
     };
     fetchArticles();
     fetchSources();
-    fetchFamilles();
   }, []);
 
   const onSuggestionPress = (suggestion) => {
@@ -164,9 +145,8 @@ export default function HomeScreen({ navigation }) {
     }
   };
 
-  // Click sur la loupe, lance la recherche
+  // Click sur la loupe, lance la recherche et envoi vers la page des résultats de recherche = searchscreen params = query
   const handleSearch = () => {
-    console.log(query);
     navigation.navigate("TabNavigator", {
       screen: "Search",
       params: {
@@ -195,15 +175,6 @@ export default function HomeScreen({ navigation }) {
       .catch((err) => console.error("Error opening URL:", err));
   };
 
-  const openFilterModal = (filter) => {
-    setSelectedFilter(filter);
-    setFilterModals((prev) => ({ ...prev, [filter]: true }));
-  };
-
-  const handleSourceChange = (value) => {
-    setSelectedSource(value);
-  };
-
   const handleDropdownSource = (item) => {
     const selectedSource = item.value;
     setSourceValue(selectedSource);
@@ -230,18 +201,12 @@ export default function HomeScreen({ navigation }) {
       setArticles(data.combinedArticles); // Mettre à jour les articles filtrés dans l'état
     } catch (error) {
       console.error(error);
-      // Gérez les erreurs
     }
   };
 
   const tabSource = loadSource.map((source) => ({
     label: source,
     value: source,
-  }));
-
-  const tabFamille = loadFamille.map((source) => ({
-    label: source.label,
-    value: source.label,
   }));
 
   const generateFeed = (articles) => {
@@ -273,7 +238,8 @@ export default function HomeScreen({ navigation }) {
 
   // Utilisation de generateFeed chaque fois que articles est modifié
   const feed = generateFeed(articles);
-
+  // Gestion du clavier avec le composant TouchableWithoutFeedback => appeler une fn qui ferme le 
+  //clavier chaque fois que vous appuyez sur l'écran
   return (
     <TouchableWithoutFeedback
       onPress={() => {

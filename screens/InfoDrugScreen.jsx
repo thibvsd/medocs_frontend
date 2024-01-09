@@ -6,31 +6,19 @@ import {
   ScrollView,
   StyleSheet,
   Image,
-  SafeAreaView,
+  SafeAreaView, //padding total screen
   Modal,
   Linking, 
   Alert,
 } from "react-native";
-import { useDispatch, useSelector } from "react-redux";
+import {  useSelector } from "react-redux";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import { IP_ADDRESS } from "../config.js";
-
-import { addFavorite } from "../reducers/drugs";
-
-import { Button } from "react-native-paper";
-
-import stylesMed from '../assets/DrugInfos.module.js';
-import globalStyles from '../assets/Styles.module.js';
 
 export default function InfoDrugScreen({ navigation }) {
   
     const [data, setData] = useState([]);
     const [listArticles, setListArticles] = useState([]);
-
-    const [showUsePrecaution, setShowUsePrecaution] = useState(false);
-    const [showIndesirableEff, setShowIndesirableEff] = useState(false);
-        
-
     const [favo, setFavo] = useState(false);
 
     const token = useSelector((state) => state.user.value.token);
@@ -43,10 +31,6 @@ export default function InfoDrugScreen({ navigation }) {
             `http://${IP_ADDRESS}:3000/drugs/byId/${currentDrug}`
           );
           const result = await response.json();
-          console.log("result", result.drug.smr);
-          console.log("result", result.drug.driving_alert);
-
-
           if (result) {
             setData(result);
             const response_articles = await fetch(
@@ -81,14 +65,13 @@ export default function InfoDrugScreen({ navigation }) {
     }, [favo]);
   
     const addToFavorites = async (currentDrug) => {
-      console.log("cur", currentDrug);
-      setFavo(!favo);
+      setFavo(!favo); //on inverse la valeur de favo
       try {
         if (favo) {
-          // Si 'favo' est vrai, supprimer de la DB
+          //Si 'favo' est vrai, supprimer de la DB
           await removeFromFavorites(currentDrug);
         } else {
-          // Sinon, ajouter à la DB
+          //Sinon, ajouter à la DB
           const response = await fetch(
             `http://${IP_ADDRESS}:3000/favorites/addFavorites/${token}`,
             {
@@ -126,9 +109,7 @@ export default function InfoDrugScreen({ navigation }) {
     };
 
     const addDrugPress = async (drug) => {
-      console.log("addDrugPress", currentDrug);
       if (currentDrug) {
-        console.log("currentDrug", currentDrug);
         try {
           const response = await fetch(
             `http://${IP_ADDRESS}:3000/treatments/addDrugTreatment/${token}`,

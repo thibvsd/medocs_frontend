@@ -13,15 +13,11 @@ export default function FavoritesScreen({ navigation }) {
     fetch(`http://${IP_ADDRESS}:3000/favorites/loadFavorite/${user.token}`)
       .then((response) => response.json())
       .then((data) => {
-        console.log("favo recu ", data.idAndName);
         setFavoDrug(data.idAndName);
       });
   }, []);
 
-  // A modifier
   const handleDelete = (drug) => {
-    // console.log("dans le delete ", drug);
-    // console.log("le token ", user.token);
     fetch(
       `http://${IP_ADDRESS}:3000/favorites/deleteFavorite/${user.token}/${drug}`,
       {
@@ -31,10 +27,7 @@ export default function FavoritesScreen({ navigation }) {
       .then((response) => response.json())
       .then((data) => {
         if (data.result) {
-          // console.log("dans le then ", data.favorites);
           setFavoDrug(data.favorites);
-        } else {
-          console.log("data.result",data.result);
         }
       })
       .catch((error) => {
@@ -44,7 +37,6 @@ export default function FavoritesScreen({ navigation }) {
   const favoDrugs =
     favoDrug && favoDrug.length > 0 || !token ? (
       favoDrug.map((data, i) => {
-        console.log("data in map", data);
         return (
           <View key={i} style={styles.card}>
             <TouchableOpacity style={styles.favoriteElement}>
@@ -62,7 +54,6 @@ export default function FavoritesScreen({ navigation }) {
       })
     ) : (
       <View>
-        {/* Votre contenu pour la vue vide, par exemple un message */}
         <Text>Aucun médicament favori</Text>
       </View>
     );
@@ -95,8 +86,8 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   favoriteElement:{
-width : "85%",
-marginLeft:10,
+    width : "85%",
+    marginLeft:10,
   },
   icon: {
     margin: 10,

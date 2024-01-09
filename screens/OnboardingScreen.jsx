@@ -68,7 +68,7 @@ const navigation = useNavigation();
         {
           backgroundColor: "#9dd0f2",
           image: <Image style= {styles.picto} source={require("../assets/biotech.png")} />,
-          title: " Avoir accès aux dernières actualités sur les médicaments",
+          title: "Avoir accès aux dernières actualités sur les médicaments",
           subtitle: "",
         }, 
         {

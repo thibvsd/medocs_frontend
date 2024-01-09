@@ -1,7 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
-  value: { search: "", favo: "", token: null, ShowSearchResults:false },
+  value: { search: "", favo: "", token:null, ShowSearchResults:false },
 };
 
 export const drugsSlice = createSlice({

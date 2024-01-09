@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import {
+  ActivityIndicator,
   Image,
   StyleSheet,
   Text,
@@ -25,6 +26,7 @@ export default function TreatmentsScreen({ navigation }) {
   const [med_reason, setMed_reason] = useState("");
   const [drugAdd, setDrugAdd] = useState([]);
   const [validation, setValidation] = useState("");
+  const [loading, setLoading] = useState(true); // État de chargement pour afficher le loader (roue qui tourne)
 
   const userPhotos = useSelector((state) => state.user.value.photos);
 
@@ -35,6 +37,7 @@ export default function TreatmentsScreen({ navigation }) {
 
   useEffect(() => {
     loadDrugs();
+    setLoading(false); // Met fin au chargement
   }, []);
 
   useEffect(() => {
@@ -74,15 +77,15 @@ export default function TreatmentsScreen({ navigation }) {
 
   // Sauvegarde les dosages et la raison médicale
   const onSave = () => {
-    fetch(`http://${IP_ADDRESS}:3000/treatments/saveTreatment/${token}`, {
+    fetch(`http://${IP_ADDRESS}:3000/treatments/updateDrugTreatment/${token}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        med_reason,
-        doseInput,
+        med_reason:med_reason,
       }),
-    });
-    setValidation("Données enregistrées avec succès !");
+    }).then((response) => response.json())
+    .then((data) => {
+    setValidation(data.validation)});
   };
 
   const addDrugPress = async (drug) => {
@@ -116,24 +119,44 @@ export default function TreatmentsScreen({ navigation }) {
         `http://${IP_ADDRESS}:3000/treatments/${token}`
       );
       const data = await response.json();
-      console.log("load ttt", data);
+      console.log("load ttt front", data);
       // Récupère les noms des médicaments et les met à jour dans setDrugAdd
       const nameAndId = data.treatment.drugs.map((drug) => {
         const match = drug.drug_id.name.match(/^([^,]+),/);
         const cleanedName = match ? match[1].trim() : drug.drug_id.name;
         const drugId = drug.drug_id._id;
+        const drugDailyPresc= drug.daily_presc;
 
-        // Créer un objet avec les propriétés name et id
-        return { name: cleanedName, _id: drugId };
+        // Créer un objet avec les propriétés name, id et daily_presc
+        return { name: cleanedName, _id: drugId, daily_presc:drugDailyPresc };
       });
       setDrugAdd(nameAndId);
     } catch (error) {
-      // Gérer les erreurs réseau
       console.error("Erreur réseau :", error);
     }
     setQuery("");
     setSuggestions([]);
   };
+
+  //  sauvegarder le dosage dans la base de données
+const saveDose = async (drugId, dose) => {
+  try {
+    const response = await fetch(
+      `http://${IP_ADDRESS}:3000/treatments/saveDose/${token}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ drugId, dose }),
+      }
+    );
+    const result = await response.json();
+    if (result.result) {
+      console.log("Dose enregistrée avec succès !");
+    }
+  } catch (error) {
+    console.error("Erreur réseau :", error);
+  }
+};
 
   const onDeleteDrugPress = async (drug) => {
     console.log("ondelete drug", drug);
@@ -176,7 +199,12 @@ export default function TreatmentsScreen({ navigation }) {
       </View>
       <View style={styles.doseContainer}>
         <Text style={styles.doseText}>Dose :</Text>
-        <TextInput style={styles.doseInput} placeholder="A compléter..." />
+        <TextInput style={styles.doseInput} placeholder={drug.daily_presc} placeholderTextColor="black"
+        onBlur={() => {
+          // Enregistre le texte de l'input dans la base de données quand clique en dehors de la zone d'input
+          saveDose(drug._id, doseInput);
+        }}
+        onChangeText={(text) => setDoseInput(text)}/>
       </View>
     </View>
   ));
@@ -203,6 +231,10 @@ export default function TreatmentsScreen({ navigation }) {
     <TouchableWithoutFeedback>
       <ScrollView>
         <View style={styles.mainContainer}>
+        {loading ? (
+            <ActivityIndicator size="large" color="#3FB4B1" />
+          ) : (
+            <>
           <Text style={styles.subtitle}>Ajouter un médicament</Text>
           <View style={styles.searchContainer}>
             <Autocomplete
@@ -258,6 +290,8 @@ export default function TreatmentsScreen({ navigation }) {
           <TouchableOpacity onPress={onSave} style={styles.saveButton}>
             <Text style={styles.saveButtonText}>Save</Text>
           </TouchableOpacity>
+          </>
+          )}
         </View>
       </ScrollView>
     </TouchableWithoutFeedback>
@@ -320,6 +354,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   doseInput: {
+    color:"black",
     height: 30,
     width: "70%",
     borderColor: "#CBCECD",
