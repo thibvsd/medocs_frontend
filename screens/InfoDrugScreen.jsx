@@ -31,6 +31,10 @@ export default function InfoDrugScreen({ navigation }) {
             `http://${IP_ADDRESS}:3000/drugs/byId/${currentDrug}`
           );
           const result = await response.json();
+          console.log("result", result.drug.smr);
+          console.log("result", result.drug.driving_alert);
+
+
           if (result) {
             setData(result);
             const response_articles = await fetch(
@@ -55,7 +59,7 @@ export default function InfoDrugScreen({ navigation }) {
         setFavo(data.isFavorite);
       });
       
-    }, []);
+    }, [currentDrug]);
 
     const [iconColor, setIconColor] = useState('black');
 
