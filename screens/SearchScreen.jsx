@@ -53,6 +53,14 @@ export default function SearchScreen({ route, navigation }) {
 
 useEffect(() => {
   // AbortController pour arrêter la requête si query est modifié
+
+  /*Création d'un contrôleur à l’aide du constructeur AbortController(),
+  puis référence à son objet AbortSignal à l’aide de la propriété AbortController.signal.
+  A l'initialisation, du fetch de la fonction fetchData 
+  nous transmettons AbortSignal en tant qu'option dans l'objet options de la demande = {signal}
+  Cela associe le signal et le contrôleur à la demande de récupération et nous permet de l'abandonner en appelant AbortController.abort()
+  à la destruction du composant => dans le return*/
+
   const fetchDataController = new AbortController();
   //query => valeur du text sélectionné dans l'autocomplete
   const queryToFilter = query;
@@ -60,7 +68,7 @@ useEffect(() => {
     //function fetchdata appelée à chaque nouvelle valeur de l'état query
     fetchData().then((responseData) => {
       if (!responseData) return;
-      //trie de responseData : Filter an item in array if it includes query drug name (contains)
+      //tri de responseData : on filtre le tableau renvoyé qui inclut (includes) le texte saisi dans l'autocomplete = query => drug name
       const filteredData = responseData
         .filter((item) =>
           item.name.toLowerCase().includes(queryToFilter.toLowerCase())
@@ -268,7 +276,7 @@ useEffect(() => {
                   <Text style={styles.suggestionItem}>{item}</Text>
                 </TouchableOpacity>
               ),
-              keyboardShouldPersistTaps: 'always'          
+              keyboardShouldPersistTaps: 'always'
             }}
             placeholder="Rechercher un médicament..."
             containerStyle={styles.autocompleteContainer}

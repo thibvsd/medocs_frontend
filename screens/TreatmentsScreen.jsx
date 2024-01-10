@@ -40,6 +40,14 @@ export default function TreatmentsScreen({ navigation }) {
     const fetchDataController = new AbortController();
     const queryToFilter = query;
     // Fonction pour fetch les noms des médicaments (pour l'autocomplétion)
+
+    /*Création d'un contrôleur à l’aide du constructeur AbortController(),
+    puis référence à son objet AbortSignal à l’aide de la propriété AbortController.signal.
+    A l'initialisation, du fetch  
+    nous transmettons AbortSignal en tant qu'option dans l'objet options de la demande = {signal}
+    Cela associe le signal et le contrôleur à la demande de récupération et nous permet de l'abandonner en appelant AbortController.abort()
+    à la destruction du composant => dans le return*/
+
     const fetchData = async () => {
       try {
         const response = await fetch(
@@ -153,7 +161,6 @@ const saveDose = async (drugId, dose) => {
 };
 
   const onDeleteDrugPress = async (drug) => {
-    console.log("ondelete drug", drug);
     try {
       const response = await fetch(
         `http://${IP_ADDRESS}:3000/treatments/deleteDrugTreatment/${token}`,
