@@ -13,7 +13,7 @@ import {
 import Autocomplete from "react-native-autocomplete-input";
 import { IP_ADDRESS } from "../config.js";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
-import { removePhoto } from "../reducers/user";
+import { removePhoto } from "../reducers/user.js";
 import { useSelector, useDispatch } from "react-redux";
 
 export default function TreatmentsScreen({ navigation }) {
@@ -29,11 +29,6 @@ export default function TreatmentsScreen({ navigation }) {
   const [loading, setLoading] = useState(true); // État de chargement pour afficher le loader (roue qui tourne)
 
   const userPhotos = useSelector((state) => state.user.value.photos);
-
-  // console.log("USER photo ", userPhotos);
-
-  console.log("query state", query);
-  console.log("drugAdd", drugAdd);
 
   useEffect(() => {
     loadDrugs();
@@ -119,7 +114,6 @@ export default function TreatmentsScreen({ navigation }) {
         `http://${IP_ADDRESS}:3000/treatments/${token}`
       );
       const data = await response.json();
-      console.log("load ttt front", data);
       // Récupère les noms des médicaments et les met à jour dans setDrugAdd
       const nameAndId = data.treatment.drugs.map((drug) => {
         const match = drug.drug_id.name.match(/^([^,]+),/);
@@ -245,6 +239,7 @@ const saveDose = async (drugId, dose) => {
                 }
                 if (!text.length) setSuggestions([]);
               }}
+              defaultValue={query}
               flatListProps={{
                 keyExtractor: (_, idx) => idx.toString(),
                 renderItem: ({ item }) => (
@@ -252,6 +247,7 @@ const saveDose = async (drugId, dose) => {
                     <Text style={styles.suggestionItem}>{item}</Text>
                   </TouchableOpacity>
                 ),
+                keyboardShouldPersistTaps: 'always'
               }}
               placeholder="Nom du médicament..."
               containerStyle={styles.autocompleteContainer}

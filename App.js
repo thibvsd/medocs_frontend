@@ -3,18 +3,20 @@ import { StyleSheet, LogBox } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+
 import { useFonts } from "expo-font";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
+
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { persistStore, persistReducer } from "redux-persist";
 import { PersistGate } from "redux-persist/integration/react";
 import { Provider, useSelector, useDispatch } from "react-redux";
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
+
 import user from "./reducers/user";
 import drugs from "./reducers/drugs";
 
 LogBox.ignoreAllLogs();
-// AsyncStorage.clear();
 
 // Import your screens
 import HomeScreen from "./screens/HomeScreen";
@@ -24,15 +26,14 @@ import SearchScreen from "./screens/SearchScreen";
 import FavoritesScreen from "./screens/FavoritesScreen";
 import TreatmentsScreen from "./screens/TreatmentsScreen";
 import SettingsScreen from "./screens/SettingsScreen";
-import FAQScreen from "./screens/FAQScreen.js";
+import FAQScreen from "./screens/FAQScreen";
 import OnboardingScreen from "./screens/OnboardingScreen";
 import InfoDrugScreen from "./screens/InfoDrugScreen";
 import CameraScreen from "./screens/CameraScreen";
-import SplashScreen from "./screens/SplashScreen.js";
-import SplashScreenOB from "./screens/SplashScreenOB.js";
-import Lgn from "./screens/Lgn.js";
+import SplashScreen from "./screens/SplashScreen";
+import SplashScreenOB from "./screens/SplashScreenOB";
+import Lgn from "./screens/Lgn";
 
-// AsyncStorage.clear();
 // Configure Redux persist
 const persistConfig = {
   key: "medidoc",
@@ -65,38 +66,20 @@ export default function App() {
     "Montserrat-Bold": require("./assets/fonts/Montserrat-Bold.ttf"),
   });
 
-  // useEffect(() => {
-  //   async function checkTokenAndLaunchStatus() {
-  //     try {
-  //       const userToken = await AsyncStorage.getItem("token");
-  //       setToken(userToken);
-
-  //       const hasLaunched = await AsyncStorage.getItem("appLaunched");
-  //       setIsFirstLaunch(hasLaunched === null);
-  //     } catch (error) {
-  //       console.error("Error checking token and launch status:", error);
-  //     }
-  //   }
-
-  //   checkTokenAndLaunchStatus();
-  // }, []);
-
-  // if (isFirstLaunch === null || !fontsLoaded) {
-  //   return null;
-  // }
   useEffect(() => {
     async function checkToken() {
       try {
         const userToken = await AsyncStorage.getItem("token");
         if (userToken) {
           setToken(userToken);
-          // dispatch(addAsyncStoragetoken(token));
         }
       } catch (error) {
         console.error("Erreur lors de la vérification du token:", error);
       }
     }
+    //lancement de checktoken pour setter dans l'état du token sa valeur, définir les params de la route signUp ou signIn (token === true)
     checkToken();
+    //affichage du onBoarding seulement la première fois si isFirstLaunch == false
     async function checkIfFirstLaunch() {
       try {
         const hasLaunched = await AsyncStorage.getItem("appLaunched");
