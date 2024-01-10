@@ -61,7 +61,7 @@ export default function HomeScreen({ navigation }) {
     nous transmettons AbortSignal en tant qu'option dans l'objet options de la demande = {signal}
     Cela associe le signal et le contrôleur à la demande de récupération et nous permet de l'abandonner en appelant AbortController.abort()
     à la destruction du composant => dans le return*/
-    
+
     const fetchDataController = new AbortController();
     //query => valeur du text sélectionné dans l'autocomplete
     const queryToFilter = query;
@@ -231,7 +231,10 @@ export default function HomeScreen({ navigation }) {
             <Text style={styles.articleDate}>{formattedDate}</Text>
             <Text style={styles.articleContent}>{data.content}</Text>
           </View>
-          <TouchableOpacity onPress={() => openUrl(data.url)}>
+          <TouchableOpacity onPress={() => openUrl(data.url)} 
+            accessibilityLabel="acces article" 
+            title={data.title}
+            accessibilityRole="button">
             <FontAwesome name="external-link" size={25} color="#3FB4B1" />
           </TouchableOpacity>
           <Image
