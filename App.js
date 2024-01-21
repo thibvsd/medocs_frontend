@@ -17,6 +17,7 @@ import user from "./reducers/user";
 import drugs from "./reducers/drugs";
 
 LogBox.ignoreAllLogs();
+AsyncStorage.clear();
 
 // Import your screens
 import HomeScreen from "./screens/HomeScreen";
