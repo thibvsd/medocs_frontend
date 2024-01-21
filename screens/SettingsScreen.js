@@ -9,7 +9,6 @@ import {
   TextInput,
 } from "react-native";
 import { useSelector } from "react-redux";
-import FontAwesome from "react-native-vector-icons/FontAwesome";
 import { IP_ADDRESS } from "../config.js";
 
 export default function ProfileSettingScreen() {

@@ -6,8 +6,7 @@ import {
   TouchableOpacity,
   TouchableWithoutFeedback,
   Keyboard,
-  Modal,
-  FlatList,
+  Linking,
   ScrollView,
   StyleSheet,
   Image,
@@ -16,7 +15,6 @@ import Autocomplete from "react-native-autocomplete-input";
 import { useDispatch, useSelector } from "react-redux";
 import { addLastSearch } from "../reducers/drugs";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
-import { Linking } from "react-native";
 import { IP_ADDRESS } from "../config.js";
 import { Dropdown } from "react-native-element-dropdown";
 

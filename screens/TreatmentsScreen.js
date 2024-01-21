@@ -30,8 +30,6 @@ export default function TreatmentsScreen({ navigation }) {
 
   const userPhotos = useSelector((state) => state.user.value.photos);
 
-  // console.log("USER photo ", userPhotos);
-
   console.log("query state", query);
   console.log("drugAdd", drugAdd);
 
