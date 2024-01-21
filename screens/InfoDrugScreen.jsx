@@ -28,14 +28,14 @@ export default function InfoDrugScreen({ navigation }) {
       const fetchData = async () => {
         try {
           const response = await fetch(
-            `http://${IP_ADDRESS}:3000/drugs/byId/${currentDrug}`
+            `https://medidoc-backend.vercel.app/drugs/byId/${currentDrug}`
           );
           const result = await response.json();
 
           if (result) {
             setData(result);
             const response_articles = await fetch(
-              `http://${IP_ADDRESS}:3000/articles/byId/${result.drug._id}`
+              `https://medidoc-backend.vercel.app/articles/byId/${result.drug._id}`
             );
             const result_articles = await response_articles.json();
             if(result_articles) setListArticles(result_articles.drugArticles)
@@ -50,7 +50,7 @@ export default function InfoDrugScreen({ navigation }) {
       };
       fetchData();
 
-      fetch(`http://${IP_ADDRESS}:3000/favorites/isFavorite/${token}/${currentDrug}`)
+      fetch(`https://medidoc-backend.vercel.app/favorites/isFavorite/${token}/${currentDrug}`)
       .then((response) => response.json())
       .then((data) => {
         setFavo(data.isFavorite);
@@ -74,7 +74,7 @@ export default function InfoDrugScreen({ navigation }) {
         } else {
           //Sinon, ajouter à la DB
           const response = await fetch(
-            `http://${IP_ADDRESS}:3000/favorites/addFavorites/${token}`,
+            `https://medidoc-backend.vercel.app/favorites/addFavorites/${token}`,
             {
               method: "POST",
               headers: { "Content-Type": "application/json" },
@@ -94,7 +94,7 @@ export default function InfoDrugScreen({ navigation }) {
       setFavo(!favo);
       try {
         const response = await fetch(
-          `http://${IP_ADDRESS}:3000/favorites/deleteFavorite/${token}/${currentDrug}`,
+          `https://medidoc-backend.vercel.app/favorites/deleteFavorite/${token}/${currentDrug}`,
           {
             method: "DELETE",
             headers: { "Content-Type": "application/json" },
@@ -113,7 +113,7 @@ export default function InfoDrugScreen({ navigation }) {
       if (currentDrug) {
         try {
           const response = await fetch(
-            `http://${IP_ADDRESS}:3000/treatments/addDrugTreatment/${token}`,
+            `https://medidoc-backend.vercel.app/treatments/addDrugTreatment/${token}`,
             {
               method: "POST",
               headers: { "Content-Type": "application/json" },

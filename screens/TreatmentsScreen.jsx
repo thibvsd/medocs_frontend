@@ -51,7 +51,7 @@ export default function TreatmentsScreen({ navigation }) {
     const fetchData = async () => {
       try {
         const response = await fetch(
-          `http://${IP_ADDRESS}:3000/drugs/query3characters/${queryToFilter}`,
+          `https://medidoc-backend.vercel.app/drugs/query3characters/${queryToFilter}`,
           { signal: fetchDataController.signal }
         );
         const result = await response.json();
@@ -80,7 +80,7 @@ export default function TreatmentsScreen({ navigation }) {
 
   // Sauvegarde les dosages et la raison médicale
   const onSave = () => {
-    fetch(`http://${IP_ADDRESS}:3000/treatments/updateDrugTreatment/${token}`, {
+    fetch(`https://medidoc-backend.vercel.app/treatments/updateDrugTreatment/${token}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -96,7 +96,7 @@ export default function TreatmentsScreen({ navigation }) {
     if (isSelected._id) {
       try {
         const response = await fetch(
-          `http://${IP_ADDRESS}:3000/treatments/addDrugTreatment/${token}`,
+          `https://medidoc-backend.vercel.app/treatments/addDrugTreatment/${token}`,
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -119,7 +119,7 @@ export default function TreatmentsScreen({ navigation }) {
   const loadDrugs = async () => {
     try {
       const response = await fetch(
-        `http://${IP_ADDRESS}:3000/treatments/${token}`
+        `https://medidoc-backend.vercel.app/treatments/${token}`
       );
       const data = await response.json();
       // Récupère les noms des médicaments et les met à jour dans setDrugAdd
@@ -144,7 +144,7 @@ export default function TreatmentsScreen({ navigation }) {
 const saveDose = async (drugId, dose) => {
   try {
     const response = await fetch(
-      `http://${IP_ADDRESS}:3000/treatments/saveDose/${token}`,
+      `https://medidoc-backend.vercel.app/treatments/saveDose/${token}`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -163,7 +163,7 @@ const saveDose = async (drugId, dose) => {
   const onDeleteDrugPress = async (drug) => {
     try {
       const response = await fetch(
-        `http://${IP_ADDRESS}:3000/treatments/deleteDrugTreatment/${token}`,
+        `https://medidoc-backend.vercel.app/treatments/deleteDrugTreatment/${token}`,
         {
           method: "DELETE",
           headers: { "Content-Type": "application/json" },

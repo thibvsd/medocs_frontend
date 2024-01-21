@@ -43,7 +43,7 @@ export default function LoginScreen({ route, navigation }) {
       Alert.alert("Attention", "Les mots de passe ne correspondent pas.");
       return;
     }
-    fetch(`http://${IP_ADDRESS}:3000/users/signup`, {
+    fetch(`https://medidoc-backend.vercel.app/users/signup`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -90,7 +90,7 @@ export default function LoginScreen({ route, navigation }) {
   };
 
   const handleConnection = () => {
-    fetch(`http://${IP_ADDRESS}:3000/users/signin`, {
+    fetch(`https://medidoc-backend.vercel.app/users/signin`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({

@@ -26,7 +26,7 @@ export default function ProfileSettingScreen() {
   const user = useSelector((state) => state.user.value);
   useEffect(() => {
     // Récupère les données utilisateurs par son token depuis la route
-    fetch(`http://${IP_ADDRESS}:3000/users/details/${user.token}`)
+    fetch(`https://medidoc-backend.vercel.app/users/details/${user.token}`)
       .then((response) => response.json())
       .then((data) => {
         setDataUsernameSetting(data.data.username);
@@ -38,7 +38,7 @@ export default function ProfileSettingScreen() {
 
   // Envoie les données modifié ou non dans la route
   const saveSettings = () => {
-    fetch(`http://${IP_ADDRESS}:3000/users/settings/${user.token}`, {
+    fetch(`https://medidoc-backend.vercel.app/users/settings/${user.token}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

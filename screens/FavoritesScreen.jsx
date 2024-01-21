@@ -14,7 +14,7 @@ export default function FavoritesScreen({ navigation }) {
 
 
   useEffect(() => {
-    fetch(`http://${IP_ADDRESS}:3000/favorites/loadFavorite/${user.token}`)
+    fetch(`https://medidoc-backend.vercel.app/favorites/loadFavorite/${user.token}`)
       .then((response) => response.json())
       .then((data) => {
         setFavoDrug(data.idAndName);
@@ -28,7 +28,7 @@ export default function FavoritesScreen({ navigation }) {
 
   const handleDelete = (drug) => {
     fetch(
-      `http://${IP_ADDRESS}:3000/favorites/deleteFavorite/${user.token}/${drug}`,
+      `https://medidoc-backend.vercel.app/favorites/deleteFavorite/${user.token}/${drug}`,
       {
         method: "DELETE",
       }

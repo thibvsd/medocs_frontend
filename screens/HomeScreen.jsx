@@ -43,7 +43,7 @@ export default function HomeScreen({ navigation }) {
   const fetchSources = async () => {
     try {
       const response = await fetch(
-        `http://${IP_ADDRESS}:3000/articles/sources`
+        `https://medidoc-backend.vercel.app/articles/sources`
       );
       const resultSources = await response.json();
       setLoadSource(resultSources.sources);
@@ -83,7 +83,7 @@ export default function HomeScreen({ navigation }) {
       try {
         ///drugs/query3characters/${queryToFilter} => limité à 10 résultats
         const response = await fetch(
-          `http://${IP_ADDRESS}:3000/drugs/query3characters/${queryToFilter}`,
+          `https://medidoc-backend.vercel.app/drugs/query3characters/${queryToFilter}`,
           { signal: fetchDataController.signal }
         );
         if (response.ok) {
@@ -110,7 +110,7 @@ export default function HomeScreen({ navigation }) {
     const fetchArticles = async () => {
       try {
         const response = await fetch(
-          `http://${IP_ADDRESS}:3000/articles/latestNews`
+          `https://medidoc-backend.vercel.app/articles/latestNews`
         );
         const result = await response.json();
         setArticles(result.latestNews);
@@ -127,7 +127,7 @@ export default function HomeScreen({ navigation }) {
     const selectedDrug = data.find((item) => item.name === suggestion)._id;
     if (token) {
       // enregistre la recherche dans la DB
-      fetch(`http://${IP_ADDRESS}:3000/searches/addLastSearch/${token}`, {
+      fetch(`https://medidoc-backend.vercel.app/searches/addLastSearch/${token}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -202,7 +202,7 @@ export default function HomeScreen({ navigation }) {
       const formattedKeyword = encodeURIComponent(keyword || "undefined");
 
       const response = await fetch(
-        `http://${IP_ADDRESS}:3000/articles/bySourceAndKeyword/${formattedSource}/${formattedKeyword}`
+        `https://medidoc-backend.vercel.app/articles/bySourceAndKeyword/${formattedSource}/${formattedKeyword}`
       );
       const data = await response.json();
 
